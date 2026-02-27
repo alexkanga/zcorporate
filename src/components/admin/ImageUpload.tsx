@@ -216,7 +216,7 @@ export function ImageUpload({
   );
 }
 
-// Compact version for inline use
+// Compact version for inline use - now with drag and drop
 export function ImageUploadCompact({
   value,
   onChange,
@@ -224,6 +224,7 @@ export function ImageUploadCompact({
   disabled = false,
 }: Omit<ImageUploadProps, 'label' | 'showPreview' | 'previewClassName'>) {
   const [isUploading, setIsUploading] = useState(false);
+  const [dragOver, setDragOver] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleFileUpload = async (file: File) => {
@@ -254,31 +255,115 @@ export function ImageUploadCompact({
     }
   };
 
+  const handleDrop = useCallback((e: React.DragEvent) => {
+    e.preventDefault();
+    setDragOver(false);
+    const file = e.dataTransfer.files?.[0];
+    if (file) handleFileUpload(file);
+  }, [handleFileUpload]);
+
+  const handleDragOver = useCallback((e: React.DragEvent) => {
+    e.preventDefault();
+    setDragOver(true);
+  }, []);
+
+  const handleDragLeave = useCallback((e: React.DragEvent) => {
+    e.preventDefault();
+    setDragOver(false);
+  }, []);
+
+  const handleClick = () => {
+    if (!disabled && !isUploading) {
+      fileInputRef.current?.click();
+    }
+  };
+
   return (
-    <div className="flex items-center gap-2">
-      <input
-        ref={fileInputRef}
-        type="file"
-        accept="image/*"
-        onChange={(e) => e.target.files?.[0] && handleFileUpload(e.target.files[0])}
-        disabled={disabled || isUploading}
-        className="hidden"
-      />
-      <Input
-        value={value || ''}
-        onChange={(e) => onChange(e.target.value)}
-        placeholder="URL de l'image"
-        disabled={disabled}
-      />
-      <Button
-        type="button"
-        variant="outline"
-        size="icon"
-        onClick={() => fileInputRef.current?.click()}
-        disabled={disabled || isUploading}
+    <div className="space-y-2">
+      {/* Drop zone */}
+      <div
+        className={`border-2 border-dashed rounded-lg p-3 text-center transition-colors cursor-pointer ${
+          dragOver ? 'border-primary bg-primary/5' : 'border-gray-300 hover:border-gray-400'
+        } ${disabled ? 'opacity-50 cursor-not-allowed' : ''}`}
+        onDrop={handleDrop}
+        onDragOver={handleDragOver}
+        onDragLeave={handleDragLeave}
+        onClick={handleClick}
       >
-        {isUploading ? <Loader2 className="h-4 w-4 animate-spin" /> : <ImageIcon className="h-4 w-4" />}
-      </Button>
+        <input
+          ref={fileInputRef}
+          type="file"
+          accept="image/*"
+          onChange={(e) => e.target.files?.[0] && handleFileUpload(e.target.files[0])}
+          disabled={disabled || isUploading}
+          className="hidden"
+        />
+        
+        {isUploading ? (
+          <div className="flex items-center justify-center gap-2 py-1">
+            <Loader2 className="h-4 w-4 animate-spin text-primary" />
+            <span className="text-sm text-muted-foreground">Upload...</span>
+          </div>
+        ) : value ? (
+          <div className="flex items-center justify-center gap-2 py-1">
+            <ImageIcon className="h-4 w-4 text-green-600" />
+            <span className="text-sm text-green-600">Image chargée</span>
+            <span className="text-xs text-muted-foreground">(cliquer pour changer)</span>
+          </div>
+        ) : (
+          <div className="flex items-center justify-center gap-2 py-1">
+            <Upload className="h-4 w-4 text-muted-foreground" />
+            <span className="text-sm text-muted-foreground">Glisser ou cliquer pour uploader</span>
+          </div>
+        )}
+      </div>
+
+      {/* URL input as alternative */}
+      <div className="flex gap-2">
+        <Input
+          value={value || ''}
+          onChange={(e) => onChange(e.target.value)}
+          placeholder="Ou entrez l'URL de l'image"
+          disabled={disabled}
+          className="text-sm"
+        />
+        {value && (
+          <>
+            <Button
+              type="button"
+              variant="ghost"
+              size="icon"
+              onClick={() => window.open(value, '_blank')}
+              title="Voir l'image"
+            >
+              <ExternalLink className="h-4 w-4" />
+            </Button>
+            <Button
+              type="button"
+              variant="ghost"
+              size="icon"
+              onClick={() => onChange('')}
+              title="Supprimer"
+            >
+              <X className="h-4 w-4" />
+            </Button>
+          </>
+        )}
+      </div>
+
+      {/* Mini preview */}
+      {value && (
+        <div className="relative rounded-md overflow-hidden border bg-muted h-20">
+          <img
+            src={value}
+            alt="Preview"
+            className="h-full w-full object-contain"
+            onError={(e) => {
+              (e.target as HTMLImageElement).style.display = 'none';
+            }}
+          />
+        </div>
+      )}
     </div>
   );
 }
