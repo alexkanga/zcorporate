@@ -1,5 +1,6 @@
 'use client';
 
+import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -7,9 +8,9 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Separator } from '@/components/ui/separator';
 import { toast } from 'sonner';
 import { Save, Loader2 } from 'lucide-react';
+import { ImageUpload } from '@/components/admin/ImageUpload';
 
 interface HomeAbout {
   id: string;
@@ -42,6 +43,7 @@ interface HomeAbout {
 
 export default function AboutAdminPage() {
   const queryClient = useQueryClient();
+  const [imageUrl, setImageUrl] = useState<string>('');
 
   const { data: about, isLoading } = useQuery({
     queryKey: ['admin-home-about'],
@@ -51,6 +53,11 @@ export default function AboutAdminPage() {
       return res.json() as Promise<HomeAbout>;
     },
   });
+
+  // Initialize imageUrl from server data when it first loads
+  if (about?.imageUrl && imageUrl === '') {
+    setImageUrl(about.imageUrl);
+  }
 
   const updateMutation = useMutation({
     mutationFn: async (data: Partial<HomeAbout>) => {
@@ -77,7 +84,7 @@ export default function AboutAdminPage() {
       titleEn: formData.get('titleEn') as string,
       contentFr: formData.get('contentFr') as string,
       contentEn: formData.get('contentEn') as string,
-      imageUrl: formData.get('imageUrl') as string,
+      imageUrl: imageUrl,
       imageAltFr: formData.get('imageAltFr') as string,
       imageAltEn: formData.get('imageAltEn') as string,
       buttonTextFr: formData.get('buttonTextFr') as string,
@@ -170,14 +177,19 @@ export default function AboutAdminPage() {
 
             <div className="grid gap-4 md:grid-cols-2">
               <div>
-                <Label htmlFor="imageUrl">URL de l&apos;image</Label>
-                <Input id="imageUrl" name="imageUrl" defaultValue={about?.imageUrl || ''} />
-              </div>
-              <div>
                 <Label htmlFor="buttonUrl">URL du bouton</Label>
                 <Input id="buttonUrl" name="buttonUrl" defaultValue={about?.buttonUrl || ''} />
               </div>
             </div>
+
+            {/* Image Upload Component */}
+            <ImageUpload
+              value={imageUrl}
+              onChange={setImageUrl}
+              folder="about"
+              label="Image de la section"
+              previewClassName="h-48 w-full"
+            />
           </CardContent>
         </Card>
 

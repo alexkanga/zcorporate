@@ -16,6 +16,7 @@ import { Switch } from '@/components/ui/switch';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { toast } from 'sonner';
 import { GripVertical, Pencil, Trash2, Plus, Loader2 } from 'lucide-react';
+import { ImageUploadCompact } from '@/components/admin/ImageUpload';
 
 interface Service {
   id: string;
@@ -170,7 +171,14 @@ export default function ServicesAdminPage() {
               </Tabs>
               <div className="grid gap-4 md:grid-cols-2">
                 <div><Label>Icône (Lucide)</Label><Input value={formData.icon || ''} onChange={(e) => setFormData({ ...formData, icon: e.target.value })} placeholder="ex: Briefcase" /></div>
-                <div><Label>URL image</Label><Input value={formData.imageUrl || ''} onChange={(e) => setFormData({ ...formData, imageUrl: e.target.value })} /></div>
+                <div>
+                  <Label>Image du service</Label>
+                  <ImageUploadCompact
+                    value={formData.imageUrl || ''}
+                    onChange={(url) => setFormData({ ...formData, imageUrl: url })}
+                    folder="services"
+                  />
+                </div>
               </div>
               <div className="flex items-center gap-2"><Switch checked={formData.visible} onCheckedChange={(checked) => setFormData({ ...formData, visible: checked })} /><Label>Visible</Label></div>
               <div className="flex justify-end gap-2"><Button type="button" variant="outline" onClick={() => setIsDialogOpen(false)}>Annuler</Button><Button type="submit">{editingService ? 'Mettre à jour' : 'Créer'}</Button></div>

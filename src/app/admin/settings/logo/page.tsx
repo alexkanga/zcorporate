@@ -148,6 +148,7 @@ export default function LogoSettingsPage() {
     try {
       const formData = new FormData();
       formData.append("file", file);
+      formData.append("folder", "logos");
 
       const response = await fetch("/api/upload", {
         method: "POST",

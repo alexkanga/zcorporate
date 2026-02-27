@@ -17,6 +17,7 @@ import { Switch } from '@/components/ui/switch';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { toast } from 'sonner';
 import { GripVertical, Pencil, Trash2, Plus } from 'lucide-react';
+import { ImageUploadCompact } from '@/components/admin/ImageUpload';
 
 interface Slider {
   id: string;
@@ -286,8 +287,12 @@ export default function SliderAdminPage() {
                 </TabsContent>
               </Tabs>
               <div>
-                <Label>URL de l&apos;image</Label>
-                <Input value={formData.imageUrl || ''} onChange={(e) => setFormData({ ...formData, imageUrl: e.target.value })} required />
+                <Label>Image du slider</Label>
+                <ImageUploadCompact
+                  value={formData.imageUrl || ''}
+                  onChange={(url) => setFormData({ ...formData, imageUrl: url })}
+                  folder="sliders"
+                />
               </div>
               <div>
                 <Label>URL du bouton</Label>

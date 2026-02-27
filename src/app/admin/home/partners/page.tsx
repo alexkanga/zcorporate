@@ -10,6 +10,7 @@ import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
 import { toast } from 'sonner';
 import { Pencil, Trash2, Plus, Loader2, ExternalLink } from 'lucide-react';
+import { ImageUploadCompact } from '@/components/admin/ImageUpload';
 
 interface Partner {
   id: string;
@@ -77,7 +78,14 @@ export default function PartnersAdminPage() {
             <DialogHeader><DialogTitle>{editingItem ? 'Modifier' : 'Ajouter'} un partenaire</DialogTitle></DialogHeader>
             <form onSubmit={handleSubmit} className="space-y-4">
               <div><Label>Nom</Label><Input value={formData.name || ''} onChange={(e) => setFormData({ ...formData, name: e.target.value })} required /></div>
-              <div><Label>URL du logo</Label><Input value={formData.logoUrl || ''} onChange={(e) => setFormData({ ...formData, logoUrl: e.target.value })} required /></div>
+              <div>
+                <Label>Logo du partenaire</Label>
+                <ImageUploadCompact
+                  value={formData.logoUrl || ''}
+                  onChange={(url) => setFormData({ ...formData, logoUrl: url })}
+                  folder="partners"
+                />
+              </div>
               <div><Label>Site web</Label><Input value={formData.website || ''} onChange={(e) => setFormData({ ...formData, website: e.target.value })} placeholder="https://" /></div>
               <div className="flex items-center gap-2"><Switch checked={formData.visible} onCheckedChange={(checked) => setFormData({ ...formData, visible: checked })} /><Label>Visible</Label></div>
               <div className="flex justify-end gap-2"><Button type="button" variant="outline" onClick={() => setIsDialogOpen(false)}>Annuler</Button><Button type="submit">{editingItem ? 'Mettre à jour' : 'Créer'}</Button></div>
