@@ -51,13 +51,24 @@ async function getHomeData() {
         orderBy: { publishedAt: 'desc' },
         take: 3,
         include: {
-          author: { select: { name: true } },
-          category: { select: { nameFr: true, nameEn: true, slug: true } },
+          User: { select: { name: true } },
+          ArticleCategory: { select: { nameFr: true, nameEn: true, slug: true } },
         },
       }),
     ]);
 
-    return { sliders, homeAbout, services, testimonials, partners, homeCTA, latestArticles };
+    // Transform articles to match expected format
+    const transformedArticles = latestArticles.map(article => ({
+      ...article,
+      author: article.User ? { name: article.User.name } : null,
+      category: article.ArticleCategory ? {
+        nameFr: article.ArticleCategory.nameFr,
+        nameEn: article.ArticleCategory.nameEn,
+        slug: article.ArticleCategory.slug,
+      } : null,
+    }));
+
+    return { sliders, homeAbout, services, testimonials, partners, homeCTA, latestArticles: transformedArticles };
   } catch (error) {
     console.error("Error fetching home data:", error);
     return {
