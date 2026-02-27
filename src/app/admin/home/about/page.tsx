@@ -7,6 +7,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Separator } from '@/components/ui/separator';
 import { toast } from 'sonner';
 import { Save, Loader2 } from 'lucide-react';
 
@@ -22,6 +23,21 @@ interface HomeAbout {
   buttonTextFr: string | null;
   buttonTextEn: string | null;
   buttonUrl: string | null;
+  badgeTextFr: string | null;
+  badgeTextEn: string | null;
+  stat1Value: string | null;
+  stat1LabelFr: string | null;
+  stat1LabelEn: string | null;
+  stat2Value: string | null;
+  stat2LabelFr: string | null;
+  stat2LabelEn: string | null;
+  stat3Value: string | null;
+  stat3LabelFr: string | null;
+  stat3LabelEn: string | null;
+  floatingBadgeTitleFr: string | null;
+  floatingBadgeTitleEn: string | null;
+  floatingBadgeTextFr: string | null;
+  floatingBadgeTextEn: string | null;
 }
 
 export default function AboutAdminPage() {
@@ -32,7 +48,7 @@ export default function AboutAdminPage() {
     queryFn: async () => {
       const res = await fetch('/api/admin/home-about');
       if (!res.ok) throw new Error('Failed to fetch');
-      return res.json();
+      return res.json() as Promise<HomeAbout>;
     },
   });
 
@@ -67,6 +83,21 @@ export default function AboutAdminPage() {
       buttonTextFr: formData.get('buttonTextFr') as string,
       buttonTextEn: formData.get('buttonTextEn') as string,
       buttonUrl: formData.get('buttonUrl') as string,
+      badgeTextFr: formData.get('badgeTextFr') as string,
+      badgeTextEn: formData.get('badgeTextEn') as string,
+      stat1Value: formData.get('stat1Value') as string,
+      stat1LabelFr: formData.get('stat1LabelFr') as string,
+      stat1LabelEn: formData.get('stat1LabelEn') as string,
+      stat2Value: formData.get('stat2Value') as string,
+      stat2LabelFr: formData.get('stat2LabelFr') as string,
+      stat2LabelEn: formData.get('stat2LabelEn') as string,
+      stat3Value: formData.get('stat3Value') as string,
+      stat3LabelFr: formData.get('stat3LabelFr') as string,
+      stat3LabelEn: formData.get('stat3LabelEn') as string,
+      floatingBadgeTitleFr: formData.get('floatingBadgeTitleFr') as string,
+      floatingBadgeTitleEn: formData.get('floatingBadgeTitleEn') as string,
+      floatingBadgeTextFr: formData.get('floatingBadgeTextFr') as string,
+      floatingBadgeTextEn: formData.get('floatingBadgeTextEn') as string,
     };
     updateMutation.mutate(data);
   };
@@ -83,7 +114,7 @@ export default function AboutAdminPage() {
       <form onSubmit={handleSubmit}>
         <Card>
           <CardHeader>
-            <CardTitle>Contenu</CardTitle>
+            <CardTitle>Contenu principal</CardTitle>
           </CardHeader>
           <CardContent className="space-y-6">
             <Tabs defaultValue="fr">
@@ -92,6 +123,10 @@ export default function AboutAdminPage() {
                 <TabsTrigger value="en">English</TabsTrigger>
               </TabsList>
               <TabsContent value="fr" className="space-y-4 mt-4">
+                <div>
+                  <Label htmlFor="badgeTextFr">Badge (petit texte au-dessus du titre)</Label>
+                  <Input id="badgeTextFr" name="badgeTextFr" defaultValue={about?.badgeTextFr || ''} placeholder="À Propos" />
+                </div>
                 <div>
                   <Label htmlFor="titleFr">Titre</Label>
                   <Input id="titleFr" name="titleFr" defaultValue={about?.titleFr || ''} required />
@@ -110,6 +145,10 @@ export default function AboutAdminPage() {
                 </div>
               </TabsContent>
               <TabsContent value="en" className="space-y-4 mt-4">
+                <div>
+                  <Label htmlFor="badgeTextEn">Badge (small text above title)</Label>
+                  <Input id="badgeTextEn" name="badgeTextEn" defaultValue={about?.badgeTextEn || ''} placeholder="About Us" />
+                </div>
                 <div>
                   <Label htmlFor="titleEn">Title</Label>
                   <Input id="titleEn" name="titleEn" defaultValue={about?.titleEn || ''} required />
@@ -139,15 +178,123 @@ export default function AboutAdminPage() {
                 <Input id="buttonUrl" name="buttonUrl" defaultValue={about?.buttonUrl || ''} />
               </div>
             </div>
+          </CardContent>
+        </Card>
 
-            <div className="flex justify-end">
-              <Button type="submit" disabled={updateMutation.isPending}>
-                {updateMutation.isPending ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : <Save className="h-4 w-4 mr-2" />}
-                Enregistrer
-              </Button>
+        {/* Statistics Section */}
+        <Card className="mt-6">
+          <CardHeader>
+            <CardTitle>Statistiques</CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-6">
+            <div className="grid gap-6 md:grid-cols-3">
+              {/* Stat 1 */}
+              <div className="space-y-4">
+                <h4 className="font-medium">Statistique 1</h4>
+                <div>
+                  <Label htmlFor="stat1Value">Valeur</Label>
+                  <Input id="stat1Value" name="stat1Value" defaultValue={about?.stat1Value || ''} placeholder="10+" />
+                </div>
+                <Tabs defaultValue="fr">
+                  <TabsList className="grid w-full grid-cols-2">
+                    <TabsTrigger value="fr">FR</TabsTrigger>
+                    <TabsTrigger value="en">EN</TabsTrigger>
+                  </TabsList>
+                  <TabsContent value="fr">
+                    <Input name="stat1LabelFr" defaultValue={about?.stat1LabelFr || ''} placeholder="Ans d'Expérience" />
+                  </TabsContent>
+                  <TabsContent value="en">
+                    <Input name="stat1LabelEn" defaultValue={about?.stat1LabelEn || ''} placeholder="Years Experience" />
+                  </TabsContent>
+                </Tabs>
+              </div>
+
+              {/* Stat 2 */}
+              <div className="space-y-4">
+                <h4 className="font-medium">Statistique 2</h4>
+                <div>
+                  <Label htmlFor="stat2Value">Valeur</Label>
+                  <Input id="stat2Value" name="stat2Value" defaultValue={about?.stat2Value || ''} placeholder="500+" />
+                </div>
+                <Tabs defaultValue="fr">
+                  <TabsList className="grid w-full grid-cols-2">
+                    <TabsTrigger value="fr">FR</TabsTrigger>
+                    <TabsTrigger value="en">EN</TabsTrigger>
+                  </TabsList>
+                  <TabsContent value="fr">
+                    <Input name="stat2LabelFr" defaultValue={about?.stat2LabelFr || ''} placeholder="Projets Réalisés" />
+                  </TabsContent>
+                  <TabsContent value="en">
+                    <Input name="stat2LabelEn" defaultValue={about?.stat2LabelEn || ''} placeholder="Projects Completed" />
+                  </TabsContent>
+                </Tabs>
+              </div>
+
+              {/* Stat 3 */}
+              <div className="space-y-4">
+                <h4 className="font-medium">Statistique 3</h4>
+                <div>
+                  <Label htmlFor="stat3Value">Valeur</Label>
+                  <Input id="stat3Value" name="stat3Value" defaultValue={about?.stat3Value || ''} placeholder="100%" />
+                </div>
+                <Tabs defaultValue="fr">
+                  <TabsList className="grid w-full grid-cols-2">
+                    <TabsTrigger value="fr">FR</TabsTrigger>
+                    <TabsTrigger value="en">EN</TabsTrigger>
+                  </TabsList>
+                  <TabsContent value="fr">
+                    <Input name="stat3LabelFr" defaultValue={about?.stat3LabelFr || ''} placeholder="Clients Satisfaits" />
+                  </TabsContent>
+                  <TabsContent value="en">
+                    <Input name="stat3LabelEn" defaultValue={about?.stat3LabelEn || ''} placeholder="Client Satisfaction" />
+                  </TabsContent>
+                </Tabs>
+              </div>
             </div>
           </CardContent>
         </Card>
+
+        {/* Floating Badge Section */}
+        <Card className="mt-6">
+          <CardHeader>
+            <CardTitle>Badge flottant sur l&apos;image</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <Tabs defaultValue="fr">
+              <TabsList className="grid w-full grid-cols-2">
+                <TabsTrigger value="fr">Français</TabsTrigger>
+                <TabsTrigger value="en">English</TabsTrigger>
+              </TabsList>
+              <TabsContent value="fr" className="space-y-4 mt-4">
+                <div>
+                  <Label htmlFor="floatingBadgeTitleFr">Titre</Label>
+                  <Input id="floatingBadgeTitleFr" name="floatingBadgeTitleFr" defaultValue={about?.floatingBadgeTitleFr || ''} placeholder="Excellence Certifiée" />
+                </div>
+                <div>
+                  <Label htmlFor="floatingBadgeTextFr">Texte</Label>
+                  <Input id="floatingBadgeTextFr" name="floatingBadgeTextFr" defaultValue={about?.floatingBadgeTextFr || ''} placeholder="Qualité garantie" />
+                </div>
+              </TabsContent>
+              <TabsContent value="en" className="space-y-4 mt-4">
+                <div>
+                  <Label htmlFor="floatingBadgeTitleEn">Title</Label>
+                  <Input id="floatingBadgeTitleEn" name="floatingBadgeTitleEn" defaultValue={about?.floatingBadgeTitleEn || ''} placeholder="Certified Excellence" />
+                </div>
+                <div>
+                  <Label htmlFor="floatingBadgeTextEn">Text</Label>
+                  <Input id="floatingBadgeTextEn" name="floatingBadgeTextEn" defaultValue={about?.floatingBadgeTextEn || ''} placeholder="Quality guaranteed" />
+                </div>
+              </TabsContent>
+            </Tabs>
+          </CardContent>
+        </Card>
+
+        <div className="flex justify-end mt-6">
+          <Button type="submit" disabled={updateMutation.isPending}>
+            {updateMutation.isPending ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : <Save className="h-4 w-4 mr-2" />}
+            Enregistrer
+          </Button>
+        </div>
       </form>
     </div>
   );

@@ -1,7 +1,7 @@
 import Link from 'next/link';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { 
-  Images, FileText, Briefcase, MessageSquare, Handshake, Megaphone 
+  Images, FileText, Briefcase, MessageSquare, Handshake, Megaphone, Heading
 } from 'lucide-react';
 
 const sections = [
@@ -40,6 +40,12 @@ const sections = [
     icon: Megaphone, 
     title: 'CTA', 
     description: 'Modifier l\'appel à l\'action' 
+  },
+  { 
+    href: '/admin/home/sections', 
+    icon: Heading, 
+    title: 'Titres des sections', 
+    description: 'Modifier les titres et sous-titres de toutes les sections' 
   },
 ];
 
