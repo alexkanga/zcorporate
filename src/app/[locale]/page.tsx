@@ -1,4 +1,5 @@
 import { type Locale } from "@/i18n";
+import { db } from "@/lib/db";
 import { HeroSlider } from "@/components/public/sections/HeroSlider";
 import { AboutSection } from "@/components/public/sections/AboutSection";
 import { ServicesSection } from "@/components/public/sections/ServicesSection";
@@ -11,117 +12,52 @@ interface HomePageProps {
   params: Promise<{ locale: string }>;
 }
 
-// Types for API response
-interface Slider {
-  id: string;
-  titleFr: string;
-  titleEn: string;
-  subtitleFr: string | null;
-  subtitleEn: string | null;
-  buttonTextFr: string | null;
-  buttonTextEn: string | null;
-  buttonUrl: string | null;
-  imageUrl: string;
-  imageAltFr: string | null;
-  imageAltEn: string | null;
-}
-
-interface HomeAbout {
-  id: string;
-  titleFr: string;
-  titleEn: string;
-  contentFr: string;
-  contentEn: string;
-  imageUrl: string | null;
-  imageAltFr: string | null;
-  imageAltEn: string | null;
-  buttonTextFr: string | null;
-  buttonTextEn: string | null;
-  buttonUrl: string | null;
-}
-
-interface Service {
-  id: string;
-  titleFr: string;
-  titleEn: string;
-  descriptionFr: string | null;
-  descriptionEn: string | null;
-  icon: string | null;
-  imageUrl: string | null;
-  imageAltFr: string | null;
-  imageAltEn: string | null;
-}
-
-interface Testimonial {
-  id: string;
-  name: string;
-  company: string | null;
-  textFr: string;
-  textEn: string;
-  avatar: string | null;
-  rating: number;
-}
-
-interface Partner {
-  id: string;
-  name: string;
-  logoUrl: string;
-  website: string | null;
-}
-
-interface HomeCTA {
-  id: string;
-  titleFr: string;
-  titleEn: string;
-  subtitleFr: string | null;
-  subtitleEn: string | null;
-  buttonTextFr: string | null;
-  buttonTextEn: string | null;
-  buttonUrl: string | null;
-}
-
-interface Article {
-  id: string;
-  titleFr: string;
-  titleEn: string;
-  slug: string;
-  excerptFr: string | null;
-  excerptEn: string | null;
-  imageUrl: string | null;
-  imageAltFr: string | null;
-  imageAltEn: string | null;
-  publishedAt: Date | null;
-  author: {
-    name: string | null;
-  } | null;
-  category: {
-    nameFr: string;
-    nameEn: string;
-    slug: string;
-  } | null;
-}
-
-interface HomeData {
-  sliders: Slider[];
-  homeAbout: HomeAbout | null;
-  services: Service[];
-  testimonials: Testimonial[];
-  partners: Partner[];
-  homeCTA: HomeCTA | null;
-  latestArticles: Article[];
-}
-
-// Fetch homepage data from API
-async function getHomeData(): Promise<HomeData> {
-  const baseUrl = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
+// Fetch homepage data directly from database
+async function getHomeData() {
   try {
-    const response = await fetch(`${baseUrl}/api/home`, {
-      cache: "no-store",
-    });
-    if (!response.ok) {
-      throw new Error("Failed to fetch home data");
-    }
-    return response.json();
+    const [
+      sliders,
+      homeAbout,
+      services,
+      testimonials,
+      partners,
+      homeCTA,
+      latestArticles,
+    ] = await Promise.all([
+      db.slider.findMany({
+        where: { visible: true, deletedAt: null },
+        orderBy: { order: 'asc' },
+      }),
+      db.homeAbout.findUnique({
+        where: { id: 'home-about' },
+      }),
+      db.service.findMany({
+        where: { visible: true, deletedAt: null },
+        orderBy: { order: 'asc' },
+      }),
+      db.testimonial.findMany({
+        where: { visible: true, deletedAt: null },
+        orderBy: { order: 'asc' },
+      }),
+      db.partner.findMany({
+        where: { visible: true, deletedAt: null },
+        orderBy: { order: 'asc' },
+      }),
+      db.homeCTA.findUnique({
+        where: { id: 'home-cta' },
+      }),
+      db.article.findMany({
+        where: { published: true, deletedAt: null },
+        orderBy: { publishedAt: 'desc' },
+        take: 3,
+        include: {
+          author: { select: { name: true } },
+          category: { select: { nameFr: true, nameEn: true, slug: true } },
+        },
+      }),
+    ]);
+
+    return { sliders, homeAbout, services, testimonials, partners, homeCTA, latestArticles };
   } catch (error) {
     console.error("Error fetching home data:", error);
     return {
