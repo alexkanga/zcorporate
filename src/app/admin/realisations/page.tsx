@@ -81,6 +81,7 @@ import {
   Star,
 } from "lucide-react";
 import Link from "next/link";
+import { ImageUploadCompact } from '@/components/admin/ImageUpload';
 
 interface Category {
   id: string;
@@ -725,25 +726,17 @@ export default function RealisationsPage() {
                 )}
               />
 
-              <FormField
-                control={form.control}
-                name="imageUrl"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Featured Image URL</FormLabel>
-                    <FormControl>
-                      <Input placeholder="https://..." {...field} />
-                    </FormControl>
-                    <FormDescription>
-                      Enter the URL of the featured image for this project.
-                    </FormDescription>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+              <div className="space-y-2">
+                <FormLabel>Image principale</FormLabel>
+                <ImageUploadCompact
+                  value={form.watch('imageUrl') || ''}
+                  onChange={(url) => form.setValue('imageUrl', url)}
+                  folder="realisations"
+                />
+              </div>
 
               <div className="space-y-2">
-                <FormLabel>Image Gallery</FormLabel>
+                <FormLabel>Galerie d'images</FormLabel>
                 <div className="flex gap-2">
                   <Input
                     placeholder="https://..."
@@ -971,22 +964,17 @@ export default function RealisationsPage() {
                 )}
               />
 
-              <FormField
-                control={editForm.control}
-                name="imageUrl"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Featured Image URL</FormLabel>
-                    <FormControl>
-                      <Input placeholder="https://..." {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+              <div className="space-y-2">
+                <FormLabel>Image principale</FormLabel>
+                <ImageUploadCompact
+                  value={editForm.watch('imageUrl') || ''}
+                  onChange={(url) => editForm.setValue('imageUrl', url)}
+                  folder="realisations"
+                />
+              </div>
 
               <div className="space-y-2">
-                <FormLabel>Image Gallery</FormLabel>
+                <FormLabel>Galerie d'images</FormLabel>
                 <div className="flex gap-2">
                   <Input
                     placeholder="https://..."

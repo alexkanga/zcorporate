@@ -13,6 +13,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { toast } from 'sonner';
 import { Pencil, Trash2, Plus, Loader2, Calendar } from 'lucide-react';
 import { format } from 'date-fns';
+import { ImageUploadCompact } from '@/components/admin/ImageUpload';
 
 interface Event {
   id: string;
@@ -126,7 +127,14 @@ export default function EventsAdminPage() {
                 <div><Label>Date fin</Label><Input type="date" value={formData.endDate || ''} onChange={(e) => setFormData({ ...formData, endDate: e.target.value })} /></div>
               </div>
               <div><Label>Lieu</Label><Input value={formData.location || ''} onChange={(e) => setFormData({ ...formData, location: e.target.value })} /></div>
-              <div><Label>URL image</Label><Input value={formData.imageUrl || ''} onChange={(e) => setFormData({ ...formData, imageUrl: e.target.value })} /></div>
+              <div>
+                <Label>Image de l'événement</Label>
+                <ImageUploadCompact
+                  value={formData.imageUrl || ''}
+                  onChange={(url) => setFormData({ ...formData, imageUrl: url })}
+                  folder="events"
+                />
+              </div>
               <div><Label>Galerie (URLs JSON)</Label><Textarea value={formData.gallery || ''} onChange={(e) => setFormData({ ...formData, gallery: e.target.value })} placeholder='["url1", "url2"]' rows={2} /></div>
               <div><Label>Vidéos YouTube (URLs JSON)</Label><Textarea value={formData.videos || ''} onChange={(e) => setFormData({ ...formData, videos: e.target.value })} placeholder='["https://youtube.com/..."]' rows={2} /></div>
               <div className="flex items-center gap-2"><Switch checked={formData.published} onCheckedChange={(checked) => setFormData({ ...formData, published: checked })} /><Label>Publié</Label></div>
