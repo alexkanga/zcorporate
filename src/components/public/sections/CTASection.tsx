@@ -14,10 +14,19 @@ interface HomeCTA {
   buttonTextFr: string | null;
   buttonTextEn: string | null;
   buttonUrl: string | null;
+  badgeTextFr: string | null;
+  badgeTextEn: string | null;
+}
+
+interface SiteSettings {
+  id: string;
+  email: string | null;
+  phone: string | null;
 }
 
 interface CTASectionProps {
   homeCTA: HomeCTA | null;
+  siteSettings: SiteSettings | null;
   locale: Locale;
 }
 
@@ -45,7 +54,7 @@ function CTASectionSkeleton() {
   );
 }
 
-export function CTASection({ homeCTA, locale }: CTASectionProps) {
+export function CTASection({ homeCTA, siteSettings, locale }: CTASectionProps) {
   if (!homeCTA) {
     return <CTASectionSkeleton />;
   }
@@ -61,6 +70,18 @@ export function CTASection({ homeCTA, locale }: CTASectionProps) {
     homeCTA.buttonTextEn,
     locale
   );
+  const badgeText = getLocalizedText(
+    homeCTA.badgeTextFr,
+    homeCTA.badgeTextEn,
+    locale
+  ) || (locale === "en" ? "Get Started Today" : "Commencez Aujourd'hui");
+  
+  // Use button URL from database or fallback to contact page
+  const buttonUrl = homeCTA.buttonUrl || `/${locale === "en" ? "en/" : ""}contact`;
+  
+  // Use site settings for contact info or fallback to defaults
+  const contactEmail = siteSettings?.email || "contact@aaea.org";
+  const contactPhone = siteSettings?.phone || "+225 07 00 00 00 00";
 
   return (
     <section className="relative py-20 md:py-32 overflow-hidden">
@@ -87,7 +108,7 @@ export function CTASection({ homeCTA, locale }: CTASectionProps) {
           <div className="inline-flex items-center gap-2 px-4 py-2 bg-white/10 backdrop-blur-sm rounded-full mb-8">
             <span className="h-2 w-2 rounded-full bg-[var(--color-accent-light)] animate-pulse" />
             <span className="text-sm font-medium text-white/90">
-              {locale === "en" ? "Get Started Today" : "Commencez Aujourd'hui"}
+              {badgeText}
             </span>
           </div>
 
@@ -110,33 +131,37 @@ export function CTASection({ homeCTA, locale }: CTASectionProps) {
               size="lg"
               className="bg-white text-[var(--color-primary)] hover:bg-[var(--color-accent-light)] px-12 py-7 text-lg font-semibold shadow-2xl hover:shadow-white/25 transition-all duration-300 group rounded-full"
             >
-              <a href={`/${locale === "en" ? "en/" : ""}contact`}>
-                {locale === "en" ? "Contact Us" : "Contactez-nous"}
+              <a href={buttonUrl}>
+                {buttonText || (locale === "en" ? "Contact Us" : "Contactez-nous")}
                 <ArrowRight className="ml-3 h-5 w-5 group-hover:translate-x-2 transition-transform" />
               </a>
             </Button>
           </div>
 
-          {/* Contact info */}
+          {/* Contact info - from site settings */}
           <div className="flex flex-col sm:flex-row items-center justify-center gap-8 text-white/80">
-            <a 
-              href="mailto:contact@aaea.org" 
-              className="flex items-center gap-2 hover:text-white transition-colors group"
-            >
-              <div className="h-10 w-10 rounded-full bg-white/10 flex items-center justify-center group-hover:bg-white/20 transition-colors">
-                <Mail className="h-5 w-5" />
-              </div>
-              <span>contact@aaea.org</span>
-            </a>
-            <a 
-              href="tel:+33123456789" 
-              className="flex items-center gap-2 hover:text-white transition-colors group"
-            >
-              <div className="h-10 w-10 rounded-full bg-white/10 flex items-center justify-center group-hover:bg-white/20 transition-colors">
-                <Phone className="h-5 w-5" />
-              </div>
-              <span>+33 1 23 45 67 89</span>
-            </a>
+            {contactEmail && (
+              <a 
+                href={`mailto:${contactEmail}`} 
+                className="flex items-center gap-2 hover:text-white transition-colors group"
+              >
+                <div className="h-10 w-10 rounded-full bg-white/10 flex items-center justify-center group-hover:bg-white/20 transition-colors">
+                  <Mail className="h-5 w-5" />
+                </div>
+                <span>{contactEmail}</span>
+              </a>
+            )}
+            {contactPhone && (
+              <a 
+                href={`tel:${contactPhone.replace(/\s/g, '')}`} 
+                className="flex items-center gap-2 hover:text-white transition-colors group"
+              >
+                <div className="h-10 w-10 rounded-full bg-white/10 flex items-center justify-center group-hover:bg-white/20 transition-colors">
+                  <Phone className="h-5 w-5" />
+                </div>
+                <span>{contactPhone}</span>
+              </a>
+            )}
           </div>
         </div>
       </div>

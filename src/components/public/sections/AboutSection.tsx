@@ -17,6 +17,24 @@ interface HomeAbout {
   buttonTextFr: string | null;
   buttonTextEn: string | null;
   buttonUrl: string | null;
+  // Badge text
+  badgeTextFr: string | null;
+  badgeTextEn: string | null;
+  // Statistics
+  stat1Value: string | null;
+  stat1LabelFr: string | null;
+  stat1LabelEn: string | null;
+  stat2Value: string | null;
+  stat2LabelFr: string | null;
+  stat2LabelEn: string | null;
+  stat3Value: string | null;
+  stat3LabelFr: string | null;
+  stat3LabelEn: string | null;
+  // Floating badge
+  floatingBadgeTitleFr: string | null;
+  floatingBadgeTitleEn: string | null;
+  floatingBadgeTextFr: string | null;
+  floatingBadgeTextEn: string | null;
 }
 
 interface AboutSectionProps {
@@ -64,6 +82,16 @@ export function AboutSection({ homeAbout, locale }: AboutSectionProps) {
   const content = getLocalizedText(homeAbout.contentFr, homeAbout.contentEn, locale);
   const buttonText = getLocalizedText(homeAbout.buttonTextFr, homeAbout.buttonTextEn, locale);
   const imageAlt = getLocalizedText(homeAbout.imageAltFr, homeAbout.imageAltEn, locale) || title || "About image";
+  const badgeText = getLocalizedText(homeAbout.badgeTextFr, homeAbout.badgeTextEn, locale) || (locale === "en" ? "About Us" : "À Propos");
+  
+  // Statistics from database
+  const stat1Label = getLocalizedText(homeAbout.stat1LabelFr, homeAbout.stat1LabelEn, locale);
+  const stat2Label = getLocalizedText(homeAbout.stat2LabelFr, homeAbout.stat2LabelEn, locale);
+  const stat3Label = getLocalizedText(homeAbout.stat3LabelFr, homeAbout.stat3LabelEn, locale);
+  
+  // Floating badge from database
+  const floatingBadgeTitle = getLocalizedText(homeAbout.floatingBadgeTitleFr, homeAbout.floatingBadgeTitleEn, locale);
+  const floatingBadgeText = getLocalizedText(homeAbout.floatingBadgeTextFr, homeAbout.floatingBadgeTextEn, locale);
 
   return (
     <section className="py-20 md:py-28 bg-white relative overflow-hidden">
@@ -79,7 +107,7 @@ export function AboutSection({ homeAbout, locale }: AboutSectionProps) {
             <div className="inline-flex items-center gap-2 px-4 py-2 bg-[var(--color-accent)]/10 rounded-full">
               <span className="h-2 w-2 rounded-full bg-[var(--color-secondary)] animate-pulse" />
               <span className="text-sm font-medium text-[var(--color-primary)]">
-                {locale === "en" ? "About Us" : "À Propos"}
+                {badgeText}
               </span>
             </div>
 
@@ -109,33 +137,22 @@ export function AboutSection({ homeAbout, locale }: AboutSectionProps) {
                     <ArrowRight className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform" />
                   </a>
                 </Button>
-                <Button
-                  asChild
-                  size="lg"
-                  variant="outline"
-                  className="border-2 border-[var(--color-primary)] text-[var(--color-primary)] hover:bg-[var(--color-primary)] hover:text-white transition-all duration-300 group rounded-full px-8"
-                >
-                  <a href={locale === "en" ? "/en/about" : "/a-propos"}>
-                    {locale === "en" ? "Learn More" : "En Savoir Plus"}
-                    <Play className="ml-2 h-4 w-4" />
-                  </a>
-                </Button>
               </div>
             )}
 
-            {/* Stats */}
+            {/* Stats - from database */}
             <div className="grid grid-cols-3 gap-6 pt-8 border-t border-gray-200">
               <div className="text-center lg:text-left">
-                <div className="text-3xl font-bold text-[var(--color-primary)]">10+</div>
-                <div className="text-sm text-gray-500">{locale === "en" ? "Years Experience" : "Ans d'Expérience"}</div>
+                <div className="text-3xl font-bold text-[var(--color-primary)]">{homeAbout.stat1Value || "10+"}</div>
+                <div className="text-sm text-gray-500">{stat1Label || (locale === "en" ? "Years Experience" : "Ans d'Expérience")}</div>
               </div>
               <div className="text-center lg:text-left">
-                <div className="text-3xl font-bold text-[var(--color-primary)]">500+</div>
-                <div className="text-sm text-gray-500">{locale === "en" ? "Projects Completed" : "Projets Réalisés"}</div>
+                <div className="text-3xl font-bold text-[var(--color-primary)]">{homeAbout.stat2Value || "500+"}</div>
+                <div className="text-sm text-gray-500">{stat2Label || (locale === "en" ? "Projects Completed" : "Projets Réalisés")}</div>
               </div>
               <div className="text-center lg:text-left">
-                <div className="text-3xl font-bold text-[var(--color-primary)]">100%</div>
-                <div className="text-sm text-gray-500">{locale === "en" ? "Client Satisfaction" : "Clients Satisfaits"}</div>
+                <div className="text-3xl font-bold text-[var(--color-primary)]">{homeAbout.stat3Value || "100%"}</div>
+                <div className="text-sm text-gray-500">{stat3Label || (locale === "en" ? "Client Satisfaction" : "Clients Satisfaits")}</div>
               </div>
             </div>
           </div>
@@ -152,7 +169,7 @@ export function AboutSection({ homeAbout, locale }: AboutSectionProps) {
                 {/* Overlay gradient */}
                 <div className="absolute inset-0 bg-gradient-to-tr from-[var(--color-primary)]/20 to-transparent opacity-0 hover:opacity-100 transition-opacity duration-500" />
                 
-                {/* Floating badge */}
+                {/* Floating badge - from database */}
                 <div className="absolute bottom-6 left-6 right-6 bg-white/90 backdrop-blur-sm rounded-xl p-4 shadow-lg transform hover:scale-105 transition-transform duration-300">
                   <div className="flex items-center gap-4">
                     <div className="h-12 w-12 rounded-full bg-[var(--color-secondary)] flex items-center justify-center text-white font-bold text-lg">
@@ -160,10 +177,10 @@ export function AboutSection({ homeAbout, locale }: AboutSectionProps) {
                     </div>
                     <div>
                       <div className="font-bold text-[var(--color-primary)]">
-                        {locale === "en" ? "Certified Excellence" : "Excellence Certifiée"}
+                        {floatingBadgeTitle || (locale === "en" ? "Certified Excellence" : "Excellence Certifiée")}
                       </div>
                       <div className="text-sm text-gray-500">
-                        {locale === "en" ? "Quality guaranteed" : "Qualité garantie"}
+                        {floatingBadgeText || (locale === "en" ? "Quality guaranteed" : "Qualité garantie")}
                       </div>
                     </div>
                   </div>

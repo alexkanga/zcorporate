@@ -27,8 +27,20 @@ interface Article {
   } | null;
 }
 
+interface SectionData {
+  id: string;
+  titleFr: string | null;
+  titleEn: string | null;
+  subtitleFr: string | null;
+  subtitleEn: string | null;
+  buttonTextFr: string | null;
+  buttonTextEn: string | null;
+  buttonUrl: string | null;
+}
+
 interface LatestArticlesProps {
   articles: Article[];
+  sectionData: SectionData | null;
   locale: Locale;
 }
 
@@ -90,18 +102,22 @@ function LatestArticlesSkeleton() {
   );
 }
 
-export function LatestArticles({ articles, locale }: LatestArticlesProps) {
+export function LatestArticles({ articles, sectionData, locale }: LatestArticlesProps) {
   if (!articles || articles.length === 0) {
     return <LatestArticlesSkeleton />;
   }
 
-  const title = locale === "en" ? "Latest Articles" : "Derniers Articles";
-  const subtitle =
-    locale === "en"
+  // Use section data from database, fallback to defaults
+  const title = getLocalizedText(sectionData?.titleFr, sectionData?.titleEn, locale) 
+    || (locale === "en" ? "Latest News" : "Dernières Actualités");
+  const subtitle = getLocalizedText(sectionData?.subtitleFr, sectionData?.subtitleEn, locale)
+    || (locale === "en"
       ? "Stay updated with our latest news and insights"
-      : "Restez informé de nos dernières actualités et perspectives";
+      : "Restez informé de nos dernières actualités et perspectives");
   const readMore = locale === "en" ? "Read More" : "Lire la suite";
-  const viewAll = locale === "en" ? "View All Articles" : "Voir Tous les Articles";
+  const viewAll = getLocalizedText(sectionData?.buttonTextFr, sectionData?.buttonTextEn, locale)
+    || (locale === "en" ? "View All Articles" : "Voir Tous les Articles");
+  const viewAllUrl = sectionData?.buttonUrl || `/${locale === "en" ? "en/" : ""}actualites`;
 
   return (
     <section className="py-20 md:py-28 bg-gradient-to-b from-gray-50 via-white to-gray-50 relative overflow-hidden">
@@ -127,7 +143,7 @@ export function LatestArticles({ articles, locale }: LatestArticlesProps) {
             asChild
             className="mt-6 lg:mt-0 bg-[var(--color-primary)] hover:bg-[var(--color-primary)]/90 text-white shadow-lg hover:shadow-xl transition-all duration-300 group px-6 py-3 rounded-full"
           >
-            <a href={`/${locale === "en" ? "en/" : ""}blog`}>
+            <a href={viewAllUrl}>
               {viewAll}
               <ArrowRight className="ml-2 h-4 w-4 group-hover:translate-x-1 transition-transform" />
             </a>
@@ -198,7 +214,7 @@ export function LatestArticles({ articles, locale }: LatestArticlesProps) {
                 <CardContent className="p-6">
                   {/* Title */}
                   <h3 className="text-xl font-bold text-gray-800 mb-3 group-hover:text-[var(--color-primary)] transition-colors duration-300 line-clamp-2 leading-tight">
-                    <a href={`/${locale === "en" ? "en/" : ""}blog/${article.slug}`}>
+                    <a href={`/${locale === "en" ? "en/" : ""}actualites/${article.slug}`}>
                       {articleTitle}
                     </a>
                   </h3>
@@ -232,7 +248,7 @@ export function LatestArticles({ articles, locale }: LatestArticlesProps) {
 
                   {/* Read More Link */}
                   <a
-                    href={`/${locale === "en" ? "en/" : ""}blog/${article.slug}`}
+                    href={`/${locale === "en" ? "en/" : ""}actualites/${article.slug}`}
                     className="inline-flex items-center gap-2 text-[var(--color-primary)] font-semibold group-hover:text-[var(--color-secondary)] transition-colors duration-300"
                   >
                     {readMore}

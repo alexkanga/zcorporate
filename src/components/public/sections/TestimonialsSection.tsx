@@ -17,8 +17,17 @@ interface Testimonial {
   rating: number;
 }
 
+interface SectionData {
+  id: string;
+  titleFr: string | null;
+  titleEn: string | null;
+  subtitleFr: string | null;
+  subtitleEn: string | null;
+}
+
 interface TestimonialsSectionProps {
   testimonials: Testimonial[];
+  sectionData: SectionData | null;
   locale: Locale;
 }
 
@@ -94,6 +103,7 @@ function TestimonialsSectionSkeleton() {
 
 export function TestimonialsSection({
   testimonials,
+  sectionData,
   locale,
 }: TestimonialsSectionProps) {
   const [currentIndex, setCurrentIndex] = useState(0);
@@ -128,11 +138,13 @@ export function TestimonialsSection({
     return <TestimonialsSectionSkeleton />;
   }
 
-  const title = locale === "en" ? "What Our Clients Say" : "Ce Que Disent Nos Clients";
-  const subtitle =
-    locale === "en"
+  // Use section data from database, fallback to defaults
+  const title = getLocalizedText(sectionData?.titleFr, sectionData?.titleEn, locale) 
+    || (locale === "en" ? "What Our Clients Say" : "Ce Que Disent Nos Clients");
+  const subtitle = getLocalizedText(sectionData?.subtitleFr, sectionData?.subtitleEn, locale)
+    || (locale === "en"
       ? "Discover testimonials from our satisfied partners"
-      : "Découvrez les témoignages de nos partenaires satisfaits";
+      : "Découvrez les témoignages de nos partenaires satisfaits");
 
   const startIndex = currentIndex * visibleCount;
   const visibleTestimonials = testimonials.slice(

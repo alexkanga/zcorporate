@@ -14,8 +14,20 @@ interface Partner {
   website: string | null;
 }
 
+interface SectionData {
+  id: string;
+  titleFr: string | null;
+  titleEn: string | null;
+  subtitleFr: string | null;
+  subtitleEn: string | null;
+  buttonTextFr: string | null;
+  buttonTextEn: string | null;
+  buttonUrl: string | null;
+}
+
 interface PartnersSectionProps {
   partners: Partner[];
+  sectionData: SectionData | null;
   locale: Locale;
 }
 
@@ -45,7 +57,17 @@ function PartnersSectionSkeleton() {
   );
 }
 
-export function PartnersSection({ partners, locale }: PartnersSectionProps) {
+// Helper to get localized content with FR fallback
+function getLocalizedText(
+  fr: string | null,
+  en: string | null,
+  locale: Locale
+): string | null {
+  if (locale === "en" && en) return en;
+  return fr;
+}
+
+export function PartnersSection({ partners, sectionData, locale }: PartnersSectionProps) {
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   const autoScrollIntervalRef = useRef<NodeJS.Timeout | null>(null);
   const [canScrollLeft, setCanScrollLeft] = useState(false);
@@ -115,12 +137,16 @@ export function PartnersSection({ partners, locale }: PartnersSectionProps) {
     return <PartnersSectionSkeleton />;
   }
 
-  const title = locale === "en" ? "Our Partners" : "Nos Partenaires";
-  const subtitle =
-    locale === "en"
+  // Use section data from database, fallback to defaults
+  const title = getLocalizedText(sectionData?.titleFr, sectionData?.titleEn, locale) 
+    || (locale === "en" ? "Our Partners" : "Nos Partenaires");
+  const subtitle = getLocalizedText(sectionData?.subtitleFr, sectionData?.subtitleEn, locale)
+    || (locale === "en"
       ? "Trusted by leading organizations worldwide"
-      : "Ils nous font confiance à travers le monde";
-  const becomePartner = locale === "en" ? "Become a Partner" : "Devenir Partenaire";
+      : "Ils nous font confiance à travers le monde");
+  const buttonText = getLocalizedText(sectionData?.buttonTextFr, sectionData?.buttonTextEn, locale)
+    || (locale === "en" ? "Become a Partner" : "Devenir Partenaire");
+  const buttonUrl = sectionData?.buttonUrl || `/${locale === "en" ? "en/" : ""}contact`;
 
   return (
     <section className="py-20 md:py-28 bg-gradient-to-b from-gray-50 via-white to-gray-50 relative overflow-hidden">
@@ -242,8 +268,8 @@ export function PartnersSection({ partners, locale }: PartnersSectionProps) {
             asChild
             className="bg-[var(--color-primary)] hover:bg-[var(--color-secondary)] text-white shadow-lg hover:shadow-xl transition-all duration-300 group rounded-full px-8 py-3"
           >
-            <a href={`/${locale === "en" ? "en/" : ""}contact`}>
-              {becomePartner}
+            <a href={buttonUrl}>
+              {buttonText}
               <ArrowRight className="ml-2 h-4 w-4 group-hover:translate-x-1 transition-transform" />
             </a>
           </Button>

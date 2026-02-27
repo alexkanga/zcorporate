@@ -19,8 +19,20 @@ interface Service {
   imageAltEn: string | null;
 }
 
+interface SectionData {
+  id: string;
+  titleFr: string | null;
+  titleEn: string | null;
+  subtitleFr: string | null;
+  subtitleEn: string | null;
+  buttonTextFr: string | null;
+  buttonTextEn: string | null;
+  buttonUrl: string | null;
+}
+
 interface ServicesSectionProps {
   services: Service[];
+  sectionData: SectionData | null;
   locale: Locale;
 }
 
@@ -78,16 +90,19 @@ function ServicesSectionSkeleton() {
   );
 }
 
-export function ServicesSection({ services, locale }: ServicesSectionProps) {
+export function ServicesSection({ services, sectionData, locale }: ServicesSectionProps) {
   if (!services || services.length === 0) {
     return <ServicesSectionSkeleton />;
   }
 
-  const title = locale === "en" ? "Our Services" : "Nos Services";
-  const subtitle =
-    locale === "en"
+  // Use section data from database, fallback to defaults
+  const title = getLocalizedText(sectionData?.titleFr, sectionData?.titleEn, locale) 
+    || (locale === "en" ? "Our Services" : "Nos Services");
+  const subtitle = getLocalizedText(sectionData?.subtitleFr, sectionData?.subtitleEn, locale)
+    || (locale === "en"
       ? "Discover our comprehensive range of services designed to meet your needs"
-      : "Découvrez notre gamme complète de services conçus pour répondre à vos besoins";
+      : "Découvrez notre gamme complète de services conçus pour répondre à vos besoins");
+  const learnMore = locale === "en" ? "Learn more" : "En savoir plus";
 
   return (
     <section className="py-20 md:py-28 bg-gradient-to-b from-gray-50 to-white">
@@ -160,7 +175,7 @@ export function ServicesSection({ services, locale }: ServicesSectionProps) {
 
                   {/* Read more indicator */}
                   <div className="flex items-center text-[var(--color-accent)] text-sm font-medium group-hover:text-[var(--color-primary)] transition-colors duration-300">
-                    <span>{locale === "en" ? "Learn more" : "En savoir plus"}</span>
+                    <span>{learnMore}</span>
                     <ArrowRight className="ml-2 h-4 w-4 group-hover:translate-x-2 transition-transform duration-300" />
                   </div>
 

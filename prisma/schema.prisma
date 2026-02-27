@@ -147,29 +147,66 @@ model Event {
 }
 
 model HomeAbout {
-  id           String   @id @default("home-about")
-  titleFr      String
-  titleEn      String
-  contentFr    String
-  contentEn    String
-  imageUrl     String?
-  imageAltFr   String?
-  imageAltEn   String?
-  buttonTextFr String?
-  buttonTextEn String?
-  buttonUrl    String?
+  id              String   @id @default("home-about")
+  titleFr         String
+  titleEn         String
+  contentFr       String
+  contentEn       String
+  imageUrl        String?
+  imageAltFr      String?
+  imageAltEn      String?
+  buttonTextFr    String?
+  buttonTextEn    String?
+  buttonUrl       String?
+  // Badge text
+  badgeTextFr     String?  @default("À Propos")
+  badgeTextEn     String?  @default("About Us")
+  // Statistics
+  stat1Value      String?  @default("10+")
+  stat1LabelFr    String?  @default("Ans d'Expérience")
+  stat1LabelEn    String?  @default("Years Experience")
+  stat2Value      String?  @default("500+")
+  stat2LabelFr    String?  @default("Projets Réalisés")
+  stat2LabelEn    String?  @default("Projects Completed")
+  stat3Value      String?  @default("100%")
+  stat3LabelFr    String?  @default("Clients Satisfaits")
+  stat3LabelEn    String?  @default("Client Satisfaction")
+  // Floating badge
+  floatingBadgeTitleFr   String?  @default("Excellence Certifiée")
+  floatingBadgeTitleEn   String?  @default("Certified Excellence")
+  floatingBadgeTextFr    String?  @default("Qualité garantie")
+  floatingBadgeTextEn    String?  @default("Quality guaranteed")
   updatedAt             DateTime         @updatedAt
 }
 
+// Section titles and subtitles for homepage
+model HomeSection {
+  id            String   @id
+  titleFr       String?
+  titleEn       String?
+  subtitleFr    String?
+  subtitleEn    String?
+  buttonTextFr  String?
+  buttonTextEn  String?
+  buttonUrl     String?
+  badgeTextFr   String?
+  badgeTextEn   String?
+  updatedAt     DateTime @updatedAt
+  
+  @@index([id])
+}
+
 model HomeCTA {
-  id           String   @id @default("home-cta")
-  titleFr      String
-  titleEn      String
-  subtitleFr   String?
-  subtitleEn   String?
-  buttonTextFr String?
-  buttonTextEn String?
-  buttonUrl    String?
+  id            String   @id @default("home-cta")
+  titleFr       String
+  titleEn       String
+  subtitleFr    String?
+  subtitleEn    String?
+  buttonTextFr  String?
+  buttonTextEn  String?
+  buttonUrl     String?
+  badgeTextFr   String?  @default("Commencez Aujourd'hui")
+  badgeTextEn   String?  @default("Get Started Today")
   updatedAt             DateTime         @updatedAt
 }
 

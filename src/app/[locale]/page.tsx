@@ -23,6 +23,11 @@ async function getHomeData() {
       partners,
       homeCTA,
       latestArticles,
+      servicesSection,
+      testimonialsSection,
+      partnersSection,
+      articlesSection,
+      siteSettings,
     ] = await Promise.all([
       db.slider.findMany({
         where: { visible: true, deletedAt: null },
@@ -55,6 +60,11 @@ async function getHomeData() {
           ArticleCategory: { select: { nameFr: true, nameEn: true, slug: true } },
         },
       }),
+      db.homeSection.findUnique({ where: { id: 'services' } }),
+      db.homeSection.findUnique({ where: { id: 'testimonials' } }),
+      db.homeSection.findUnique({ where: { id: 'partners' } }),
+      db.homeSection.findUnique({ where: { id: 'articles' } }),
+      db.siteSettings.findUnique({ where: { id: 'site-settings' } }),
     ]);
 
     // Transform articles to match expected format
@@ -68,7 +78,22 @@ async function getHomeData() {
       } : null,
     }));
 
-    return { sliders, homeAbout, services, testimonials, partners, homeCTA, latestArticles: transformedArticles };
+    return { 
+      sliders, 
+      homeAbout, 
+      services, 
+      testimonials, 
+      partners, 
+      homeCTA, 
+      latestArticles: transformedArticles,
+      sections: {
+        services: servicesSection,
+        testimonials: testimonialsSection,
+        partners: partnersSection,
+        articles: articlesSection,
+      },
+      siteSettings,
+    };
   } catch (error) {
     console.error("Error fetching home data:", error);
     return {
@@ -79,6 +104,13 @@ async function getHomeData() {
       partners: [],
       homeCTA: null,
       latestArticles: [],
+      sections: {
+        services: null,
+        testimonials: null,
+        partners: null,
+        articles: null,
+      },
+      siteSettings: null,
     };
   }
 }
@@ -96,22 +128,39 @@ export default async function HomePage({ params }: HomePageProps) {
       <AboutSection homeAbout={data.homeAbout} locale={locale as Locale} />
 
       {/* Services Section */}
-      <ServicesSection services={data.services} locale={locale as Locale} />
+      <ServicesSection 
+        services={data.services} 
+        sectionData={data.sections.services}
+        locale={locale as Locale} 
+      />
 
       {/* Testimonials Section */}
       <TestimonialsSection
         testimonials={data.testimonials}
+        sectionData={data.sections.testimonials}
         locale={locale as Locale}
       />
 
       {/* Partners Section */}
-      <PartnersSection partners={data.partners} locale={locale as Locale} />
+      <PartnersSection 
+        partners={data.partners} 
+        sectionData={data.sections.partners}
+        locale={locale as Locale} 
+      />
 
       {/* CTA Section */}
-      <CTASection homeCTA={data.homeCTA} locale={locale as Locale} />
+      <CTASection 
+        homeCTA={data.homeCTA} 
+        siteSettings={data.siteSettings}
+        locale={locale as Locale} 
+      />
 
       {/* Latest Articles Section */}
-      <LatestArticles articles={data.latestArticles} locale={locale as Locale} />
+      <LatestArticles 
+        articles={data.latestArticles} 
+        sectionData={data.sections.articles}
+        locale={locale as Locale} 
+      />
     </main>
   );
 }

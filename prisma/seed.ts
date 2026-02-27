@@ -187,6 +187,21 @@ async function main() {
       buttonTextFr: 'En savoir plus',
       buttonTextEn: 'Learn more',
       buttonUrl: '/a-propos',
+      badgeTextFr: 'À Propos',
+      badgeTextEn: 'About Us',
+      stat1Value: '10+',
+      stat1LabelFr: "Ans d'Expérience",
+      stat1LabelEn: 'Years Experience',
+      stat2Value: '500+',
+      stat2LabelFr: 'Projets Réalisés',
+      stat2LabelEn: 'Projects Completed',
+      stat3Value: '100%',
+      stat3LabelFr: 'Clients Satisfaits',
+      stat3LabelEn: 'Client Satisfaction',
+      floatingBadgeTitleFr: 'Excellence Certifiée',
+      floatingBadgeTitleEn: 'Certified Excellence',
+      floatingBadgeTextFr: 'Qualité garantie',
+      floatingBadgeTextEn: 'Quality guaranteed',
     },
   });
 
@@ -202,8 +217,58 @@ async function main() {
       buttonTextFr: 'Contactez-nous',
       buttonTextEn: 'Contact us',
       buttonUrl: '/contact',
+      badgeTextFr: "Commencez Aujourd'hui",
+      badgeTextEn: 'Get Started Today',
     },
   });
+
+  // ==================== HOME SECTIONS (Titles & Subtitles) ====================
+  console.log('Creating home sections...');
+
+  const homeSections = [
+    { 
+      id: 'services', 
+      titleFr: 'Nos Services', 
+      titleEn: 'Our Services',
+      subtitleFr: 'Découvrez notre gamme complète de services conçus pour répondre à vos besoins',
+      subtitleEn: 'Discover our comprehensive range of services designed to meet your needs',
+    },
+    { 
+      id: 'testimonials', 
+      titleFr: 'Ce Que Disent Nos Clients', 
+      titleEn: 'What Our Clients Say',
+      subtitleFr: 'Découvrez les témoignages de nos partenaires satisfaits',
+      subtitleEn: 'Discover testimonials from our satisfied partners',
+    },
+    { 
+      id: 'partners', 
+      titleFr: 'Nos Partenaires', 
+      titleEn: 'Our Partners',
+      subtitleFr: 'Ils nous font confiance à travers le monde',
+      subtitleEn: 'Trusted by leading organizations worldwide',
+      buttonTextFr: 'Devenir Partenaire',
+      buttonTextEn: 'Become a Partner',
+      buttonUrl: '/contact',
+    },
+    { 
+      id: 'articles', 
+      titleFr: 'Dernières Actualités', 
+      titleEn: 'Latest News',
+      subtitleFr: 'Restez informé de nos dernières actualités et perspectives',
+      subtitleEn: 'Stay updated with our latest news and insights',
+      buttonTextFr: 'Voir Tous les Articles',
+      buttonTextEn: 'View All Articles',
+      buttonUrl: '/actualites',
+    },
+  ];
+
+  for (const section of homeSections) {
+    await prisma.homeSection.upsert({
+      where: { id: section.id },
+      update: {},
+      create: section,
+    });
+  }
 
   console.log('✅ Home sections ready');
 
