@@ -12,6 +12,7 @@ import { Switch } from '@/components/ui/switch';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { toast } from 'sonner';
 import { Pencil, Trash2, Plus, Loader2, Star } from 'lucide-react';
+import { ImageUploadCompact } from '@/components/admin/ImageUpload';
 
 interface Testimonial {
   id: string;
@@ -89,11 +90,18 @@ export default function TestimonialsAdminPage() {
                 <TabsContent value="fr" className="space-y-4"><div><Label>Témoignage</Label><Textarea value={formData.textFr || ''} onChange={(e) => setFormData({ ...formData, textFr: e.target.value })} required rows={4} /></div></TabsContent>
                 <TabsContent value="en" className="space-y-4"><div><Label>Testimonial</Label><Textarea value={formData.textEn || ''} onChange={(e) => setFormData({ ...formData, textEn: e.target.value })} required rows={4} /></div></TabsContent>
               </Tabs>
-              <div className="grid gap-4 md:grid-cols-3">
-                <div><Label>Avatar URL</Label><Input value={formData.avatar || ''} onChange={(e) => setFormData({ ...formData, avatar: e.target.value })} /></div>
+              <div className="grid gap-4 md:grid-cols-2">
+                <div>
+                  <Label>Avatar</Label>
+                  <ImageUploadCompact
+                    value={formData.avatar || ''}
+                    onChange={(url) => setFormData({ ...formData, avatar: url })}
+                    folder="testimonials"
+                  />
+                </div>
                 <div><Label>Note (1-5)</Label><Input type="number" min={1} max={5} value={formData.rating || 5} onChange={(e) => setFormData({ ...formData, rating: parseInt(e.target.value) })} /></div>
-                <div className="flex items-end gap-2 pb-2"><Switch checked={formData.visible} onCheckedChange={(checked) => setFormData({ ...formData, visible: checked })} /><Label>Visible</Label></div>
               </div>
+              <div className="flex items-center gap-2"><Switch checked={formData.visible} onCheckedChange={(checked) => setFormData({ ...formData, visible: checked })} /><Label>Visible</Label></div>
               <div className="flex justify-end gap-2"><Button type="button" variant="outline" onClick={() => setIsDialogOpen(false)}>Annuler</Button><Button type="submit">{editingItem ? 'Mettre à jour' : 'Créer'}</Button></div>
             </form>
           </DialogContent>

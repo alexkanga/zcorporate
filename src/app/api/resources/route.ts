@@ -30,7 +30,7 @@ export async function GET(request: NextRequest) {
     const resources = await db.resource.findMany({
       where,
       include: {
-        category: {
+        ResourceCategory: {
           select: {
             id: true,
             nameFr: true,
