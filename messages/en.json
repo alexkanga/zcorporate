@@ -1,0 +1,550 @@
+{
+  "navigation": {
+    "home": "Home",
+    "about": "About",
+    "solutions": "Solutions",
+    "realisations": "Projects",
+    "resources": "Resources",
+    "events": "Events",
+    "contact": "Contact"
+  },
+  "common": {
+    "buttons": {
+      "submit": "Submit",
+      "cancel": "Cancel",
+      "save": "Save",
+      "delete": "Delete",
+      "edit": "Edit",
+      "add": "Add",
+      "view": "View",
+      "close": "Close",
+      "confirm": "Confirm",
+      "back": "Back",
+      "next": "Next",
+      "previous": "Previous",
+      "search": "Search",
+      "reset": "Reset",
+      "apply": "Apply",
+      "download": "Download",
+      "upload": "Upload",
+      "loading": "Loading...",
+      "seeMore": "See more",
+      "seeAll": "See all",
+      "learnMore": "Learn more",
+      "readMore": "Read more"
+    },
+    "forms": {
+      "required": "This field is required",
+      "optional": "Optional",
+      "selectOption": "Select an option",
+      "selectMultiple": "Select multiple options",
+      "typeToSearch": "Type to search...",
+      "noResults": "No results found",
+      "all": "All",
+      "none": "None",
+      "yes": "Yes",
+      "no": "No"
+    },
+    "errors": {
+      "general": "An error occurred",
+      "notFound": "Page not found",
+      "serverError": "Server error",
+      "unauthorized": "Unauthorized",
+      "forbidden": "Access denied",
+      "validationError": "Validation error",
+      "networkError": "Connection error",
+      "tryAgain": "Please try again",
+      "contactSupport": "Contact support if the problem persists"
+    },
+    "success": {
+      "saved": "Successfully saved",
+      "deleted": "Successfully deleted",
+      "updated": "Successfully updated",
+      "submitted": "Successfully submitted",
+      "sent": "Successfully sent",
+      "copied": "Copied to clipboard"
+    }
+  },
+  "header": {
+    "logoAlt": "Company logo",
+    "searchPlaceholder": "Search...",
+    "searchAria": "Search the site",
+    "login": "Login",
+    "register": "Sign up",
+    "logout": "Logout",
+    "profile": "My profile",
+    "settings": "Settings",
+    "dashboard": "Dashboard",
+    "languageSwitch": "Change language",
+    "currentLanguage": "Current language: English",
+    "menu": "Menu",
+    "closeMenu": "Close menu"
+  },
+  "footer": {
+    "copyright": "© {year} All rights reserved",
+    "description": "Your trusted technology partner",
+    "links": {
+      "title": "Useful links",
+      "privacy": "Privacy Policy",
+      "terms": "Terms of Service",
+      "cookies": "Cookie Policy",
+      "legal": "Legal Notice",
+      "accessibility": "Accessibility",
+      "sitemap": "Sitemap"
+    },
+    "contact": {
+      "title": "Contact",
+      "address": "Address",
+      "phone": "Phone",
+      "email": "Email",
+      "hours": "Opening hours"
+    },
+    "social": {
+      "title": "Follow us",
+      "facebook": "Facebook",
+      "twitter": "Twitter",
+      "linkedin": "LinkedIn",
+      "instagram": "Instagram",
+      "youtube": "YouTube"
+    },
+    "newsletter": {
+      "title": "Newsletter",
+      "description": "Stay informed about our latest news",
+      "placeholder": "Your email address",
+      "subscribe": "Subscribe",
+      "success": "Thank you for subscribing!"
+    }
+  },
+  "auth": {
+    "login": {
+      "title": "Login",
+      "subtitle": "Welcome! Sign in to your account",
+      "email": "Email address",
+      "password": "Password",
+      "rememberMe": "Remember me",
+      "forgotPassword": "Forgot password?",
+      "submit": "Sign in",
+      "noAccount": "Don't have an account?",
+      "register": "Create an account",
+      "orContinueWith": "Or continue with",
+      "success": "Successfully logged in!"
+    },
+    "register": {
+      "title": "Create an account",
+      "subtitle": "Join us in a few steps",
+      "firstName": "First name",
+      "lastName": "Last name",
+      "email": "Email address",
+      "password": "Password",
+      "confirmPassword": "Confirm password",
+      "acceptTerms": "I accept the {terms} and {privacy}",
+      "termsOfService": "terms of service",
+      "privacyPolicy": "privacy policy",
+      "submit": "Create my account",
+      "alreadyHaveAccount": "Already have an account?",
+      "login": "Sign in",
+      "success": "Account created successfully!"
+    },
+    "logout": {
+      "title": "Logout",
+      "confirm": "Are you sure you want to log out?",
+      "success": "You have been successfully logged out"
+    },
+    "forgotPassword": {
+      "title": "Forgot password",
+      "subtitle": "Enter your email to reset your password",
+      "email": "Email address",
+      "submit": "Send reset link",
+      "backToLogin": "Back to login",
+      "success": "A reset email has been sent",
+      "checkEmail": "Check your inbox"
+    },
+    "resetPassword": {
+      "title": "Reset password",
+      "subtitle": "Create a new password",
+      "newPassword": "New password",
+      "confirmPassword": "Confirm new password",
+      "submit": "Reset password",
+      "success": "Password successfully reset"
+    },
+    "errors": {
+      "invalidCredentials": "Invalid email or password",
+      "emailRequired": "Email address is required",
+      "emailInvalid": "Please enter a valid email address",
+      "passwordRequired": "Password is required",
+      "passwordTooShort": "Password must be at least 8 characters",
+      "passwordMismatch": "Passwords do not match",
+      "emailAlreadyExists": "An account with this email already exists",
+      "accountNotVerified": "Please verify your email to activate your account",
+      "tokenExpired": "The reset link has expired",
+      "tokenInvalid": "The reset link is invalid",
+      "weakPassword": "Password must contain uppercase, lowercase letters, numbers, and special characters"
+    }
+  },
+  "contact": {
+    "title": "Contact us",
+    "subtitle": "We would love to hear from you",
+    "form": {
+      "name": "Full name",
+      "namePlaceholder": "Your name",
+      "email": "Email address",
+      "emailPlaceholder": "your@email.com",
+      "phone": "Phone",
+      "phonePlaceholder": "+33 6 00 00 00 00",
+      "subject": "Subject",
+      "subjectPlaceholder": "Subject of your message",
+      "message": "Message",
+      "messagePlaceholder": "Your message...",
+      "send": "Send message",
+      "sending": "Sending...",
+      "success": "Your message has been sent successfully! We will get back to you as soon as possible.",
+      "error": "An error occurred while sending the message. Please try again."
+    },
+    "info": {
+      "title": "Contact information",
+      "address": "Address",
+      "phone": "Phone",
+      "email": "Email",
+      "hours": "Opening hours",
+      "hoursValue": "Mon - Fri: 9:00 AM - 6:00 PM"
+    }
+  },
+  "about": {
+    "title": "About us",
+    "subtitle": "Discover our story and mission",
+    "ourStory": {
+      "title": "Our story",
+      "content": "Founded with passion, our company has grown to become a leader in our field."
+    },
+    "ourMission": {
+      "title": "Our mission",
+      "content": "We are committed to providing innovative, high-quality solutions to our clients."
+    },
+    "ourValues": {
+      "title": "Our values",
+      "innovation": "Innovation",
+      "innovationDesc": "We constantly push boundaries to deliver cutting-edge solutions.",
+      "excellence": "Excellence",
+      "excellenceDesc": "We strive for perfection in every project we undertake.",
+      "integrity": "Integrity",
+      "integrityDesc": "We act with honesty and transparency in all our interactions.",
+      "collaboration": "Collaboration",
+      "collaborationDesc": "We believe in the power of teamwork and partnership."
+    },
+    "team": {
+      "title": "Our team",
+      "subtitle": "Meet the passionate people behind our success"
+    },
+    "stats": {
+      "clients": "Satisfied clients",
+      "projects": "Projects completed",
+      "years": "Years of experience",
+      "team": "Team members"
+    }
+  },
+  "solutions": {
+    "title": "Our solutions",
+    "subtitle": "Solutions tailored to your needs",
+    "categories": {
+      "all": "All solutions",
+      "digital": "Digital Transformation",
+      "consulting": "Consulting",
+      "development": "Development",
+      "cloud": "Cloud & Infrastructure",
+      "security": "Cybersecurity",
+      "data": "Data & Analytics"
+    },
+    "card": {
+      "learnMore": "Learn more",
+      "requestDemo": "Request a demo",
+      "features": "Features",
+      "benefits": "Benefits"
+    },
+    "cta": {
+      "title": "Need a custom solution?",
+      "description": "Contact us to discuss your project",
+      "button": "Contact us"
+    }
+  },
+  "realisations": {
+    "title": "Our projects",
+    "subtitle": "Discover our achievements and successes",
+    "filters": {
+      "all": "All",
+      "byCategory": "By category",
+      "byYear": "By year",
+      "byClient": "By client",
+      "clearFilters": "Clear filters"
+    },
+    "categories": {
+      "web": "Web Applications",
+      "mobile": "Mobile Applications",
+      "enterprise": "Enterprise Solutions",
+      "ecommerce": "E-commerce",
+      "integration": "Integrations",
+      "other": "Other"
+    },
+    "card": {
+      "viewDetails": "View details",
+      "viewProject": "View project",
+      "client": "Client",
+      "year": "Year",
+      "technologies": "Technologies",
+      "duration": "Duration",
+      "team": "Team"
+    },
+    "detail": {
+      "challenge": "The challenge",
+      "solution": "Our solution",
+      "results": "Results",
+      "testimonials": "Testimonials",
+      "gallery": "Gallery"
+    }
+  },
+  "resources": {
+    "title": "Resources",
+    "subtitle": "Documentation, guides, and tools",
+    "download": "Download",
+    "filterByType": "Filter by type",
+    "categories": {
+      "all": "All resources",
+      "guides": "Guides",
+      "whitepapers": "Whitepapers",
+      "caseStudies": "Case Studies",
+      "tutorials": "Tutorials",
+      "documentation": "Documentation",
+      "videos": "Videos",
+      "podcasts": "Podcasts",
+      "blog": "Blog"
+    },
+    "card": {
+      "readTime": "Read time",
+      "minutes": "min",
+      "downloads": "downloads",
+      "views": "views",
+      "publishedOn": "Published on",
+      "updatedOn": "Updated on",
+      "author": "Author"
+    },
+    "search": {
+      "placeholder": "Search resources...",
+      "noResults": "No resources found",
+      "tryDifferent": "Try different keywords"
+    }
+  },
+  "events": {
+    "title": "Events",
+    "subtitle": "Stay informed about our upcoming events",
+    "photos": "Photos",
+    "videos": "Videos",
+    "date": "Date",
+    "location": "Location",
+    "time": "Time",
+    "register": "Register",
+    "registered": "Registered",
+    "registrationClosed": "Registration closed",
+    "pastEvents": "Past events",
+    "upcomingEvents": "Upcoming events",
+    "allEvents": "All events",
+    "categories": {
+      "all": "All events",
+      "conference": "Conferences",
+      "webinar": "Webinars",
+      "workshop": "Workshops",
+      "meetup": "Meetups",
+      "training": "Training",
+      "other": "Other"
+    },
+    "detail": {
+      "description": "Description",
+      "agenda": "Agenda",
+      "speakers": "Speakers",
+      "partners": "Partners",
+      "venue": "Venue",
+      "addToCalendar": "Add to calendar",
+      "shareEvent": "Share event"
+    },
+    "gallery": {
+      "title": "Gallery",
+      "viewAll": "View all photos"
+    }
+  },
+  "admin": {
+    "dashboard": {
+      "title": "Dashboard",
+      "welcome": "Welcome, {name}!",
+      "overview": "Overview",
+      "recentActivity": "Recent activity",
+      "quickActions": "Quick actions",
+      "statistics": "Statistics"
+    },
+    "settings": {
+      "title": "Settings",
+      "description": "Manage your site configuration and appearance",
+      "general": "General",
+      "security": "Security",
+      "notifications": "Notifications",
+      "appearance": "Appearance",
+      "language": "Language",
+      "timezone": "Timezone",
+      "save": "Save settings",
+      "saved": "Settings saved successfully",
+      "logo": {
+        "title": "Logo & Branding",
+        "description": "Upload your logo and configure alt text",
+        "uploadTitle": "Logo",
+        "uploadDescription": "Upload your company logo. Recommended size: 200x60px, PNG or SVG format.",
+        "noLogo": "No logo uploaded",
+        "uploadButton": "Upload Logo",
+        "uploading": "Uploading...",
+        "siteInfoTitle": "Site Information",
+        "siteInfoDescription": "Configure site name and logo alt text for accessibility",
+        "siteNameFr": "Site Name (French)",
+        "siteNameEn": "Site Name (English)",
+        "altFr": "Logo Alt Text (French)",
+        "altEn": "Logo Alt Text (English)",
+        "descriptionFr": "Site Description (French)",
+        "descriptionEn": "Site Description (English)"
+      },
+      "colors": {
+        "title": "Brand Colors",
+        "description": "Customize your site's color scheme",
+        "settingsTitle": "Color Settings",
+        "settingsDescription": "Choose colors for your brand. Click on a color to pick a new one.",
+        "primary": "Primary Color",
+        "secondary": "Secondary Color",
+        "accent": "Accent Color",
+        "light": "Light Color",
+        "previewTitle": "Live Preview",
+        "previewDescription": "See how your colors will look on the site",
+        "reset": "Reset to Defaults"
+      },
+      "menus": {
+        "title": "Menu Management",
+        "description": "Create and organize navigation menus",
+        "addItem": "Add Menu Item",
+        "itemsTitle": "Menu Items",
+        "itemsDescription": "Drag and drop to reorder. Click to edit.",
+        "noItems": "No menu items yet. Create your first menu item.",
+        "createTitle": "Create Menu Item",
+        "createDescription": "Add a new navigation menu item",
+        "editTitle": "Edit Menu Item",
+        "editDescription": "Update menu item settings",
+        "labelFr": "Label (French)",
+        "labelEn": "Label (English)",
+        "slug": "Slug",
+        "route": "Route",
+        "parent": "Parent Menu",
+        "location": "Location",
+        "visible": "Visible",
+        "external": "External Link",
+        "deleteTitle": "Delete Menu Item",
+        "deleteDescription": "Are you sure you want to delete",
+        "deleteChildren": "This will also delete {count} child menu item(s).",
+        "orderSaved": "Menu order saved",
+        "visibilityUpdated": "Visibility updated"
+      },
+      "maps": {
+        "title": "Maps Settings",
+        "description": "Configure Google Maps location for your site",
+        "configTitle": "Map Configuration",
+        "configDescription": "Set the location to display on your contact page",
+        "searchLabel": "Search Location",
+        "searchPlaceholder": "Search for an address...",
+        "searchDescription": "Search for a location to auto-fill coordinates",
+        "latitude": "Latitude",
+        "latitudeDescription": "Range: -90 to 90 (default: Paris, France)",
+        "longitude": "Longitude",
+        "longitudeDescription": "Range: -180 to 180",
+        "zoom": "Zoom Level: {value}",
+        "zoomDescription": "1 = World view, 20 = Street level",
+        "apiKey": "Google Maps API Key (Optional)",
+        "apiKeyDescription": "Optional. Leave empty to use OpenStreetMap instead.",
+        "previewTitle": "Map Preview",
+        "previewDescription": "Preview of your location on the map",
+        "presets": "Quick Presets",
+        "notSet": "Not set"
+      },
+      "currentConfig": "Current Configuration",
+      "currentConfigDescription": "Overview of your current site settings",
+      "logoBranding": "Logo & Branding",
+      "brandColors": "Brand Colors",
+      "siteInfo": "Site Information",
+      "mapsConfig": "Maps Configuration",
+      "logoUploaded": "Logo uploaded"
+    },
+    "users": {
+      "title": "User Management",
+      "addUser": "Add user",
+      "editUser": "Edit user",
+      "deleteUser": "Delete user",
+      "confirmDelete": "Are you sure you want to delete this user?",
+      "role": "Role",
+      "roles": {
+        "admin": "Administrator",
+        "editor": "Editor",
+        "viewer": "Viewer",
+        "user": "User"
+      },
+      "status": {
+        "active": "Active",
+        "inactive": "Inactive",
+        "pending": "Pending",
+        "suspended": "Suspended"
+      },
+      "lastLogin": "Last login",
+      "createdAt": "Created at"
+    },
+    "content": {
+      "title": "Content Management",
+      "pages": "Pages",
+      "posts": "Posts",
+      "media": "Media",
+      "forms": "Forms",
+      "addNew": "Add new",
+      "edit": "Edit",
+      "delete": "Delete",
+      "publish": "Publish",
+      "unpublish": "Unpublish",
+      "duplicate": "Duplicate",
+      "status": {
+        "draft": "Draft",
+        "published": "Published",
+        "archived": "Archived",
+        "scheduled": "Scheduled"
+      }
+    },
+    "media": {
+      "title": "Media Library",
+      "upload": "Upload",
+      "selectFiles": "Select files",
+      "dragDrop": "Drag and drop your files here",
+      "or": "or",
+      "browseFiles": "Browse files",
+      "supportedFormats": "Supported formats: {formats}",
+      "maxSize": "Max size: {size}",
+      "delete": "Delete",
+      "deleteConfirm": "Are you sure you want to delete this file?",
+      "replace": "Replace",
+      "download": "Download",
+      "copyUrl": "Copy URL",
+      "editDetails": "Edit details",
+      "alt": "Alternative text",
+      "title": "Title",
+      "caption": "Caption",
+      "description": "Description"
+    },
+    "analytics": {
+      "title": "Analytics",
+      "visitors": "Visitors",
+      "pageViews": "Page views",
+      "bounceRate": "Bounce rate",
+      "avgDuration": "Avg. duration",
+      "topPages": "Top pages",
+      "topReferrers": "Traffic sources",
+      "devices": "Devices",
+      "browsers": "Browsers",
+      "countries": "Countries"
+    }
+  }
+}

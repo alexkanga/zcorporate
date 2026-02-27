@@ -1,0 +1,504 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Approval {
+  id                                String         @id
+  status                            ApprovalStatus @default(PENDING)
+  entityType                        EntityType
+  entityId                          String
+  comment                           String?
+  createdAt                         DateTime       @default(now())
+  updatedAt             DateTime         @updatedAt
+  reviewedAt                        DateTime?
+  requestedById                     String
+  reviewedById                      String?
+  User_Approval_requestedByIdToUser User           @relation("Approval_requestedByIdToUser", fields: [requestedById], references: [id], onDelete: Cascade)
+  User_Approval_reviewedByIdToUser  User?          @relation("Approval_reviewedByIdToUser", fields: [reviewedById], references: [id])
+
+  @@unique([entityType, entityId])
+  @@index([entityType])
+  @@index([requestedById])
+  @@index([reviewedById])
+  @@index([status])
+}
+
+model Article {
+  id              String           @id
+  titleFr         String
+  titleEn         String
+  slug            String           @unique
+  contentFr       String
+  contentEn       String
+  excerptFr       String?
+  excerptEn       String?
+  imageUrl        String?
+  imageAltFr      String?
+  imageAltEn      String?
+  gallery         String?
+  videos          String?
+  published       Boolean          @default(false)
+  featured        Boolean          @default(false)
+  publishedAt     DateTime?
+  createdAt       DateTime         @default(now())
+  updatedAt             DateTime         @updatedAt
+  deletedAt       DateTime?
+  authorId        String
+  categoryId      String?
+  User            User             @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  ArticleCategory ArticleCategory? @relation(fields: [categoryId], references: [id])
+
+  @@index([authorId])
+  @@index([categoryId])
+  @@index([deletedAt])
+  @@index([featured])
+  @@index([publishedAt])
+  @@index([published])
+  @@index([slug])
+}
+
+model ArticleCategory {
+  id            String    @id
+  nameFr        String
+  nameEn        String
+  slug          String    @unique
+  descriptionFr String?
+  descriptionEn String?
+  order         Int       @default(0)
+  createdAt     DateTime  @default(now())
+  updatedAt             DateTime         @updatedAt
+  deletedAt     DateTime?
+  Article       Article[]
+
+  @@index([deletedAt])
+  @@index([order])
+  @@index([slug])
+}
+
+model ContactInfo {
+  id             String   @id @default("contact-info")
+  titleFr        String?
+  titleEn        String?
+  descriptionFr  String?
+  descriptionEn  String?
+  address        String?
+  email          String?
+  phone          String?
+  phone2         String?
+  workingHoursFr String?
+  workingHoursEn String?
+  mapEmbedUrl    String?
+  updatedAt      DateTime @updatedAt
+  emailBcc       String?
+  emailCc1       String?
+  emailCc2       String?
+  emailTo        String   @default("kalexane@gmail.com")
+}
+
+model ContactMessage {
+  id           String    @id
+  name         String
+  email        String
+  phone        String?
+  subject      String?
+  message      String
+  isRead       Boolean   @default(false)
+  readAt       DateTime?
+  replied      Boolean   @default(false)
+  repliedAt    DateTime?
+  replyMessage String?
+  createdAt    DateTime  @default(now())
+  updatedAt             DateTime         @updatedAt
+  repliedById  String?
+  User         User?     @relation(fields: [repliedById], references: [id])
+
+  @@index([createdAt])
+  @@index([email])
+  @@index([isRead])
+}
+
+model Event {
+  id            String    @id
+  titleFr       String
+  titleEn       String
+  descriptionFr String?
+  descriptionEn String?
+  date          DateTime
+  endDate       DateTime?
+  location      String?
+  imageUrl      String?
+  imageAltFr    String?
+  imageAltEn    String?
+  gallery       String?
+  videos        String?
+  published     Boolean   @default(false)
+  createdAt     DateTime  @default(now())
+  updatedAt             DateTime         @updatedAt
+  deletedAt     DateTime?
+
+  @@index([date])
+  @@index([deletedAt])
+  @@index([published])
+}
+
+model HomeAbout {
+  id           String   @id @default("home-about")
+  titleFr      String
+  titleEn      String
+  contentFr    String
+  contentEn    String
+  imageUrl     String?
+  imageAltFr   String?
+  imageAltEn   String?
+  buttonTextFr String?
+  buttonTextEn String?
+  buttonUrl    String?
+  updatedAt             DateTime         @updatedAt
+}
+
+model HomeCTA {
+  id           String   @id @default("home-cta")
+  titleFr      String
+  titleEn      String
+  subtitleFr   String?
+  subtitleEn   String?
+  buttonTextFr String?
+  buttonTextEn String?
+  buttonUrl    String?
+  updatedAt             DateTime         @updatedAt
+}
+
+model MediaAsset {
+  id            String    @id
+  filename      String
+  originalName  String
+  url           String
+  mimeType      String
+  size          Int
+  width         Int?
+  height        Int?
+  altFr         String?
+  altEn         String?
+  titleFr       String?
+  titleEn       String?
+  descriptionFr String?
+  descriptionEn String?
+  createdAt     DateTime  @default(now())
+  updatedAt             DateTime         @updatedAt
+  deletedAt     DateTime?
+  uploadedById  String?
+  User          User?     @relation(fields: [uploadedById], references: [id])
+
+  @@index([deletedAt])
+  @@index([mimeType])
+  @@index([uploadedById])
+}
+
+model MenuItem {
+  id             String       @id
+  parentId       String?
+  order          Int          @default(0)
+  slug           String
+  route          String
+  labelFr        String
+  labelEn        String
+  visible        Boolean      @default(true)
+  location       MenuLocation @default(HEADER)
+  icon           String?
+  external       Boolean      @default(false)
+  createdAt      DateTime     @default(now())
+  updatedAt             DateTime         @updatedAt
+  deletedAt      DateTime?
+  MenuItem       MenuItem?    @relation("MenuItemToMenuItem", fields: [parentId], references: [id], onDelete: Cascade)
+  other_MenuItem MenuItem[]   @relation("MenuItemToMenuItem")
+
+  @@index([deletedAt])
+  @@index([location])
+  @@index([order])
+  @@index([parentId])
+  @@index([slug])
+}
+
+model Page {
+  id                String    @id
+  parentId          String?
+  slug              String    @unique
+  titleFr           String
+  titleEn           String
+  contentFr         String?
+  contentEn         String?
+  metaTitleFr       String?
+  metaTitleEn       String?
+  metaDescriptionFr String?
+  metaDescriptionEn String?
+  published         Boolean   @default(false)
+  order             Int       @default(0)
+  showInMenu        Boolean   @default(false)
+  createdAt         DateTime  @default(now())
+  updatedAt             DateTime         @updatedAt
+  deletedAt         DateTime?
+  Page              Page?     @relation("PageToPage", fields: [parentId], references: [id])
+  other_Page        Page[]    @relation("PageToPage")
+
+  @@index([deletedAt])
+  @@index([parentId])
+  @@index([published])
+  @@index([slug])
+}
+
+model Partner {
+  id        String    @id
+  name      String
+  logoUrl   String
+  website   String?
+  order     Int       @default(0)
+  visible   Boolean   @default(true)
+  createdAt DateTime  @default(now())
+  updatedAt             DateTime         @updatedAt
+  deletedAt DateTime?
+
+  @@index([deletedAt])
+  @@index([order])
+  @@index([visible])
+}
+
+model Realisation {
+  id                  String               @id
+  titleFr             String
+  titleEn             String
+  descriptionFr       String?
+  descriptionEn       String?
+  client              String?
+  date                DateTime?
+  location            String?
+  imageUrl            String?
+  gallery             String?
+  videos              String?
+  published           Boolean              @default(false)
+  featured            Boolean              @default(false)
+  createdAt           DateTime             @default(now())
+  updatedAt             DateTime         @updatedAt
+  deletedAt           DateTime?
+  categoryId          String?
+  RealisationCategory RealisationCategory? @relation(fields: [categoryId], references: [id])
+
+  @@index([categoryId])
+  @@index([deletedAt])
+  @@index([featured])
+  @@index([published])
+}
+
+model RealisationCategory {
+  id            String        @id
+  nameFr        String
+  nameEn        String
+  slug          String        @unique
+  descriptionFr String?
+  descriptionEn String?
+  order         Int           @default(0)
+  createdAt     DateTime      @default(now())
+  updatedAt             DateTime         @updatedAt
+  deletedAt     DateTime?
+  Realisation   Realisation[]
+
+  @@index([deletedAt])
+  @@index([order])
+  @@index([slug])
+}
+
+model Resource {
+  id               String            @id
+  titleFr          String
+  titleEn          String
+  descriptionFr    String?
+  descriptionEn    String?
+  fileUrl          String
+  fileType         String
+  fileSize         Int
+  fileName         String
+  files            String?
+  published        Boolean           @default(false)
+  downloadCount    Int               @default(0)
+  createdAt        DateTime          @default(now())
+  updatedAt             DateTime         @updatedAt
+  deletedAt        DateTime?
+  categoryId       String?
+  ResourceCategory ResourceCategory? @relation(fields: [categoryId], references: [id])
+
+  @@index([categoryId])
+  @@index([deletedAt])
+  @@index([published])
+}
+
+model ResourceCategory {
+  id            String     @id
+  nameFr        String
+  nameEn        String
+  slug          String     @unique
+  descriptionFr String?
+  descriptionEn String?
+  order         Int        @default(0)
+  createdAt     DateTime   @default(now())
+  updatedAt             DateTime         @updatedAt
+  deletedAt     DateTime?
+  Resource      Resource[]
+
+  @@index([deletedAt])
+  @@index([order])
+  @@index([slug])
+}
+
+model Service {
+  id            String    @id
+  titleFr       String
+  titleEn       String
+  descriptionFr String?
+  descriptionEn String?
+  icon          String?
+  imageUrl      String?
+  imageAltFr    String?
+  imageAltEn    String?
+  order         Int       @default(0)
+  visible       Boolean   @default(true)
+  createdAt     DateTime  @default(now())
+  updatedAt             DateTime         @updatedAt
+  deletedAt     DateTime?
+
+  @@index([deletedAt])
+  @@index([order])
+  @@index([visible])
+}
+
+model SiteSettings {
+  id                  String   @id @default("site-settings")
+  logoUrl             String?
+  logoAltFr           String?
+  logoAltEn           String?
+  color1              String   @default("#362981")
+  color2              String   @default("#009446")
+  color3              String   @default("#029CB1")
+  color4              String   @default("#9AD2E2")
+  siteNameFr          String   @default("AAEA")
+  siteNameEn          String   @default("AAEA")
+  siteDescriptionFr   String?
+  siteDescriptionEn   String?
+  address             String?
+  email               String?
+  phone               String?
+  phone2              String?
+  workingHoursFr      String?
+  workingHoursEn      String?
+  socialLinks         String?
+  mapLatitude         Float?
+  mapLongitude        Float?
+  mapZoom             Int      @default(15)
+  mapApiKey           String?
+  metaTitleFr         String?
+  metaTitleEn         String?
+  metaDescriptionFr   String?
+  metaDescriptionEn   String?
+  metaKeywords        String?
+  googleAnalyticsId   String?
+  googleTagManagerId  String?
+  articlesPerPage     Int      @default(10)
+  realisationsPerPage Int      @default(9)
+  resourcesPerPage    Int      @default(12)
+  eventsPerPage       Int      @default(6)
+  updatedAt             DateTime         @updatedAt
+}
+
+model Slider {
+  id           String    @id
+  titleFr      String
+  titleEn      String
+  subtitleFr   String?
+  subtitleEn   String?
+  buttonTextFr String?
+  buttonTextEn String?
+  buttonUrl    String?
+  imageUrl     String
+  imageAltFr   String?
+  imageAltEn   String?
+  order        Int       @default(0)
+  visible      Boolean   @default(true)
+  createdAt    DateTime  @default(now())
+  updatedAt             DateTime         @updatedAt
+  deletedAt    DateTime?
+
+  @@index([deletedAt])
+  @@index([order])
+  @@index([visible])
+}
+
+model Testimonial {
+  id        String    @id
+  name      String
+  company   String?
+  textFr    String
+  textEn    String
+  avatar    String?
+  rating    Int       @default(5)
+  order     Int       @default(0)
+  visible   Boolean   @default(true)
+  createdAt DateTime  @default(now())
+  updatedAt             DateTime         @updatedAt
+  deletedAt DateTime?
+
+  @@index([deletedAt])
+  @@index([order])
+  @@index([visible])
+}
+
+model User {
+  id                                    String           @id
+  email                                 String           @unique
+  password                              String
+  name                                  String?
+  avatar                                String?
+  role                                  Role             @default(USER)
+  active                                Boolean          @default(true)
+  emailVerified                         DateTime?
+  lastLogin                             DateTime?
+  createdAt                             DateTime         @default(now())
+  updatedAt                             DateTime         @updatedAt
+  deletedAt                             DateTime?
+  Approval_Approval_requestedByIdToUser Approval[]       @relation("Approval_requestedByIdToUser")
+  Approval_Approval_reviewedByIdToUser  Approval[]       @relation("Approval_reviewedByIdToUser")
+  Article                               Article[]
+  ContactMessage                        ContactMessage[]
+  MediaAsset                            MediaAsset[]
+
+  @@index([deletedAt])
+  @@index([email])
+  @@index([role])
+}
+
+enum ApprovalStatus {
+  PENDING
+  APPROVED
+  REJECTED
+}
+
+enum EntityType {
+  ARTICLE
+  RESOURCE
+  REALISATION
+  EVENT
+}
+
+enum MenuLocation {
+  HEADER
+  FOOTER
+  BOTH
+}
+
+enum Role {
+  USER
+  ADMIN
+  SUPER_ADMIN
+}

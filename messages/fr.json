@@ -1,0 +1,550 @@
+{
+  "navigation": {
+    "home": "Accueil",
+    "about": "À propos",
+    "solutions": "Solutions",
+    "realisations": "Réalisations",
+    "resources": "Ressources",
+    "events": "Événements",
+    "contact": "Contact"
+  },
+  "common": {
+    "buttons": {
+      "submit": "Envoyer",
+      "cancel": "Annuler",
+      "save": "Enregistrer",
+      "delete": "Supprimer",
+      "edit": "Modifier",
+      "add": "Ajouter",
+      "view": "Voir",
+      "close": "Fermer",
+      "confirm": "Confirmer",
+      "back": "Retour",
+      "next": "Suivant",
+      "previous": "Précédent",
+      "search": "Rechercher",
+      "reset": "Réinitialiser",
+      "apply": "Appliquer",
+      "download": "Télécharger",
+      "upload": "Téléverser",
+      "loading": "Chargement...",
+      "seeMore": "Voir plus",
+      "seeAll": "Voir tout",
+      "learnMore": "En savoir plus",
+      "readMore": "Lire la suite"
+    },
+    "forms": {
+      "required": "Ce champ est obligatoire",
+      "optional": "Facultatif",
+      "selectOption": "Sélectionner une option",
+      "selectMultiple": "Sélectionner plusieurs options",
+      "typeToSearch": "Tapez pour rechercher...",
+      "noResults": "Aucun résultat trouvé",
+      "all": "Tous",
+      "none": "Aucun",
+      "yes": "Oui",
+      "no": "Non"
+    },
+    "errors": {
+      "general": "Une erreur est survenue",
+      "notFound": "Page non trouvée",
+      "serverError": "Erreur serveur",
+      "unauthorized": "Non autorisé",
+      "forbidden": "Accès refusé",
+      "validationError": "Erreur de validation",
+      "networkError": "Erreur de connexion",
+      "tryAgain": "Veuillez réessayer",
+      "contactSupport": "Contactez le support si le problème persiste"
+    },
+    "success": {
+      "saved": "Enregistré avec succès",
+      "deleted": "Supprimé avec succès",
+      "updated": "Mis à jour avec succès",
+      "submitted": "Soumis avec succès",
+      "sent": "Envoyé avec succès",
+      "copied": "Copié dans le presse-papiers"
+    }
+  },
+  "header": {
+    "logoAlt": "Logo de l'entreprise",
+    "searchPlaceholder": "Rechercher...",
+    "searchAria": "Rechercher sur le site",
+    "login": "Connexion",
+    "register": "S'inscrire",
+    "logout": "Déconnexion",
+    "profile": "Mon profil",
+    "settings": "Paramètres",
+    "dashboard": "Tableau de bord",
+    "languageSwitch": "Changer de langue",
+    "currentLanguage": "Langue actuelle : Français",
+    "menu": "Menu",
+    "closeMenu": "Fermer le menu"
+  },
+  "footer": {
+    "copyright": "© {year} Tous droits réservés",
+    "description": "Votre partenaire technologique de confiance",
+    "links": {
+      "title": "Liens utiles",
+      "privacy": "Politique de confidentialité",
+      "terms": "Conditions d'utilisation",
+      "cookies": "Politique des cookies",
+      "legal": "Mentions légales",
+      "accessibility": "Accessibilité",
+      "sitemap": "Plan du site"
+    },
+    "contact": {
+      "title": "Contact",
+      "address": "Adresse",
+      "phone": "Téléphone",
+      "email": "Email",
+      "hours": "Horaires d'ouverture"
+    },
+    "social": {
+      "title": "Suivez-nous",
+      "facebook": "Facebook",
+      "twitter": "Twitter",
+      "linkedin": "LinkedIn",
+      "instagram": "Instagram",
+      "youtube": "YouTube"
+    },
+    "newsletter": {
+      "title": "Newsletter",
+      "description": "Restez informé de nos dernières actualités",
+      "placeholder": "Votre adresse email",
+      "subscribe": "S'abonner",
+      "success": "Merci pour votre inscription !"
+    }
+  },
+  "auth": {
+    "login": {
+      "title": "Connexion",
+      "subtitle": "Bienvenue ! Connectez-vous à votre compte",
+      "email": "Adresse email",
+      "password": "Mot de passe",
+      "rememberMe": "Se souvenir de moi",
+      "forgotPassword": "Mot de passe oublié ?",
+      "submit": "Se connecter",
+      "noAccount": "Pas encore de compte ?",
+      "register": "Créer un compte",
+      "orContinueWith": "Ou continuer avec",
+      "success": "Connexion réussie !"
+    },
+    "register": {
+      "title": "Créer un compte",
+      "subtitle": "Rejoignez-nous en quelques étapes",
+      "firstName": "Prénom",
+      "lastName": "Nom",
+      "email": "Adresse email",
+      "password": "Mot de passe",
+      "confirmPassword": "Confirmer le mot de passe",
+      "acceptTerms": "J'accepte les {terms} et la {privacy}",
+      "termsOfService": "conditions d'utilisation",
+      "privacyPolicy": "politique de confidentialité",
+      "submit": "Créer mon compte",
+      "alreadyHaveAccount": "Déjà un compte ?",
+      "login": "Se connecter",
+      "success": "Compte créé avec succès !"
+    },
+    "logout": {
+      "title": "Déconnexion",
+      "confirm": "Êtes-vous sûr de vouloir vous déconnecter ?",
+      "success": "Vous avez été déconnecté avec succès"
+    },
+    "forgotPassword": {
+      "title": "Mot de passe oublié",
+      "subtitle": "Entrez votre email pour réinitialiser votre mot de passe",
+      "email": "Adresse email",
+      "submit": "Envoyer le lien de réinitialisation",
+      "backToLogin": "Retour à la connexion",
+      "success": "Un email de réinitialisation a été envoyé",
+      "checkEmail": "Vérifiez votre boîte de réception"
+    },
+    "resetPassword": {
+      "title": "Réinitialiser le mot de passe",
+      "subtitle": "Créez un nouveau mot de passe",
+      "newPassword": "Nouveau mot de passe",
+      "confirmPassword": "Confirmer le nouveau mot de passe",
+      "submit": "Réinitialiser le mot de passe",
+      "success": "Mot de passe réinitialisé avec succès"
+    },
+    "errors": {
+      "invalidCredentials": "Email ou mot de passe incorrect",
+      "emailRequired": "L'adresse email est requise",
+      "emailInvalid": "Veuillez entrer une adresse email valide",
+      "passwordRequired": "Le mot de passe est requis",
+      "passwordTooShort": "Le mot de passe doit contenir au moins 8 caractères",
+      "passwordMismatch": "Les mots de passe ne correspondent pas",
+      "emailAlreadyExists": "Un compte avec cet email existe déjà",
+      "accountNotVerified": "Veuillez vérifier votre email pour activer votre compte",
+      "tokenExpired": "Le lien de réinitialisation a expiré",
+      "tokenInvalid": "Le lien de réinitialisation est invalide",
+      "weakPassword": "Le mot de passe doit contenir des lettres majuscules, minuscules, des chiffres et des caractères spéciaux"
+    }
+  },
+  "contact": {
+    "title": "Contactez-nous",
+    "subtitle": "Nous serions ravis d'échanger avec vous",
+    "form": {
+      "name": "Nom complet",
+      "namePlaceholder": "Votre nom",
+      "email": "Adresse email",
+      "emailPlaceholder": "votre@email.com",
+      "phone": "Téléphone",
+      "phonePlaceholder": "+33 6 00 00 00 00",
+      "subject": "Sujet",
+      "subjectPlaceholder": "Objet de votre message",
+      "message": "Message",
+      "messagePlaceholder": "Votre message...",
+      "send": "Envoyer le message",
+      "sending": "Envoi en cours...",
+      "success": "Votre message a été envoyé avec succès ! Nous vous répondrons dans les plus brefs délais.",
+      "error": "Une erreur est survenue lors de l'envoi du message. Veuillez réessayer."
+    },
+    "info": {
+      "title": "Informations de contact",
+      "address": "Adresse",
+      "phone": "Téléphone",
+      "email": "Email",
+      "hours": "Horaires d'ouverture",
+      "hoursValue": "Lun - Ven : 9h00 - 18h00"
+    }
+  },
+  "about": {
+    "title": "À propos de nous",
+    "subtitle": "Découvrez notre histoire et notre mission",
+    "ourStory": {
+      "title": "Notre histoire",
+      "content": "Fondée avec passion, notre entreprise s'est développée pour devenir un leader dans notre domaine."
+    },
+    "ourMission": {
+      "title": "Notre mission",
+      "content": "Nous nous engageons à fournir des solutions innovantes et de qualité à nos clients."
+    },
+    "ourValues": {
+      "title": "Nos valeurs",
+      "innovation": "Innovation",
+      "innovationDesc": "Nous repoussons constamment les limites pour offrir des solutions avant-gardistes.",
+      "excellence": "Excellence",
+      "excellenceDesc": "Nous visons la perfection dans chaque projet que nous entreprenons.",
+      "integrity": "Intégrité",
+      "integrityDesc": "Nous agissons avec honnêteté et transparence dans toutes nos interactions.",
+      "collaboration": "Collaboration",
+      "collaborationDesc": "Nous croyons en la puissance du travail d'équipe et du partenariat."
+    },
+    "team": {
+      "title": "Notre équipe",
+      "subtitle": "Rencontrez les personnes passionnées derrière notre succès"
+    },
+    "stats": {
+      "clients": "Clients satisfaits",
+      "projects": "Projets réalisés",
+      "years": "Années d'expérience",
+      "team": "Membres de l'équipe"
+    }
+  },
+  "solutions": {
+    "title": "Nos solutions",
+    "subtitle": "Des solutions adaptées à vos besoins",
+    "categories": {
+      "all": "Toutes les solutions",
+      "digital": "Transformation digitale",
+      "consulting": "Conseil",
+      "development": "Développement",
+      "cloud": "Cloud & Infrastructure",
+      "security": "Cybersécurité",
+      "data": "Data & Analytics"
+    },
+    "card": {
+      "learnMore": "En savoir plus",
+      "requestDemo": "Demander une démo",
+      "features": "Fonctionnalités",
+      "benefits": "Avantages"
+    },
+    "cta": {
+      "title": "Besoin d'une solution sur mesure ?",
+      "description": "Contactez-nous pour discuter de votre projet",
+      "button": "Nous contacter"
+    }
+  },
+  "realisations": {
+    "title": "Nos réalisations",
+    "subtitle": "Découvrez nos projets et réussites",
+    "filters": {
+      "all": "Tous",
+      "byCategory": "Par catégorie",
+      "byYear": "Par année",
+      "byClient": "Par client",
+      "clearFilters": "Effacer les filtres"
+    },
+    "categories": {
+      "web": "Applications Web",
+      "mobile": "Applications Mobile",
+      "enterprise": "Solutions Entreprise",
+      "ecommerce": "E-commerce",
+      "integration": "Intégrations",
+      "other": "Autres"
+    },
+    "card": {
+      "viewDetails": "Voir les détails",
+      "viewProject": "Voir le projet",
+      "client": "Client",
+      "year": "Année",
+      "technologies": "Technologies",
+      "duration": "Durée",
+      "team": "Équipe"
+    },
+    "detail": {
+      "challenge": "Le défi",
+      "solution": "Notre solution",
+      "results": "Résultats",
+      "testimonials": "Témoignages",
+      "gallery": "Galerie"
+    }
+  },
+  "resources": {
+    "title": "Ressources",
+    "subtitle": "Documentation, guides et outils",
+    "download": "Télécharger",
+    "filterByType": "Filtrer par type",
+    "categories": {
+      "all": "Toutes les ressources",
+      "guides": "Guides",
+      "whitepapers": "Livres blancs",
+      "caseStudies": "Études de cas",
+      "tutorials": "Tutoriels",
+      "documentation": "Documentation",
+      "videos": "Vidéos",
+      "podcasts": "Podcasts",
+      "blog": "Blog"
+    },
+    "card": {
+      "readTime": "Temps de lecture",
+      "minutes": "min",
+      "downloads": "téléchargements",
+      "views": "vues",
+      "publishedOn": "Publié le",
+      "updatedOn": "Mis à jour le",
+      "author": "Auteur"
+    },
+    "search": {
+      "placeholder": "Rechercher des ressources...",
+      "noResults": "Aucune ressource trouvée",
+      "tryDifferent": "Essayez avec d'autres mots-clés"
+    }
+  },
+  "events": {
+    "title": "Événements",
+    "subtitle": "Restez informé de nos événements à venir",
+    "photos": "Photos",
+    "videos": "Vidéos",
+    "date": "Date",
+    "location": "Lieu",
+    "time": "Heure",
+    "register": "S'inscrire",
+    "registered": "Inscrit",
+    "registrationClosed": "Inscriptions closes",
+    "pastEvents": "Événements passés",
+    "upcomingEvents": "Événements à venir",
+    "allEvents": "Tous les événements",
+    "categories": {
+      "all": "Tous les événements",
+      "conference": "Conférences",
+      "webinar": "Webinaires",
+      "workshop": "Ateliers",
+      "meetup": "Meetups",
+      "training": "Formations",
+      "other": "Autres"
+    },
+    "detail": {
+      "description": "Description",
+      "agenda": "Programme",
+      "speakers": "Intervenants",
+      "partners": "Partenaires",
+      "venue": "Lieu",
+      "addToCalendar": "Ajouter au calendrier",
+      "shareEvent": "Partager l'événement"
+    },
+    "gallery": {
+      "title": "Galerie",
+      "viewAll": "Voir toutes les photos"
+    }
+  },
+  "admin": {
+    "dashboard": {
+      "title": "Tableau de bord",
+      "welcome": "Bienvenue, {name} !",
+      "overview": "Vue d'ensemble",
+      "recentActivity": "Activité récente",
+      "quickActions": "Actions rapides",
+      "statistics": "Statistiques"
+    },
+    "settings": {
+      "title": "Paramètres",
+      "description": "Gérez la configuration et l'apparence de votre site",
+      "general": "Général",
+      "security": "Sécurité",
+      "notifications": "Notifications",
+      "appearance": "Apparence",
+      "language": "Langue",
+      "timezone": "Fuseau horaire",
+      "save": "Enregistrer les paramètres",
+      "saved": "Paramètres enregistrés avec succès",
+      "logo": {
+        "title": "Logo & Identité",
+        "description": "Téléchargez votre logo et configurez les textes alternatifs",
+        "uploadTitle": "Logo",
+        "uploadDescription": "Téléchargez le logo de votre entreprise. Taille recommandée : 200x60px, format PNG ou SVG.",
+        "noLogo": "Aucun logo téléchargé",
+        "uploadButton": "Télécharger le logo",
+        "uploading": "Téléchargement en cours...",
+        "siteInfoTitle": "Informations du site",
+        "siteInfoDescription": "Configurez le nom du site et le texte alternatif du logo pour l'accessibilité",
+        "siteNameFr": "Nom du site (Français)",
+        "siteNameEn": "Nom du site (Anglais)",
+        "altFr": "Texte alternatif du logo (Français)",
+        "altEn": "Texte alternatif du logo (Anglais)",
+        "descriptionFr": "Description du site (Français)",
+        "descriptionEn": "Description du site (Anglais)"
+      },
+      "colors": {
+        "title": "Couleurs de la marque",
+        "description": "Personnalisez la palette de couleurs de votre site",
+        "settingsTitle": "Paramètres des couleurs",
+        "settingsDescription": "Choisissez les couleurs de votre marque. Cliquez sur une couleur pour en choisir une nouvelle.",
+        "primary": "Couleur Principale",
+        "secondary": "Couleur Secondaire",
+        "accent": "Couleur d'Accent",
+        "light": "Couleur Claire",
+        "previewTitle": "Aperçu en direct",
+        "previewDescription": "Voyez comment vos couleurs apparaîtront sur le site",
+        "reset": "Réinitialiser par défaut"
+      },
+      "menus": {
+        "title": "Gestion des menus",
+        "description": "Créez et organisez les menus de navigation",
+        "addItem": "Ajouter un élément",
+        "itemsTitle": "Éléments du menu",
+        "itemsDescription": "Glissez-déposez pour réorganiser. Cliquez pour modifier.",
+        "noItems": "Aucun élément de menu. Créez votre premier élément.",
+        "createTitle": "Créer un élément de menu",
+        "createDescription": "Ajouter un nouvel élément de navigation",
+        "editTitle": "Modifier l'élément de menu",
+        "editDescription": "Mettre à jour les paramètres de l'élément",
+        "labelFr": "Libellé (Français)",
+        "labelEn": "Libellé (Anglais)",
+        "slug": "Slug",
+        "route": "Route",
+        "parent": "Menu parent",
+        "location": "Emplacement",
+        "visible": "Visible",
+        "external": "Lien externe",
+        "deleteTitle": "Supprimer l'élément de menu",
+        "deleteDescription": "Êtes-vous sûr de vouloir supprimer",
+        "deleteChildren": "Cela supprimera également {count} élément(s) enfant(s).",
+        "orderSaved": "Ordre du menu enregistré",
+        "visibilityUpdated": "Visibilité mise à jour"
+      },
+      "maps": {
+        "title": "Paramètres de la carte",
+        "description": "Configurez l'emplacement Google Maps pour votre site",
+        "configTitle": "Configuration de la carte",
+        "configDescription": "Définissez l'emplacement à afficher sur votre page de contact",
+        "searchLabel": "Rechercher un emplacement",
+        "searchPlaceholder": "Rechercher une adresse...",
+        "searchDescription": "Recherchez un emplacement pour remplir automatiquement les coordonnées",
+        "latitude": "Latitude",
+        "latitudeDescription": "Plage : -90 à 90 (défaut : Paris, France)",
+        "longitude": "Longitude",
+        "longitudeDescription": "Plage : -180 à 180",
+        "zoom": "Niveau de zoom : {value}",
+        "zoomDescription": "1 = Vue mondiale, 20 = Niveau rue",
+        "apiKey": "Clé API Google Maps (Optionnel)",
+        "apiKeyDescription": "Optionnel. Laissez vide pour utiliser OpenStreetMap à la place.",
+        "previewTitle": "Aperçu de la carte",
+        "previewDescription": "Aperçu de votre emplacement sur la carte",
+        "presets": "Préréglages rapides",
+        "notSet": "Non défini"
+      },
+      "currentConfig": "Configuration actuelle",
+      "currentConfigDescription": "Aperçu de vos paramètres actuels",
+      "logoBranding": "Logo & Identité",
+      "brandColors": "Couleurs de la marque",
+      "siteInfo": "Informations du site",
+      "mapsConfig": "Configuration Maps",
+      "logoUploaded": "Logo téléchargé"
+    },
+    "users": {
+      "title": "Gestion des utilisateurs",
+      "addUser": "Ajouter un utilisateur",
+      "editUser": "Modifier l'utilisateur",
+      "deleteUser": "Supprimer l'utilisateur",
+      "confirmDelete": "Êtes-vous sûr de vouloir supprimer cet utilisateur ?",
+      "role": "Rôle",
+      "roles": {
+        "admin": "Administrateur",
+        "editor": "Éditeur",
+        "viewer": "Lecteur",
+        "user": "Utilisateur"
+      },
+      "status": {
+        "active": "Actif",
+        "inactive": "Inactif",
+        "pending": "En attente",
+        "suspended": "Suspendu"
+      },
+      "lastLogin": "Dernière connexion",
+      "createdAt": "Date de création"
+    },
+    "content": {
+      "title": "Gestion du contenu",
+      "pages": "Pages",
+      "posts": "Articles",
+      "media": "Médias",
+      "forms": "Formulaires",
+      "addNew": "Ajouter nouveau",
+      "edit": "Modifier",
+      "delete": "Supprimer",
+      "publish": "Publier",
+      "unpublish": "Dépublier",
+      "duplicate": "Dupliquer",
+      "status": {
+        "draft": "Brouillon",
+        "published": "Publié",
+        "archived": "Archivé",
+        "scheduled": "Programmé"
+      }
+    },
+    "media": {
+      "title": "Bibliothèque média",
+      "upload": "Téléverser",
+      "selectFiles": "Sélectionner des fichiers",
+      "dragDrop": "Glissez-déposez vos fichiers ici",
+      "or": "ou",
+      "browseFiles": "Parcourir les fichiers",
+      "supportedFormats": "Formats supportés : {formats}",
+      "maxSize": "Taille maximale : {size}",
+      "delete": "Supprimer",
+      "deleteConfirm": "Êtes-vous sûr de vouloir supprimer ce fichier ?",
+      "replace": "Remplacer",
+      "download": "Télécharger",
+      "copyUrl": "Copier l'URL",
+      "editDetails": "Modifier les détails",
+      "alt": "Texte alternatif",
+      "title": "Titre",
+      "caption": "Légende",
+      "description": "Description"
+    },
+    "analytics": {
+      "title": "Analytique",
+      "visitors": "Visiteurs",
+      "pageViews": "Pages vues",
+      "bounceRate": "Taux de rebond",
+      "avgDuration": "Durée moyenne",
+      "topPages": "Pages populaires",
+      "topReferrers": "Sources de trafic",
+      "devices": "Appareils",
+      "browsers": "Navigateurs",
+      "countries": "Pays"
+    }
+  }
+}
