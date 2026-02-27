@@ -239,70 +239,83 @@ export default function SliderAdminPage() {
               Ajouter un slider
             </Button>
           </DialogTrigger>
-          <DialogContent className="max-w-2xl">
-            <DialogHeader>
+          <DialogContent className="max-w-2xl max-h-[90vh] flex flex-col p-0 overflow-hidden">
+            <DialogHeader className="px-6 pt-6 pb-2 flex-shrink-0">
               <DialogTitle>{editingSlider ? 'Modifier le slider' : 'Ajouter un slider'}</DialogTitle>
             </DialogHeader>
-            <form onSubmit={handleSubmit} className="space-y-4">
-              <Tabs defaultValue="fr">
-                <TabsList className="grid w-full grid-cols-2">
-                  <TabsTrigger value="fr">Français</TabsTrigger>
-                  <TabsTrigger value="en">English</TabsTrigger>
-                </TabsList>
-                <TabsContent value="fr" className="space-y-4">
+            <form onSubmit={handleSubmit} className="flex flex-col flex-1 overflow-hidden min-h-0">
+              <div className="flex-1 overflow-y-auto px-6 pb-4 space-y-4 min-h-0">
+                {/* Image upload - First for visibility */}
+                <div>
+                  <Label className="text-sm font-medium">Image du slider *</Label>
+                  <ImageUploadCompact
+                    value={formData.imageUrl || ''}
+                    onChange={(url) => setFormData({ ...formData, imageUrl: url })}
+                    folder="sliders"
+                  />
+                </div>
+                
+                <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <Label>Titre</Label>
-                    <Input value={formData.titleFr || ''} onChange={(e) => setFormData({ ...formData, titleFr: e.target.value })} required />
+                    <Label>URL du bouton</Label>
+                    <Input value={formData.buttonUrl || ''} onChange={(e) => setFormData({ ...formData, buttonUrl: e.target.value })} placeholder="/page ou https://..." />
                   </div>
-                  <div>
-                    <Label>Sous-titre</Label>
-                    <Textarea value={formData.subtitleFr || ''} onChange={(e) => setFormData({ ...formData, subtitleFr: e.target.value })} />
+                  <div className="flex items-end pb-2">
+                    <Switch checked={formData.visible} onCheckedChange={(checked) => setFormData({ ...formData, visible: checked })} />
+                    <Label className="ml-2 cursor-pointer">Visible</Label>
                   </div>
-                  <div>
-                    <Label>Texte du bouton</Label>
-                    <Input value={formData.buttonTextFr || ''} onChange={(e) => setFormData({ ...formData, buttonTextFr: e.target.value })} />
-                  </div>
-                  <div>
-                    <Label>Alt image</Label>
-                    <Input value={formData.imageAltFr || ''} onChange={(e) => setFormData({ ...formData, imageAltFr: e.target.value })} />
-                  </div>
-                </TabsContent>
-                <TabsContent value="en" className="space-y-4">
-                  <div>
-                    <Label>Title</Label>
-                    <Input value={formData.titleEn || ''} onChange={(e) => setFormData({ ...formData, titleEn: e.target.value })} required />
-                  </div>
-                  <div>
-                    <Label>Subtitle</Label>
-                    <Textarea value={formData.subtitleEn || ''} onChange={(e) => setFormData({ ...formData, subtitleEn: e.target.value })} />
-                  </div>
-                  <div>
-                    <Label>Button text</Label>
-                    <Input value={formData.buttonTextEn || ''} onChange={(e) => setFormData({ ...formData, buttonTextEn: e.target.value })} />
-                  </div>
-                  <div>
-                    <Label>Image alt</Label>
-                    <Input value={formData.imageAltEn || ''} onChange={(e) => setFormData({ ...formData, imageAltEn: e.target.value })} />
-                  </div>
-                </TabsContent>
-              </Tabs>
-              <div>
-                <Label>Image du slider</Label>
-                <ImageUploadCompact
-                  value={formData.imageUrl || ''}
-                  onChange={(url) => setFormData({ ...formData, imageUrl: url })}
-                  folder="sliders"
-                />
+                </div>
+                
+                <Tabs defaultValue="fr">
+                  <TabsList className="grid w-full grid-cols-2">
+                    <TabsTrigger value="fr">Français</TabsTrigger>
+                    <TabsTrigger value="en">English</TabsTrigger>
+                  </TabsList>
+                  <TabsContent value="fr" className="space-y-3 mt-3">
+                    <div>
+                      <Label>Titre *</Label>
+                      <Input value={formData.titleFr || ''} onChange={(e) => setFormData({ ...formData, titleFr: e.target.value })} required />
+                    </div>
+                    <div>
+                      <Label>Sous-titre</Label>
+                      <Textarea value={formData.subtitleFr || ''} onChange={(e) => setFormData({ ...formData, subtitleFr: e.target.value })} rows={2} />
+                    </div>
+                    <div className="grid grid-cols-2 gap-3">
+                      <div>
+                        <Label>Texte du bouton</Label>
+                        <Input value={formData.buttonTextFr || ''} onChange={(e) => setFormData({ ...formData, buttonTextFr: e.target.value })} />
+                      </div>
+                      <div>
+                        <Label>Alt image</Label>
+                        <Input value={formData.imageAltFr || ''} onChange={(e) => setFormData({ ...formData, imageAltFr: e.target.value })} />
+                      </div>
+                    </div>
+                  </TabsContent>
+                  <TabsContent value="en" className="space-y-3 mt-3">
+                    <div>
+                      <Label>Title *</Label>
+                      <Input value={formData.titleEn || ''} onChange={(e) => setFormData({ ...formData, titleEn: e.target.value })} required />
+                    </div>
+                    <div>
+                      <Label>Subtitle</Label>
+                      <Textarea value={formData.subtitleEn || ''} onChange={(e) => setFormData({ ...formData, subtitleEn: e.target.value })} rows={2} />
+                    </div>
+                    <div className="grid grid-cols-2 gap-3">
+                      <div>
+                        <Label>Button text</Label>
+                        <Input value={formData.buttonTextEn || ''} onChange={(e) => setFormData({ ...formData, buttonTextEn: e.target.value })} />
+                      </div>
+                      <div>
+                        <Label>Image alt</Label>
+                        <Input value={formData.imageAltEn || ''} onChange={(e) => setFormData({ ...formData, imageAltEn: e.target.value })} />
+                      </div>
+                    </div>
+                  </TabsContent>
+                </Tabs>
               </div>
-              <div>
-                <Label>URL du bouton</Label>
-                <Input value={formData.buttonUrl || ''} onChange={(e) => setFormData({ ...formData, buttonUrl: e.target.value })} />
-              </div>
-              <div className="flex items-center gap-2">
-                <Switch checked={formData.visible} onCheckedChange={(checked) => setFormData({ ...formData, visible: checked })} />
-                <Label>Visible</Label>
-              </div>
-              <div className="flex justify-end gap-2">
+              
+              {/* Fixed footer with buttons */}
+              <div className="flex-shrink-0 bg-background border-t px-6 py-4 flex justify-end gap-2 mt-auto">
                 <Button type="button" variant="outline" onClick={() => setIsDialogOpen(false)}>Annuler</Button>
                 <Button type="submit">{editingSlider ? 'Mettre à jour' : 'Créer'}</Button>
               </div>
