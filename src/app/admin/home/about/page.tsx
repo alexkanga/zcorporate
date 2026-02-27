@@ -1,16 +1,16 @@
 'use client';
 
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Textarea } from '@/components/ui/textarea';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { toast } from 'sonner';
 import { Save, Loader2 } from 'lucide-react';
 import { ImageUpload } from '@/components/admin/ImageUpload';
+import { RichTextEditor } from '@/components/admin/RichTextEditor';
 
 interface HomeAbout {
   id: string;
@@ -44,6 +44,8 @@ interface HomeAbout {
 export default function AboutAdminPage() {
   const queryClient = useQueryClient();
   const [localImageUrl, setLocalImageUrl] = useState<string>('');
+  const [contentFr, setContentFr] = useState<string>('');
+  const [contentEn, setContentEn] = useState<string>('');
 
   const { data: about, isLoading } = useQuery({
     queryKey: ['admin-home-about'],
@@ -53,6 +55,10 @@ export default function AboutAdminPage() {
       return res.json() as Promise<HomeAbout>;
     },
   });
+
+  // Derive content values: use local state if edited, otherwise use server data
+  const displayContentFr = contentFr || about?.contentFr || '';
+  const displayContentEn = contentEn || about?.contentEn || '';
 
   // Use the image URL from server data or local state
   const imageUrl = localImageUrl || about?.imageUrl || '';
@@ -80,8 +86,8 @@ export default function AboutAdminPage() {
     const data: Partial<HomeAbout> = {
       titleFr: formData.get('titleFr') as string,
       titleEn: formData.get('titleEn') as string,
-      contentFr: formData.get('contentFr') as string,
-      contentEn: formData.get('contentEn') as string,
+      contentFr: contentFr || about?.contentFr || '',
+      contentEn: contentEn || about?.contentEn || '',
       imageUrl: imageUrl || null,
       imageAltFr: formData.get('imageAltFr') as string || null,
       imageAltEn: formData.get('imageAltEn') as string || null,
@@ -159,11 +165,10 @@ export default function AboutAdminPage() {
                 </div>
                 <div>
                   <Label htmlFor="contentFr">Contenu</Label>
-                  <Textarea
-                    id="contentFr"
-                    name="contentFr"
-                    defaultValue={about?.contentFr || ''}
-                    rows={6}
+                  <RichTextEditor
+                    value={displayContentFr}
+                    onChange={setContentFr}
+                    placeholder="Écrivez le contenu ici..."
                   />
                 </div>
                 <div>
@@ -204,11 +209,10 @@ export default function AboutAdminPage() {
                 </div>
                 <div>
                   <Label htmlFor="contentEn">Content</Label>
-                  <Textarea
-                    id="contentEn"
-                    name="contentEn"
-                    defaultValue={about?.contentEn || ''}
-                    rows={6}
+                  <RichTextEditor
+                    value={displayContentEn}
+                    onChange={setContentEn}
+                    placeholder="Write your content here..."
                   />
                 </div>
                 <div>

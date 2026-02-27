@@ -13,6 +13,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { toast } from 'sonner';
 import { Pencil, Trash2, Plus, Loader2, Download, FileText } from 'lucide-react';
+import { FileUploadCompact } from '@/components/admin/FileUpload';
 
 interface Resource {
   id: string;
@@ -126,7 +127,23 @@ export default function ResourcesAdminPage() {
                   <SelectContent>{categories.map((cat) => (<SelectItem key={cat.id} value={cat.id}>{cat.nameFr}</SelectItem>))}</SelectContent>
                 </Select>
               </div>
-              <div><Label>URL du fichier</Label><Input value={formData.fileUrl || ''} onChange={(e) => setFormData({ ...formData, fileUrl: e.target.value })} required /></div>
+              <div>
+                <Label>Fichier</Label>
+                <FileUploadCompact
+                  value={formData.fileUrl || ''}
+                  onChange={(url, file) => {
+                    setFormData({ 
+                      ...formData, 
+                      fileUrl: url,
+                      fileName: file?.name || formData.fileName,
+                      fileType: file?.type || formData.fileType,
+                      fileSize: file?.size || formData.fileSize,
+                    });
+                  }}
+                  folder="resources"
+                  accept=".pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.zip,.rar"
+                />
+              </div>
               <div className="grid gap-4 md:grid-cols-3">
                 <div><Label>Nom du fichier</Label><Input value={formData.fileName || ''} onChange={(e) => setFormData({ ...formData, fileName: e.target.value })} required /></div>
                 <div><Label>Type MIME</Label><Input value={formData.fileType || ''} onChange={(e) => setFormData({ ...formData, fileType: e.target.value })} placeholder="application/pdf" required /></div>
