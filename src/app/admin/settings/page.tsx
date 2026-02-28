@@ -12,6 +12,7 @@ import {
   ArrowRight,
   CheckCircle,
   XCircle,
+  FileText,
 } from "lucide-react";
 import Link from "next/link";
 
@@ -76,6 +77,14 @@ const settingsCards = [
     color: "text-green-600",
     bgColor: "bg-green-100",
   },
+  {
+    title: "Pagination",
+    description: "Configure items per page",
+    href: "/admin/settings/pagination",
+    icon: FileText,
+    color: "text-orange-600",
+    bgColor: "bg-orange-100",
+  },
 ];
 
 export default function SettingsPage() {
@@ -101,7 +110,7 @@ export default function SettingsPage() {
       </div>
 
       {/* Settings Navigation Cards */}
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-5">
         {settingsCards.map((card) => (
           <Link key={card.href} href={card.href}>
             <Card className="hover:shadow-md transition-shadow cursor-pointer h-full">

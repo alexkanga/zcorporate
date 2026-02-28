@@ -7,8 +7,8 @@ export default function AboutPagesAdminPage() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-3xl font-bold">Pages À propos</h1>
-        <p className="text-muted-foreground">Gérez les sous-pages de la section À propos</p>
+        <h1 className="text-3xl font-bold">Pages Présentation</h1>
+        <p className="text-muted-foreground">Gérez les sous-pages de la section Présentation</p>
       </div>
       <Card>
         <CardContent className="flex flex-col items-center justify-center py-12">

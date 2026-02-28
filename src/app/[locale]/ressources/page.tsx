@@ -2,7 +2,7 @@
 
 import { useQuery } from '@tanstack/react-query';
 import { useLocale } from 'next-intl';
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -25,8 +25,9 @@ import {
   Folder,
   HardDrive,
   Filter,
+  ChevronLeft,
+  ChevronRight,
 } from 'lucide-react';
-import type { Metadata } from 'next';
 
 interface Resource {
   id: string;
@@ -55,17 +56,29 @@ interface Category {
   slug: string;
 }
 
-async function fetchResources(categoryId?: string, fileType?: string) {
-  const params = new URLSearchParams();
-  if (categoryId && categoryId !== 'all') {
-    params.append('categoryId', categoryId);
-  }
-  if (fileType && fileType !== 'all') {
-    params.append('fileType', fileType);
-  }
-  const response = await fetch(`/api/resources?${params.toString()}`);
-  const data = await response.json();
-  return data;
+interface ResourcesResponse {
+  data: Resource[];
+  categories: Category[];
+  fileTypes: string[];
+  pagination: {
+    page: number;
+    limit: number;
+    total: number;
+    totalPages: number;
+  };
+}
+
+async function fetchResources(params: { page: number; categoryId?: string; fileType?: string }): Promise<ResourcesResponse> {
+  const searchParams = new URLSearchParams({
+    page: params.page.toString(),
+    limit: '12',
+    ...(params.categoryId && { categoryId: params.categoryId }),
+    ...(params.fileType && { fileType: params.fileType }),
+  });
+
+  const response = await fetch(`/api/resources?${searchParams}`);
+  if (!response.ok) throw new Error('Failed to fetch resources');
+  return response.json();
 }
 
 const getFileIcon = (fileType: string) => {
@@ -107,22 +120,105 @@ const getFileTypeLabel = (fileType: string, locale: 'fr' | 'en') => {
   return labels[type]?.[locale] || type;
 };
 
+// Pagination component
+function Pagination({
+  currentPage,
+  totalPages,
+  onPageChange,
+}: {
+  currentPage: number;
+  totalPages: number;
+  onPageChange: (page: number) => void;
+}) {
+  const pages = useMemo(() => {
+    const items: (number | 'ellipsis')[] = [];
+    
+    if (totalPages <= 7) {
+      for (let i = 1; i <= totalPages; i++) {
+        items.push(i);
+      }
+    } else {
+      items.push(1);
+      if (currentPage > 3) items.push('ellipsis');
+      
+      const start = Math.max(2, currentPage - 1);
+      const end = Math.min(totalPages - 1, currentPage + 1);
+      for (let i = start; i <= end; i++) items.push(i);
+      
+      if (currentPage < totalPages - 2) items.push('ellipsis');
+      items.push(totalPages);
+    }
+    
+    return items;
+  }, [currentPage, totalPages]);
+
+  if (totalPages <= 1) return null;
+
+  return (
+    <div className="flex items-center justify-center gap-1.5 mt-8">
+      <Button
+        variant="outline"
+        size="icon"
+        onClick={() => onPageChange(currentPage - 1)}
+        disabled={currentPage === 1}
+        className="h-9 w-9 border-[var(--color-primary)]/30 hover:bg-[var(--color-primary)] hover:text-white hover:border-[var(--color-primary)] disabled:opacity-50"
+      >
+        <ChevronLeft className="h-4 w-4" />
+      </Button>
+
+      {pages.map((page, index) => {
+        if (page === 'ellipsis') {
+          return <span key={`ellipsis-${index}`} className="px-2 text-muted-foreground">...</span>;
+        }
+        const isActive = page === currentPage;
+        return (
+          <Button
+            key={page}
+            variant={isActive ? 'default' : 'outline'}
+            size="icon"
+            onClick={() => onPageChange(page)}
+            className={isActive
+              ? 'h-9 w-9 bg-[var(--color-primary)] text-white hover:bg-[var(--color-primary)]/90'
+              : 'h-9 w-9 border-[var(--color-primary)]/30 hover:bg-[var(--color-primary)] hover:text-white hover:border-[var(--color-primary)]'
+            }
+          >
+            {page}
+          </Button>
+        );
+      })}
+
+      <Button
+        variant="outline"
+        size="icon"
+        onClick={() => onPageChange(currentPage + 1)}
+        disabled={currentPage === totalPages}
+        className="h-9 w-9 border-[var(--color-primary)]/30 hover:bg-[var(--color-primary)] hover:text-white hover:border-[var(--color-primary)] disabled:opacity-50"
+      >
+        <ChevronRight className="h-4 w-4" />
+      </Button>
+    </div>
+  );
+}
+
 export default function ResourcesPage() {
   const locale = useLocale() as 'fr' | 'en';
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
   const [selectedFileType, setSelectedFileType] = useState<string>('all');
+  const [page, setPage] = useState(1);
 
   const { data, isLoading, error } = useQuery({
-    queryKey: ['resources', selectedCategory, selectedFileType],
-    queryFn: () => fetchResources(
-      selectedCategory === 'all' ? undefined : selectedCategory,
-      selectedFileType === 'all' ? undefined : selectedFileType
-    ),
+    queryKey: ['resources', page, selectedCategory, selectedFileType],
+    queryFn: () => fetchResources({
+      page,
+      categoryId: selectedCategory === 'all' ? undefined : selectedCategory,
+      fileType: selectedFileType === 'all' ? undefined : selectedFileType,
+    }),
   });
 
   const resources: Resource[] = data?.data || [];
   const categories: Category[] = data?.categories || [];
   const fileTypes: string[] = data?.fileTypes || [];
+  const pagination = data?.pagination;
 
   const getTitle = (item: Resource) =>
     locale === 'fr' ? item.titleFr : item.titleEn;
@@ -143,12 +239,7 @@ export default function ResourcesPage() {
 
   const handleDownload = async (resource: Resource) => {
     try {
-      // Track download
-      await fetch(`/api/resources/${resource.id}/download`, {
-        method: 'POST',
-      });
-
-      // Trigger download
+      await fetch(`/api/resources/${resource.id}/download`, { method: 'POST' });
       const link = document.createElement('a');
       link.href = resource.fileUrl;
       link.download = resource.fileName;
@@ -161,9 +252,25 @@ export default function ResourcesPage() {
     }
   };
 
+  const handlePageChange = (newPage: number) => {
+    setPage(newPage);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  const handleCategoryChange = (value: string) => {
+    setSelectedCategory(value);
+    setPage(1);
+  };
+
+  const handleFileTypeChange = (value: string) => {
+    setSelectedFileType(value);
+    setPage(1);
+  };
+
   const clearFilters = () => {
     setSelectedCategory('all');
     setSelectedFileType('all');
+    setPage(1);
   };
 
   const hasFilters = selectedCategory !== 'all' || selectedFileType !== 'all';
@@ -198,10 +305,7 @@ export default function ResourcesPage() {
                 <Filter className="w-4 h-4" />
                 {locale === 'fr' ? 'Filtrer par :' : 'Filter by:'}
               </span>
-              <Select
-                value={selectedCategory}
-                onValueChange={setSelectedCategory}
-              >
+              <Select value={selectedCategory} onValueChange={handleCategoryChange}>
                 <SelectTrigger className="w-[200px]">
                   <SelectValue placeholder={locale === 'fr' ? 'Catégorie' : 'Category'} />
                 </SelectTrigger>
@@ -216,10 +320,7 @@ export default function ResourcesPage() {
                   ))}
                 </SelectContent>
               </Select>
-              <Select
-                value={selectedFileType}
-                onValueChange={setSelectedFileType}
-              >
+              <Select value={selectedFileType} onValueChange={handleFileTypeChange}>
                 <SelectTrigger className="w-[180px]">
                   <SelectValue placeholder={locale === 'fr' ? 'Type de fichier' : 'File type'} />
                 </SelectTrigger>
@@ -235,11 +336,7 @@ export default function ResourcesPage() {
                 </SelectContent>
               </Select>
               {hasFilters && (
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={clearFilters}
-                >
+                <Button variant="ghost" size="sm" onClick={clearFilters}>
                   {locale === 'fr' ? 'Effacer les filtres' : 'Clear filters'}
                 </Button>
               )}
@@ -283,62 +380,73 @@ export default function ResourcesPage() {
                 </p>
               </div>
             ) : (
-              <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {resources.map((resource) => {
-                  const FileIcon = getFileIcon(resource.fileType);
-                  return (
-                    <Card key={resource.id} className="overflow-hidden hover:shadow-lg transition-shadow">
-                      <CardContent className="p-4">
-                        <div className="flex items-start gap-4">
-                          <div className="w-12 h-12 rounded-lg bg-[var(--color-primary)]/10 flex items-center justify-center flex-shrink-0">
-                            <FileIcon className="w-6 h-6 text-[var(--color-primary)]" />
+              <>
+                <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+                  {resources.map((resource) => {
+                    const FileIcon = getFileIcon(resource.fileType);
+                    return (
+                      <Card key={resource.id} className="overflow-hidden hover:shadow-lg transition-shadow">
+                        <CardContent className="p-4">
+                          <div className="flex items-start gap-4">
+                            <div className="w-12 h-12 rounded-lg bg-[var(--color-primary)]/10 flex items-center justify-center flex-shrink-0">
+                              <FileIcon className="w-6 h-6 text-[var(--color-primary)]" />
+                            </div>
+                            <div className="flex-1 min-w-0">
+                              <h3 className="font-semibold mb-1 truncate" title={getTitle(resource)}>
+                                {getTitle(resource)}
+                              </h3>
+                              {resource.category && (
+                                <Badge variant="outline" className="text-xs mb-2">
+                                  {getCategoryName(resource.category)}
+                                </Badge>
+                              )}
+                            </div>
                           </div>
-                          <div className="flex-1 min-w-0">
-                            <h3 className="font-semibold mb-1 truncate" title={getTitle(resource)}>
-                              {getTitle(resource)}
-                            </h3>
-                            {resource.category && (
-                              <Badge variant="outline" className="text-xs mb-2">
-                                {getCategoryName(resource.category)}
+                          {getDescription(resource) && (
+                            <p className="text-sm text-muted-foreground mt-3 line-clamp-2">
+                              {getDescription(resource)}
+                            </p>
+                          )}
+                          <div className="flex items-center justify-between mt-4 pt-4 border-t">
+                            <div className="flex items-center gap-4 text-xs text-muted-foreground">
+                              <span className="flex items-center gap-1">
+                                <HardDrive className="w-3 h-3" />
+                                {formatFileSize(resource.fileSize)}
+                              </span>
+                              <Badge variant="secondary" className="text-xs">
+                                {getFileTypeLabel(resource.fileType, locale)}
                               </Badge>
-                            )}
+                            </div>
+                            <Button
+                              size="sm"
+                              variant="ghost"
+                              className="text-[var(--color-primary)] hover:text-[var(--color-primary)] hover:bg-[var(--color-primary)]/10"
+                              onClick={() => handleDownload(resource)}
+                            >
+                              <Download className="w-4 h-4 mr-1" />
+                              {locale === 'fr' ? 'Télécharger' : 'Download'}
+                            </Button>
                           </div>
-                        </div>
-                        {getDescription(resource) && (
-                          <p className="text-sm text-muted-foreground mt-3 line-clamp-2">
-                            {getDescription(resource)}
-                          </p>
-                        )}
-                        <div className="flex items-center justify-between mt-4 pt-4 border-t">
-                          <div className="flex items-center gap-4 text-xs text-muted-foreground">
-                            <span className="flex items-center gap-1">
-                              <HardDrive className="w-3 h-3" />
-                              {formatFileSize(resource.fileSize)}
-                            </span>
-                            <Badge variant="secondary" className="text-xs">
-                              {getFileTypeLabel(resource.fileType, locale)}
-                            </Badge>
+                          <div className="text-xs text-muted-foreground mt-2">
+                            {locale === 'fr' ? 'Publié le' : 'Published on'} {formatDate(resource.createdAt)}
+                            {' • '}
+                            {resource.downloadCount} {locale === 'fr' ? 'téléchargements' : 'downloads'}
                           </div>
-                          <Button
-                            size="sm"
-                            variant="ghost"
-                            className="text-[var(--color-primary)] hover:text-[var(--color-primary)] hover:bg-[var(--color-primary)]/10"
-                            onClick={() => handleDownload(resource)}
-                          >
-                            <Download className="w-4 h-4 mr-1" />
-                            {locale === 'fr' ? 'Télécharger' : 'Download'}
-                          </Button>
-                        </div>
-                        <div className="text-xs text-muted-foreground mt-2">
-                          {locale === 'fr' ? 'Publié le' : 'Published on'} {formatDate(resource.createdAt)}
-                          {' • '}
-                          {resource.downloadCount} {locale === 'fr' ? 'téléchargements' : 'downloads'}
-                        </div>
-                      </CardContent>
-                    </Card>
-                  );
-                })}
-              </div>
+                        </CardContent>
+                      </Card>
+                    );
+                  })}
+                </div>
+
+                {/* Pagination */}
+                {pagination && (
+                  <Pagination
+                    currentPage={page}
+                    totalPages={pagination.totalPages}
+                    onPageChange={handlePageChange}
+                  />
+                )}
+              </>
             )}
           </div>
         </div>

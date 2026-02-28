@@ -45,6 +45,7 @@ import {
   Link2,
   Sparkles,
   LogOut,
+  Newspaper,
 } from "lucide-react";
 
 const navigation = [
@@ -82,7 +83,7 @@ const navigation = [
     bgColor: "bg-orange-100",
     children: [
       { title: "Slider", href: "/admin/home/slider", icon: Image, color: "text-orange-600" },
-      { title: "À propos", href: "/admin/home/about", icon: Info, color: "text-cyan-600" },
+      { title: "Présentation", href: "/admin/home/about", icon: Info, color: "text-cyan-600" },
       { title: "Services", href: "/admin/home/services", icon: Briefcase, color: "text-blue-600" },
       { title: "Témoignages", href: "/admin/home/testimonials", icon: MessageSquare, color: "text-yellow-600" },
       { title: "Partenaires", href: "/admin/home/partners", icon: Building2, color: "text-purple-600" },
@@ -90,7 +91,7 @@ const navigation = [
     ],
   },
   {
-    title: "À propos",
+    title: "Présentation",
     icon: Info,
     color: "text-cyan-600",
     bgColor: "bg-cyan-100",
@@ -106,6 +107,13 @@ const navigation = [
     children: [
       { title: "Pages", href: "/admin/solutions/pages", icon: FileText, color: "text-blue-600" },
     ],
+  },
+  {
+    title: "Actualités",
+    href: "/admin/articles",
+    icon: Newspaper,
+    color: "text-amber-600",
+    bgColor: "bg-amber-100",
   },
   {
     title: "Réalisations",

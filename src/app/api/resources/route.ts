@@ -6,6 +6,8 @@ export async function GET(request: NextRequest) {
     const { searchParams } = new URL(request.url);
     const categoryId = searchParams.get('categoryId');
     const fileType = searchParams.get('fileType');
+    const page = parseInt(searchParams.get('page') || '1');
+    const limit = parseInt(searchParams.get('limit') || '12');
 
     // Build filter conditions
     const where: {
@@ -26,7 +28,10 @@ export async function GET(request: NextRequest) {
       where.fileType = { startsWith: fileType };
     }
 
-    // Get resources with category
+    // Get total count
+    const total = await db.resource.count({ where });
+
+    // Get resources with category and pagination
     const resources = await db.resource.findMany({
       where,
       include: {
@@ -40,6 +45,8 @@ export async function GET(request: NextRequest) {
         },
       },
       orderBy: { createdAt: 'desc' },
+      skip: (page - 1) * limit,
+      take: limit,
     });
 
     // Get categories for filter
@@ -56,18 +63,28 @@ export async function GET(request: NextRequest) {
       },
     });
 
-    // Get unique file types
-    const fileTypes = [...new Set(resources.map(r => r.fileType.split('/')[0]))];
+    // Get unique file types from all resources
+    const allResources = await db.resource.findMany({
+      where: { deletedAt: null, published: true },
+      select: { fileType: true },
+    });
+    const fileTypes = [...new Set(allResources.map(r => r.fileType.split('/')[0]))];
 
     return NextResponse.json({
       data: resources,
       categories,
       fileTypes,
+      pagination: {
+        page,
+        limit,
+        total,
+        totalPages: Math.ceil(total / limit),
+      },
     });
   } catch (error) {
     console.error('Error fetching resources:', error);
     return NextResponse.json(
-      { error: 'Failed to fetch resources', data: [], categories: [], fileTypes: [] },
+      { error: 'Failed to fetch resources', data: [], categories: [], fileTypes: [], pagination: { page: 1, limit: 12, total: 0, totalPages: 0 } },
       { status: 500 }
     );
   }

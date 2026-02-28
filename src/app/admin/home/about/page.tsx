@@ -75,7 +75,7 @@ export default function AboutAdminPage() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['admin-home-about'] });
-      toast.success('Section À propos mise à jour');
+      toast.success('Section Présentation mise à jour');
     },
     onError: () => toast.error('Erreur lors de la mise à jour'),
   });
@@ -124,9 +124,9 @@ export default function AboutAdminPage() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-3xl font-bold">Section À propos</h1>
+        <h1 className="text-3xl font-bold">Section Présentation</h1>
         <p className="text-muted-foreground">
-          Modifiez la section À propos de la page d&apos;accueil
+          Modifiez la section Présentation de la page d&apos;accueil
         </p>
       </div>
 
@@ -151,7 +151,7 @@ export default function AboutAdminPage() {
                     id="badgeTextFr"
                     name="badgeTextFr"
                     defaultValue={about?.badgeTextFr || ''}
-                    placeholder="À Propos"
+                    placeholder="Présentation"
                   />
                 </div>
                 <div>

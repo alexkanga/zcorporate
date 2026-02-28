@@ -29,14 +29,11 @@ export function LanguageSwitcher() {
         <Button
           variant="ghost"
           size="sm"
-          className="gap-2 px-2"
+          className="gap-1.5 px-2"
           aria-label={t("languageSwitch")}
         >
-          <Globe className="h-4 w-4" />
-          <span className="hidden sm:inline">
-            {localeFlags[locale]} {localeNames[locale]}
-          </span>
-          <span className="sm:hidden">{localeFlags[locale]}</span>
+          <Globe className="h-4 w-4 text-gray-600" />
+          <span className="text-lg">{localeFlags[locale]}</span>
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" className="min-w-[140px]">

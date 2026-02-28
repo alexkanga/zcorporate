@@ -20,7 +20,7 @@ export async function generateMetadata({
   const { locale } = await params;
 
   return {
-    title: locale === 'fr' ? 'À propos' : 'About',
+    title: locale === 'fr' ? 'Présentation' : 'Presentation',
     description: locale === 'fr'
       ? 'Découvrez notre histoire et notre mission'
       : 'Discover our story and mission',
@@ -47,7 +47,7 @@ export default async function AboutPage({ params }: AboutPageProps) {
   }
 
   // Get localized content
-  const title = pageData?.titleFr || pageData?.titleEn || (currentLocale === 'fr' ? 'À propos de nous' : 'About us');
+  const title = pageData?.titleFr || pageData?.titleEn || (currentLocale === 'fr' ? 'Présentation' : 'Presentation');
   const content = currentLocale === 'fr'
     ? (pageData?.contentFr || null)
     : (pageData?.contentEn || null);

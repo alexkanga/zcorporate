@@ -130,7 +130,7 @@ async function main() {
 
   const menuItems = [
     { id: 'menu-accueil', slug: 'accueil', route: '/', labelFr: 'Accueil', labelEn: 'Home', location: MenuLocation.HEADER, order: 0 },
-    { id: 'menu-a-propos', slug: 'a-propos', route: '/a-propos', labelFr: 'À propos', labelEn: 'About', location: MenuLocation.HEADER, order: 1 },
+    { id: 'menu-a-propos', slug: 'a-propos', route: '/a-propos', labelFr: 'Présentation', labelEn: 'Presentation', location: MenuLocation.HEADER, order: 1 },
     { id: 'menu-solutions', slug: 'solutions', route: '/solutions', labelFr: 'Solutions', labelEn: 'Solutions', location: MenuLocation.HEADER, order: 2 },
     { id: 'menu-realisations', slug: 'realisations', route: '/realisations', labelFr: 'Réalisations', labelEn: 'Projects', location: MenuLocation.HEADER, order: 3 },
     { id: 'menu-ressources', slug: 'ressources', route: '/ressources', labelFr: 'Ressources', labelEn: 'Resources', location: MenuLocation.HEADER, order: 4 },

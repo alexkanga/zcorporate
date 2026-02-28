@@ -14,20 +14,27 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { Skeleton } from '@/components/ui/skeleton';
-import { Calendar, MapPin, ArrowRight, Folder, ChevronLeft, ChevronRight } from 'lucide-react';
+import { Calendar, ArrowRight, User, Folder, ChevronLeft, ChevronRight, Image, Video } from 'lucide-react';
 import { Link } from '@/i18n/routing';
 
-interface Realisation {
+interface Article {
   id: string;
   titleFr: string;
   titleEn: string;
-  descriptionFr: string | null;
-  descriptionEn: string | null;
-  client: string | null;
-  date: Date | null;
-  location: string | null;
+  slug: string;
+  excerptFr: string | null;
+  excerptEn: string | null;
   imageUrl: string | null;
+  imageAltFr: string | null;
+  imageAltEn: string | null;
+  publishedAt: Date | null;
   featured: boolean;
+  photoCount?: number;
+  videoCount?: number;
+  author: {
+    id: string;
+    name: string | null;
+  } | null;
   category: {
     id: string;
     nameFr: string;
@@ -43,8 +50,8 @@ interface Category {
   slug: string;
 }
 
-interface RealisationsResponse {
-  data: Realisation[];
+interface ArticlesResponse {
+  data: Article[];
   categories: Category[];
   pagination: {
     page: number;
@@ -54,15 +61,15 @@ interface RealisationsResponse {
   };
 }
 
-async function fetchRealisations(params: { page: number; categoryId?: string }): Promise<RealisationsResponse> {
+async function fetchArticles(params: { page: number; categoryId?: string }): Promise<ArticlesResponse> {
   const searchParams = new URLSearchParams({
     page: params.page.toString(),
     limit: '9',
     ...(params.categoryId && { categoryId: params.categoryId }),
   });
 
-  const response = await fetch(`/api/realisations?${searchParams}`);
-  if (!response.ok) throw new Error('Failed to fetch realisations');
+  const response = await fetch(`/api/articles?${searchParams}`);
+  if (!response.ok) throw new Error('Failed to fetch articles');
   return response.json();
 }
 
@@ -170,28 +177,28 @@ function Pagination({
   );
 }
 
-export default function RealisationsPage() {
+export default function ActualitesPage() {
   const locale = useLocale() as 'fr' | 'en';
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
   const [page, setPage] = useState(1);
 
   const { data, isLoading, error } = useQuery({
-    queryKey: ['realisations', page, selectedCategory],
-    queryFn: () => fetchRealisations({
+    queryKey: ['articles', page, selectedCategory],
+    queryFn: () => fetchArticles({
       page,
       categoryId: selectedCategory === 'all' ? undefined : selectedCategory,
     }),
   });
 
-  const realisations: Realisation[] = data?.data || [];
+  const articles: Article[] = data?.data || [];
   const categories: Category[] = data?.categories || [];
   const pagination = data?.pagination;
 
-  const getTitle = (item: Realisation) =>
+  const getTitle = (item: Article) =>
     locale === 'fr' ? item.titleFr : item.titleEn;
 
-  const getDescription = (item: Realisation) =>
-    locale === 'fr' ? item.descriptionFr : item.descriptionEn;
+  const getExcerpt = (item: Article) =>
+    locale === 'fr' ? item.excerptFr : item.excerptEn;
 
   const getCategoryName = (category: Category | null) =>
     category ? (locale === 'fr' ? category.nameFr : category.nameEn) : null;
@@ -201,11 +208,13 @@ export default function RealisationsPage() {
     return new Date(date).toLocaleDateString(locale === 'fr' ? 'fr-FR' : 'en-US', {
       year: 'numeric',
       month: 'long',
+      day: 'numeric',
     });
   };
 
   const handlePageChange = (newPage: number) => {
     setPage(newPage);
+    // Scroll to top of articles section
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
@@ -221,15 +230,15 @@ export default function RealisationsPage() {
         <div className="container mx-auto px-4">
           <div className="max-w-4xl mx-auto text-center">
             <Badge variant="secondary" className="mb-4">
-              {locale === 'fr' ? 'Portfolio' : 'Portfolio'}
+              {locale === 'fr' ? 'Blog' : 'Blog'}
             </Badge>
             <h1 className="text-4xl md:text-5xl font-bold mb-6 bg-gradient-to-r from-[var(--color-primary)] to-[var(--color-secondary)] bg-clip-text text-transparent">
-              {locale === 'fr' ? 'Nos réalisations' : 'Our Projects'}
+              {locale === 'fr' ? 'Nos Actualités' : 'Our News'}
             </h1>
             <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
               {locale === 'fr'
-                ? 'Découvrez nos projets et réussites'
-                : 'Discover our achievements and successes'}
+                ? 'Découvrez nos dernières actualités, conseils et perspectives'
+                : 'Discover our latest news, tips and insights'}
             </p>
           </div>
         </div>
@@ -293,72 +302,94 @@ export default function RealisationsPage() {
               <div className="text-center py-12">
                 <p className="text-muted-foreground">
                   {locale === 'fr'
-                    ? 'Erreur lors du chargement des réalisations'
-                    : 'Error loading projects'}
+                    ? 'Erreur lors du chargement des actualités'
+                    : 'Error loading news'}
                 </p>
               </div>
-            ) : realisations.length === 0 ? (
+            ) : articles.length === 0 ? (
               <div className="text-center py-12">
                 <Folder className="w-16 h-16 mx-auto text-muted-foreground/50 mb-4" />
                 <p className="text-muted-foreground">
                   {locale === 'fr'
-                    ? 'Aucune réalisation trouvée'
-                    : 'No projects found'}
+                    ? 'Aucune actualité trouvée'
+                    : 'No news found'}
                 </p>
               </div>
             ) : (
               <>
                 <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-                  {realisations.map((realisation) => (
+                  {articles.map((article) => (
                     <Link
-                      key={realisation.id}
-                      href={`/realisations/${realisation.id}`}
+                      key={article.id}
+                      href={`/actualites/${article.slug}`}
                     >
-                      <Card className="overflow-hidden group hover:shadow-xl transition-all duration-300 hover:-translate-y-1 h-full">
+                      <Card className="overflow-hidden group hover:shadow-2xl transition-all duration-500 hover:-translate-y-2 h-full border border-transparent hover:border-[var(--color-primary)]/20">
                         <div className="aspect-video relative overflow-hidden bg-muted">
-                          {realisation.imageUrl ? (
+                          {article.imageUrl ? (
                             <img
-                              src={realisation.imageUrl}
-                              alt={getTitle(realisation)}
-                              className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                              src={article.imageUrl}
+                              alt={getTitle(article) || ''}
+                              className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
                             />
                           ) : (
                             <div className="w-full h-full flex items-center justify-center">
                               <Folder className="w-12 h-12 text-muted-foreground/30" />
                             </div>
                           )}
-                          {realisation.featured && (
-                            <Badge className="absolute top-2 right-2 bg-[var(--color-primary)] text-white">
+                          {/* Gradient overlay on hover */}
+                          <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                          
+                          {article.featured && (
+                            <Badge className="absolute top-2 right-2 bg-[var(--color-primary)] text-white shadow-lg">
                               {locale === 'fr' ? 'À la une' : 'Featured'}
                             </Badge>
                           )}
+                          {article.category && (
+                            <Badge className="absolute top-2 left-2 bg-[var(--color-secondary)] text-white shadow-lg">
+                              {getCategoryName(article.category)}
+                            </Badge>
+                          )}
+                          
+                          {/* Photo/Video count badges */}
+                          {((article.photoCount && article.photoCount > 0) || (article.videoCount && article.videoCount > 0)) && (
+                            <div className="absolute bottom-2 right-2 flex gap-1.5 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                              {article.photoCount && article.photoCount > 0 && (
+                                <Badge variant="secondary" className="bg-white/90 text-gray-800 shadow-md backdrop-blur-sm gap-1 px-2 py-1">
+                                  <Image className="h-3 w-3" />
+                                  <span className="text-xs font-medium">{article.photoCount}</span>
+                                </Badge>
+                              )}
+                              {article.videoCount && article.videoCount > 0 && (
+                                <Badge variant="secondary" className="bg-white/90 text-gray-800 shadow-md backdrop-blur-sm gap-1 px-2 py-1">
+                                  <Video className="h-3 w-3" />
+                                  <span className="text-xs font-medium">{article.videoCount}</span>
+                                </Badge>
+                              )}
+                            </div>
+                          )}
                         </div>
                         <CardContent className="p-4">
-                          <div className="flex items-center gap-2 mb-2">
-                            {realisation.category && (
-                              <Badge variant="outline" className="text-xs">
-                                {getCategoryName(realisation.category)}
-                              </Badge>
-                            )}
-                          </div>
-                          <h3 className="text-lg font-semibold mb-2 group-hover:text-[var(--color-primary)] transition-colors">
-                            {getTitle(realisation)}
+                          <h3 className="text-lg font-semibold mb-2 group-hover:text-[var(--color-primary)] transition-colors line-clamp-2">
+                            {getTitle(article)}
                           </h3>
-                          {getDescription(realisation) && (
+                          {getExcerpt(article) && (
                             <p className="text-sm text-muted-foreground line-clamp-2 mb-3">
-                              {getDescription(realisation)}
+                              {getExcerpt(article)}
                             </p>
                           )}
                           <div className="flex items-center justify-between text-xs text-muted-foreground">
                             <div className="flex items-center gap-3">
-                              {realisation.date && (
+                              {article.publishedAt && (
                                 <div className="flex items-center gap-1">
                                   <Calendar className="w-3 h-3" />
-                                  {formatDate(realisation.date)}
+                                  {formatDate(article.publishedAt)}
                                 </div>
                               )}
-                              {realisation.client && (
-                                <span>{realisation.client}</span>
+                              {article.author?.name && (
+                                <div className="flex items-center gap-1">
+                                  <User className="w-3 h-3" />
+                                  {article.author.name}
+                                </div>
                               )}
                             </div>
                             <ArrowRight className="w-4 h-4 opacity-0 group-hover:opacity-100 transition-opacity" />
@@ -389,13 +420,13 @@ export default function RealisationsPage() {
           <div className="max-w-4xl mx-auto text-center">
             <h2 className="text-3xl font-bold mb-4">
               {locale === 'fr'
-                ? 'Vous avez un projet en tête ?'
-                : 'Have a project in mind?'}
+                ? 'Restez informé'
+                : 'Stay informed'}
             </h2>
             <p className="text-muted-foreground mb-8">
               {locale === 'fr'
-                ? 'Discutons de votre projet et voyons comment nous pouvons vous aider'
-                : "Let's discuss your project and see how we can help"}
+                ? 'Suivez-nous pour ne rien manquer de nos actualités'
+                : 'Follow us to not miss any of our news'}
             </p>
             <Link href="/contact">
               <Button size="lg" className="bg-[var(--color-primary)] hover:bg-[var(--color-primary)]/90 text-white">

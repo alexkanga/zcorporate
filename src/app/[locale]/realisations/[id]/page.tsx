@@ -188,7 +188,7 @@ export default function RealisationDetailPage() {
               )}
               {realisation.featured && (
                 <Badge className="bg-[var(--color-primary)] text-white">
-                  {locale === 'fr' ? 'En vedette' : 'Featured'}
+                  {locale === 'fr' ? 'À la une' : 'Featured'}
                 </Badge>
               )}
             </div>

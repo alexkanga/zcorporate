@@ -51,6 +51,12 @@ const settingsSchema = z.object({
   // Analytics
   googleAnalyticsId: z.string().nullable(),
   googleTagManagerId: z.string().nullable(),
+  
+  // Pagination
+  articlesPerPage: z.number().min(1).max(50).optional(),
+  realisationsPerPage: z.number().min(1).max(50).optional(),
+  resourcesPerPage: z.number().min(1).max(50).optional(),
+  eventsPerPage: z.number().min(1).max(50).optional(),
 });
 
 // GET /api/admin/settings - Get site settings
@@ -162,6 +168,12 @@ export async function PUT(request: NextRequest) {
         // Analytics
         googleAnalyticsId: validatedData.googleAnalyticsId,
         googleTagManagerId: validatedData.googleTagManagerId,
+        
+        // Pagination
+        ...(validatedData.articlesPerPage && { articlesPerPage: validatedData.articlesPerPage }),
+        ...(validatedData.realisationsPerPage && { realisationsPerPage: validatedData.realisationsPerPage }),
+        ...(validatedData.resourcesPerPage && { resourcesPerPage: validatedData.resourcesPerPage }),
+        ...(validatedData.eventsPerPage && { eventsPerPage: validatedData.eventsPerPage }),
       },
       create: {
         id: "site-settings",
@@ -194,6 +206,10 @@ export async function PUT(request: NextRequest) {
         metaKeywords: validatedData.metaKeywords,
         googleAnalyticsId: validatedData.googleAnalyticsId,
         googleTagManagerId: validatedData.googleTagManagerId,
+        ...(validatedData.articlesPerPage && { articlesPerPage: validatedData.articlesPerPage }),
+        ...(validatedData.realisationsPerPage && { realisationsPerPage: validatedData.realisationsPerPage }),
+        ...(validatedData.resourcesPerPage && { resourcesPerPage: validatedData.resourcesPerPage }),
+        ...(validatedData.eventsPerPage && { eventsPerPage: validatedData.eventsPerPage }),
       },
     });
     

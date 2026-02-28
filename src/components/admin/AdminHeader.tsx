@@ -35,7 +35,7 @@ const routeLabels: Record<string, string> = {
   users: "Utilisateurs",
   home: "Accueil",
   slider: "Slider",
-  about: "À propos",
+  about: "Présentation",
   services: "Services",
   testimonials: "Témoignages",
   partners: "Partenaires",

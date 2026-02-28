@@ -51,9 +51,10 @@ export async function POST(request: NextRequest) {
 
     const menuItems = [
       { slug: 'accueil', route: '/', labelFr: 'Accueil', labelEn: 'Home', location: MenuLocation.HEADER, order: 0 },
-      { slug: 'a-propos', route: '/a-propos', labelFr: 'À propos', labelEn: 'About', location: MenuLocation.HEADER, order: 1 },
+      { slug: 'a-propos', route: '/a-propos', labelFr: 'Présentation', labelEn: 'Presentation', location: MenuLocation.HEADER, order: 1 },
       { slug: 'solutions', route: '/solutions', labelFr: 'Solutions', labelEn: 'Solutions', location: MenuLocation.HEADER, order: 2 },
-      { slug: 'contact', route: '/contact', labelFr: 'Contact', labelEn: 'Contact', location: MenuLocation.HEADER, order: 3 },
+      { slug: 'actualites', route: '/actualites', labelFr: 'Actualités', labelEn: 'News', location: MenuLocation.HEADER, order: 3 },
+      { slug: 'contact', route: '/contact', labelFr: 'Contact', labelEn: 'Contact', location: MenuLocation.HEADER, order: 4 },
     ];
 
     for (const item of menuItems) {

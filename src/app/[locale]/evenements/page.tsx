@@ -2,11 +2,11 @@
 
 import { useQuery } from '@tanstack/react-query';
 import { useLocale } from 'next-intl';
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Skeleton } from '@/components/ui/skeleton';
 import {
   Dialog,
@@ -15,7 +15,6 @@ import {
 import {
   Calendar,
   MapPin,
-  Clock,
   Play,
   Image as ImageIcon,
   ChevronLeft,
@@ -23,7 +22,6 @@ import {
   X,
   CalendarDays,
 } from 'lucide-react';
-import type { Metadata } from 'next';
 
 interface Event {
   id: string;
@@ -40,11 +38,26 @@ interface Event {
   createdAt: string;
 }
 
-async function fetchEvents(filter?: string) {
-  const url = filter ? `/api/events?filter=${filter}` : '/api/events';
-  const response = await fetch(url);
-  const data = await response.json();
-  return data;
+interface EventsResponse {
+  data: Event[];
+  pagination: {
+    page: number;
+    limit: number;
+    total: number;
+    totalPages: number;
+  };
+}
+
+async function fetchEvents(params: { page: number; filter?: string }): Promise<EventsResponse> {
+  const searchParams = new URLSearchParams({
+    page: params.page.toString(),
+    limit: '6',
+    ...(params.filter && { filter: params.filter }),
+  });
+
+  const response = await fetch(`/api/events?${searchParams}`);
+  if (!response.ok) throw new Error('Failed to fetch events');
+  return response.json();
 }
 
 const getYouTubeId = (url: string): string | null => {
@@ -58,9 +71,90 @@ const getYouTubeId = (url: string): string | null => {
   return null;
 };
 
+// Pagination component
+function Pagination({
+  currentPage,
+  totalPages,
+  onPageChange,
+}: {
+  currentPage: number;
+  totalPages: number;
+  onPageChange: (page: number) => void;
+}) {
+  const pages = useMemo(() => {
+    const items: (number | 'ellipsis')[] = [];
+    
+    if (totalPages <= 7) {
+      for (let i = 1; i <= totalPages; i++) {
+        items.push(i);
+      }
+    } else {
+      items.push(1);
+      if (currentPage > 3) items.push('ellipsis');
+      
+      const start = Math.max(2, currentPage - 1);
+      const end = Math.min(totalPages - 1, currentPage + 1);
+      for (let i = start; i <= end; i++) items.push(i);
+      
+      if (currentPage < totalPages - 2) items.push('ellipsis');
+      items.push(totalPages);
+    }
+    
+    return items;
+  }, [currentPage, totalPages]);
+
+  if (totalPages <= 1) return null;
+
+  return (
+    <div className="flex items-center justify-center gap-1.5 mt-8">
+      <Button
+        variant="outline"
+        size="icon"
+        onClick={() => onPageChange(currentPage - 1)}
+        disabled={currentPage === 1}
+        className="h-9 w-9 border-[var(--color-primary)]/30 hover:bg-[var(--color-primary)] hover:text-white hover:border-[var(--color-primary)] disabled:opacity-50"
+      >
+        <ChevronLeft className="h-4 w-4" />
+      </Button>
+
+      {pages.map((page, index) => {
+        if (page === 'ellipsis') {
+          return <span key={`ellipsis-${index}`} className="px-2 text-muted-foreground">...</span>;
+        }
+        const isActive = page === currentPage;
+        return (
+          <Button
+            key={page}
+            variant={isActive ? 'default' : 'outline'}
+            size="icon"
+            onClick={() => onPageChange(page)}
+            className={isActive
+              ? 'h-9 w-9 bg-[var(--color-primary)] text-white hover:bg-[var(--color-primary)]/90'
+              : 'h-9 w-9 border-[var(--color-primary)]/30 hover:bg-[var(--color-primary)] hover:text-white hover:border-[var(--color-primary)]'
+            }
+          >
+            {page}
+          </Button>
+        );
+      })}
+
+      <Button
+        variant="outline"
+        size="icon"
+        onClick={() => onPageChange(currentPage + 1)}
+        disabled={currentPage === totalPages}
+        className="h-9 w-9 border-[var(--color-primary)]/30 hover:bg-[var(--color-primary)] hover:text-white hover:border-[var(--color-primary)] disabled:opacity-50"
+      >
+        <ChevronRight className="h-4 w-4" />
+      </Button>
+    </div>
+  );
+}
+
 export default function EventsPage() {
   const locale = useLocale() as 'fr' | 'en';
   const [activeTab, setActiveTab] = useState<string>('all');
+  const [page, setPage] = useState(1);
 
   const [lightboxOpen, setLightboxOpen] = useState(false);
   const [lightboxImages, setLightboxImages] = useState<string[]>([]);
@@ -70,11 +164,15 @@ export default function EventsPage() {
   const [activeVideoId, setActiveVideoId] = useState<string | null>(null);
 
   const { data, isLoading, error } = useQuery({
-    queryKey: ['events', activeTab],
-    queryFn: () => fetchEvents(activeTab === 'all' ? undefined : activeTab),
+    queryKey: ['events', page, activeTab],
+    queryFn: () => fetchEvents({
+      page,
+      filter: activeTab === 'all' ? undefined : activeTab,
+    }),
   });
 
   const events: Event[] = data?.data || [];
+  const pagination = data?.pagination;
 
   const getTitle = (item: Event) =>
     locale === 'fr' ? item.titleFr : item.titleEn;
@@ -117,6 +215,16 @@ export default function EventsPage() {
     }
   };
 
+  const handleTabChange = (value: string) => {
+    setActiveTab(value);
+    setPage(1);
+  };
+
+  const handlePageChange = (newPage: number) => {
+    setPage(newPage);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
   return (
     <div className="min-h-screen">
       {/* Hero Section */}
@@ -142,7 +250,7 @@ export default function EventsPage() {
       <section className="py-8 border-b">
         <div className="container mx-auto px-4">
           <div className="max-w-6xl mx-auto">
-            <Tabs value={activeTab} onValueChange={setActiveTab}>
+            <Tabs value={activeTab} onValueChange={handleTabChange}>
               <TabsList className="grid w-full max-w-md mx-auto grid-cols-3">
                 <TabsTrigger value="all" className="flex items-center gap-2">
                   <CalendarDays className="w-4 h-4" />
@@ -200,101 +308,112 @@ export default function EventsPage() {
                 </p>
               </div>
             ) : (
-              <div className="space-y-8">
-                {events.map((event) => {
-                  const upcoming = isUpcoming(event.date);
-                  const allImages = [...(event.gallery || [])];
-                  if (event.imageUrl && !allImages.includes(event.imageUrl)) {
-                    allImages.unshift(event.imageUrl);
-                  }
-                  const videos = event.videos || [];
+              <>
+                <div className="space-y-8">
+                  {events.map((event) => {
+                    const upcoming = isUpcoming(event.date);
+                    const allImages = [...(event.gallery || [])];
+                    if (event.imageUrl && !allImages.includes(event.imageUrl)) {
+                      allImages.unshift(event.imageUrl);
+                    }
+                    const videos = event.videos || [];
 
-                  return (
-                    <Card key={event.id} className="overflow-hidden">
-                      <CardContent className="p-6">
-                        <div className="flex flex-col lg:flex-row gap-6">
-                          {/* Image */}
-                          <div className="lg:w-80 flex-shrink-0">
-                            {event.imageUrl ? (
-                              <div
-                                className="aspect-video rounded-lg overflow-hidden bg-muted cursor-pointer"
-                                onClick={() => openLightbox(allImages, 0)}
-                              >
-                                <img
-                                  src={event.imageUrl}
-                                  alt={getTitle(event)}
-                                  className="w-full h-full object-cover hover:scale-105 transition-transform"
-                                />
-                              </div>
-                            ) : (
-                              <div className="aspect-video rounded-lg bg-muted flex items-center justify-center">
-                                <Calendar className="w-12 h-12 text-muted-foreground/30" />
-                              </div>
-                            )}
-                          </div>
-
-                          {/* Content */}
-                          <div className="flex-1">
-                            <div className="flex items-center gap-2 mb-2">
-                              <Badge variant={upcoming ? 'default' : 'secondary'}>
-                                {upcoming
-                                  ? locale === 'fr' ? 'À venir' : 'Upcoming'
-                                  : locale === 'fr' ? 'Passé' : 'Past'}
-                              </Badge>
-                            </div>
-                            <h2 className="text-2xl font-bold mb-3">{getTitle(event)}</h2>
-
-                            {/* Meta Info */}
-                            <div className="flex flex-wrap gap-4 text-sm text-muted-foreground mb-4">
-                              <div className="flex items-center gap-1">
-                                <Calendar className="w-4 h-4" />
-                                {formatDate(event.date)}
-                              </div>
-                              {event.location && (
-                                <div className="flex items-center gap-1">
-                                  <MapPin className="w-4 h-4" />
-                                  {event.location}
+                    return (
+                      <Card key={event.id} className="overflow-hidden">
+                        <CardContent className="p-6">
+                          <div className="flex flex-col lg:flex-row gap-6">
+                            {/* Image */}
+                            <div className="lg:w-80 flex-shrink-0">
+                              {event.imageUrl ? (
+                                <div
+                                  className="aspect-video rounded-lg overflow-hidden bg-muted cursor-pointer"
+                                  onClick={() => openLightbox(allImages, 0)}
+                                >
+                                  <img
+                                    src={event.imageUrl}
+                                    alt={getTitle(event)}
+                                    className="w-full h-full object-cover hover:scale-105 transition-transform"
+                                  />
+                                </div>
+                              ) : (
+                                <div className="aspect-video rounded-lg bg-muted flex items-center justify-center">
+                                  <Calendar className="w-12 h-12 text-muted-foreground/30" />
                                 </div>
                               )}
                             </div>
 
-                            {/* Description */}
-                            {getDescription(event) && (
-                              <p className="text-muted-foreground mb-4 line-clamp-2">
-                                {getDescription(event)}
-                              </p>
-                            )}
+                            {/* Content */}
+                            <div className="flex-1">
+                              <div className="flex items-center gap-2 mb-2">
+                                <Badge variant={upcoming ? 'default' : 'secondary'}>
+                                  {upcoming
+                                    ? locale === 'fr' ? 'À venir' : 'Upcoming'
+                                    : locale === 'fr' ? 'Passé' : 'Past'}
+                                </Badge>
+                              </div>
+                              <h2 className="text-2xl font-bold mb-3">{getTitle(event)}</h2>
 
-                            {/* Media Actions */}
-                            <div className="flex flex-wrap gap-2">
-                              {allImages.length > 1 && (
-                                <Button
-                                  variant="outline"
-                                  size="sm"
-                                  onClick={() => openLightbox(allImages, 0)}
-                                >
-                                  <ImageIcon className="w-4 h-4 mr-2" />
-                                  {locale === 'fr' ? 'Photos' : 'Photos'} ({allImages.length})
-                                </Button>
+                              {/* Meta Info */}
+                              <div className="flex flex-wrap gap-4 text-sm text-muted-foreground mb-4">
+                                <div className="flex items-center gap-1">
+                                  <Calendar className="w-4 h-4" />
+                                  {formatDate(event.date)}
+                                </div>
+                                {event.location && (
+                                  <div className="flex items-center gap-1">
+                                    <MapPin className="w-4 h-4" />
+                                    {event.location}
+                                  </div>
+                                )}
+                              </div>
+
+                              {/* Description */}
+                              {getDescription(event) && (
+                                <p className="text-muted-foreground mb-4 line-clamp-2">
+                                  {getDescription(event)}
+                                </p>
                               )}
-                              {videos.length > 0 && (
-                                <Button
-                                  variant="outline"
-                                  size="sm"
-                                  onClick={() => openVideo(videos[0])}
-                                >
-                                  <Play className="w-4 h-4 mr-2" />
-                                  {locale === 'fr' ? 'Vidéos' : 'Videos'} ({videos.length})
-                                </Button>
-                              )}
+
+                              {/* Media Actions */}
+                              <div className="flex flex-wrap gap-2">
+                                {allImages.length > 1 && (
+                                  <Button
+                                    variant="outline"
+                                    size="sm"
+                                    onClick={() => openLightbox(allImages, 0)}
+                                  >
+                                    <ImageIcon className="w-4 h-4 mr-2" />
+                                    {locale === 'fr' ? 'Photos' : 'Photos'} ({allImages.length})
+                                  </Button>
+                                )}
+                                {videos.length > 0 && (
+                                  <Button
+                                    variant="outline"
+                                    size="sm"
+                                    onClick={() => openVideo(videos[0])}
+                                  >
+                                    <Play className="w-4 h-4 mr-2" />
+                                    {locale === 'fr' ? 'Vidéos' : 'Videos'} ({videos.length})
+                                  </Button>
+                                )}
+                              </div>
                             </div>
                           </div>
-                        </div>
-                      </CardContent>
-                    </Card>
-                  );
-                })}
-              </div>
+                        </CardContent>
+                      </Card>
+                    );
+                  })}
+                </div>
+
+                {/* Pagination */}
+                {pagination && (
+                  <Pagination
+                    currentPage={page}
+                    totalPages={pagination.totalPages}
+                    onPageChange={handlePageChange}
+                  />
+                )}
+              </>
             )}
           </div>
         </div>
@@ -343,7 +462,7 @@ export default function EventsPage() {
             )}
 
             {lightboxImages.length > 1 && (
-              <div className="absolute bottom-4 left-1/2 -translate-x-1/2 text-white text-sm">
+              <div className="absolute bottom-4 left-1/2 -translate-x-1/2 text-white text-sm bg-black/50 px-3 py-1 rounded-full">
                 {lightboxIndex + 1} / {lightboxImages.length}
               </div>
             )}

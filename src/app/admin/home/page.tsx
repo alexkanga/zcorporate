@@ -14,8 +14,8 @@ const sections = [
   { 
     href: '/admin/home/about', 
     icon: FileText, 
-    title: 'À propos', 
-    description: 'Modifier la section À propos de la page d\'accueil' 
+    title: 'Présentation', 
+    description: 'Modifier la section Présentation de la page d\'accueil' 
   },
   { 
     href: '/admin/home/services', 
