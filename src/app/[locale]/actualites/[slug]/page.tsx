@@ -374,11 +374,6 @@ export default function ArticleDetailPage() {
                   alt={getTitle()}
                   className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                 />
-                <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors flex items-center justify-center">
-                  <div className="opacity-0 group-hover:opacity-100 transition-opacity bg-white/90 rounded-full p-3">
-                    <ExternalLink className="w-6 h-6 text-[var(--color-primary)]" />
-                  </div>
-                </div>
               </div>
             ) : (
               <div className="aspect-video rounded-lg bg-muted flex items-center justify-center">

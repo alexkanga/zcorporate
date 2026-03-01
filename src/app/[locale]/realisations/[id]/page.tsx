@@ -3,11 +3,12 @@
 import { useQuery } from '@tanstack/react-query';
 import { useLocale } from 'next-intl';
 import { useParams } from 'next/navigation';
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import {
   Dialog,
   DialogContent,
@@ -21,9 +22,10 @@ import {
   ChevronLeft,
   ChevronRight,
   X,
+  Play,
+  Video,
 } from 'lucide-react';
 import { Link } from '@/i18n/routing';
-import type { Metadata } from 'next';
 
 interface RealisationDetail {
   id: string;
@@ -36,6 +38,7 @@ interface RealisationDetail {
   location: string | null;
   imageUrl: string | null;
   gallery: string[];
+  videos: string[];
   featured: boolean;
   category: {
     id: string;
@@ -45,10 +48,95 @@ interface RealisationDetail {
   } | null;
 }
 
-async function fetchRealisation(id: string) {
+interface VideoInfo {
+  url: string;
+  type: 'youtube' | 'vimeo' | 'dailymotion' | 'direct';
+  id: string | null;
+  thumbnail: string | null;
+  embedUrl: string | null;
+}
+
+async function fetchRealisation(id: string): Promise<{ data: RealisationDetail | null }> {
   const response = await fetch(`/api/realisations/${id}`);
-  const data = await response.json();
-  return data;
+  if (!response.ok) throw new Error('Failed to fetch realisation');
+  return response.json();
+}
+
+// Get YouTube video ID
+function getYouTubeId(url: string): string | null {
+  const patterns = [
+    /(?:youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/embed\/|youtube\.com\/v\/)([^"&?\/\s]{11})/,
+    /youtube\.com\/shorts\/([^"&?\/\s]{11})/,
+  ];
+  for (const pattern of patterns) {
+    const match = url.match(pattern);
+    if (match) return match[1];
+  }
+  return null;
+}
+
+// Get Vimeo video ID
+function getVimeoId(url: string): string | null {
+  const match = url.match(/vimeo\.com\/(\d+)/);
+  return match ? match[1] : null;
+}
+
+// Get Dailymotion video ID
+function getDailymotionId(url: string): string | null {
+  const patterns = [
+    /dailymotion\.com\/video\/([^&_]+)/,
+    /dai\.ly\/([^&]+)/,
+  ];
+  for (const pattern of patterns) {
+    const match = url.match(pattern);
+    if (match) return match[1];
+  }
+  return null;
+}
+
+// Get video info including thumbnail and embed URL
+function getVideoInfo(url: string): VideoInfo {
+  const youtubeId = getYouTubeId(url);
+  if (youtubeId) {
+    return {
+      url,
+      type: 'youtube',
+      id: youtubeId,
+      thumbnail: `https://img.youtube.com/vi/${youtubeId}/maxresdefault.jpg`,
+      embedUrl: `https://www.youtube.com/embed/${youtubeId}?autoplay=1`,
+    };
+  }
+
+  const vimeoId = getVimeoId(url);
+  if (vimeoId) {
+    return {
+      url,
+      type: 'vimeo',
+      id: vimeoId,
+      thumbnail: null,
+      embedUrl: `https://player.vimeo.com/video/${vimeoId}?autoplay=1`,
+    };
+  }
+
+  const dailymotionId = getDailymotionId(url);
+  if (dailymotionId) {
+    return {
+      url,
+      type: 'dailymotion',
+      id: dailymotionId,
+      thumbnail: `https://www.dailymotion.com/thumbnail/video/${dailymotionId}`,
+      embedUrl: `https://www.dailymotion.com/embed/video/${dailymotionId}?autoplay=1`,
+    };
+  }
+
+  // Direct video file
+  return {
+    url,
+    type: 'direct',
+    id: null,
+    thumbnail: null,
+    embedUrl: null,
+  };
 }
 
 export default function RealisationDetailPage() {
@@ -56,8 +144,10 @@ export default function RealisationDetailPage() {
   const params = useParams();
   const id = params.id as string;
 
-  const [lightboxOpen, setLightboxOpen] = useState(false);
-  const [lightboxIndex, setLightboxIndex] = useState(0);
+  const [imageLightboxOpen, setImageLightboxOpen] = useState(false);
+  const [imageLightboxIndex, setImageLightboxIndex] = useState(0);
+  const [videoLightboxOpen, setVideoLightboxOpen] = useState(false);
+  const [videoLightboxIndex, setVideoLightboxIndex] = useState(0);
 
   const { data, isLoading, error } = useQuery({
     queryKey: ['realisation', id],
@@ -89,25 +179,116 @@ export default function RealisationDetailPage() {
     });
   };
 
-  const openLightbox = (index: number) => {
-    setLightboxIndex(index);
-    setLightboxOpen(true);
+  // Separate photos and videos
+  const photos = useMemo(() => {
+    const images: string[] = [];
+    if (realisation?.imageUrl) {
+      images.push(realisation.imageUrl);
+    }
+    if (realisation?.gallery && Array.isArray(realisation.gallery)) {
+      realisation.gallery.forEach(url => {
+        if (url && !images.includes(url)) {
+          images.push(url);
+        }
+      });
+    }
+    return images;
+  }, [realisation]);
+
+  const videos = useMemo(() => {
+    if (!realisation?.videos || !Array.isArray(realisation.videos)) return [];
+    return realisation.videos.filter(url => url).map(url => getVideoInfo(url));
+  }, [realisation]);
+
+  const openImageLightbox = (index: number) => {
+    setImageLightboxIndex(index);
+    setImageLightboxOpen(true);
   };
 
-  const navigateLightbox = (direction: 'prev' | 'next') => {
-    if (!realisation?.gallery) return;
-    const total = realisation.gallery.length;
+  const openVideoLightbox = (index: number) => {
+    setVideoLightboxIndex(index);
+    setVideoLightboxOpen(true);
+  };
+
+  const navigateImageLightbox = (direction: 'prev' | 'next') => {
+    const total = photos.length;
     if (direction === 'prev') {
-      setLightboxIndex((prev) => (prev - 1 + total) % total);
+      setImageLightboxIndex((prev) => (prev - 1 + total) % total);
     } else {
-      setLightboxIndex((prev) => (prev + 1) % total);
+      setImageLightboxIndex((prev) => (prev + 1) % total);
     }
   };
 
-  const allImages = realisation?.gallery || [];
-  if (realisation?.imageUrl && !allImages.includes(realisation.imageUrl)) {
-    allImages.unshift(realisation.imageUrl);
-  }
+  const navigateVideoLightbox = (direction: 'prev' | 'next') => {
+    const total = videos.length;
+    if (direction === 'prev') {
+      setVideoLightboxIndex((prev) => (prev - 1 + total) % total);
+    } else {
+      setVideoLightboxIndex((prev) => (prev + 1) % total);
+    }
+  };
+
+  // Render video embed
+  const renderVideoEmbed = (video: VideoInfo) => {
+    if (video.embedUrl) {
+      return (
+        <iframe
+          src={video.embedUrl}
+          className="w-full h-full"
+          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+          allowFullScreen
+        />
+      );
+    }
+    
+    // Direct video file
+    return (
+      <video
+        src={video.url}
+        controls
+        autoPlay
+        className="max-w-full max-h-full"
+      />
+    );
+  };
+
+  // Render video thumbnail with play overlay
+  const renderVideoThumbnail = (video: VideoInfo, index: number) => {
+    return (
+      <div
+        key={index}
+        className="aspect-video rounded-lg overflow-hidden bg-muted cursor-pointer group relative"
+        onClick={() => openVideoLightbox(index)}
+      >
+        {video.thumbnail ? (
+          <img
+            src={video.thumbnail}
+            alt={`Video ${index + 1}`}
+            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+            onError={(e) => {
+              (e.target as HTMLImageElement).style.display = 'none';
+            }}
+          />
+        ) : (
+          <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-muted to-muted/50">
+            <Video className="w-12 h-12 text-muted-foreground/50" />
+          </div>
+        )}
+        {/* Play overlay */}
+        <div className="absolute inset-0 flex items-center justify-center bg-black/30 group-hover:bg-black/40 transition-colors">
+          <div className="w-16 h-16 rounded-full bg-white/90 flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform">
+            <Play className="w-8 h-8 text-[var(--color-primary)] ml-1" fill="currentColor" />
+          </div>
+        </div>
+        {/* Video type badge */}
+        <div className="absolute top-2 right-2">
+          <Badge variant="secondary" className="bg-black/60 text-white text-xs">
+            {video.type.charAt(0).toUpperCase() + video.type.slice(1)}
+          </Badge>
+        </div>
+      </div>
+    );
+  };
 
   if (isLoading) {
     return (
@@ -147,6 +328,8 @@ export default function RealisationDetailPage() {
     );
   }
 
+  const hasGallery = photos.length > 1 || videos.length > 0;
+
   return (
     <div className="min-h-screen py-8">
       <div className="container mx-auto px-4">
@@ -164,14 +347,15 @@ export default function RealisationDetailPage() {
           <div className="mb-8">
             {realisation.imageUrl ? (
               <div
-                className="aspect-video rounded-lg overflow-hidden bg-muted cursor-pointer"
-                onClick={() => openLightbox(0)}
+                className="aspect-video rounded-lg overflow-hidden bg-muted cursor-pointer group"
+                onClick={() => openImageLightbox(0)}
               >
                 <img
                   src={realisation.imageUrl}
                   alt={getTitle()}
-                  className="w-full h-full object-cover"
+                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                 />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
               </div>
             ) : (
               <div className="aspect-video rounded-lg bg-muted flex items-center justify-center">
@@ -228,28 +412,72 @@ export default function RealisationDetailPage() {
             </Card>
           )}
 
-          {/* Gallery */}
-          {allImages.length > 1 && (
+          {/* Gallery & Videos with Tabs */}
+          {hasGallery && (
             <div className="mb-8">
-              <h2 className="text-xl font-semibold mb-4 flex items-center gap-2">
-                <ImageIcon className="w-5 h-5" />
-                {locale === 'fr' ? 'Galerie' : 'Gallery'}
-              </h2>
-              <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-                {allImages.map((image, index) => (
-                  <div
-                    key={index}
-                    className="aspect-square rounded-lg overflow-hidden bg-muted cursor-pointer hover:opacity-90 transition-opacity"
-                    onClick={() => openLightbox(index)}
-                  >
-                    <img
-                      src={image}
-                      alt={`${getTitle()} - ${index + 1}`}
-                      className="w-full h-full object-cover"
-                    />
-                  </div>
-                ))}
-              </div>
+              <Tabs defaultValue="photos" className="w-full">
+                <TabsList className="grid w-full grid-cols-2 mb-6">
+                  <TabsTrigger value="photos" className="flex items-center gap-2">
+                    <ImageIcon className="w-4 h-4" />
+                    {locale === 'fr' ? 'Photos' : 'Photos'}
+                    {photos.length > 0 && (
+                      <Badge variant="secondary" className="ml-1">
+                        {photos.length}
+                      </Badge>
+                    )}
+                  </TabsTrigger>
+                  <TabsTrigger value="videos" className="flex items-center gap-2">
+                    <Video className="w-4 h-4" />
+                    {locale === 'fr' ? 'Vidéos' : 'Videos'}
+                    {videos.length > 0 && (
+                      <Badge variant="secondary" className="ml-1">
+                        {videos.length}
+                      </Badge>
+                    )}
+                  </TabsTrigger>
+                </TabsList>
+
+                {/* Photos Tab */}
+                <TabsContent value="photos">
+                  {photos.length > 1 ? (
+                    <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+                      {photos.slice(1).map((url, index) => (
+                        <div
+                          key={index}
+                          className="aspect-square rounded-lg overflow-hidden bg-muted cursor-pointer group relative"
+                          onClick={() => openImageLightbox(index + 1)}
+                        >
+                          <img
+                            src={url}
+                            alt={`${getTitle()} - ${index + 2}`}
+                            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                          />
+                          <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors" />
+                        </div>
+                      ))}
+                    </div>
+                  ) : (
+                    <div className="text-center py-8 text-muted-foreground">
+                      <ImageIcon className="w-12 h-12 mx-auto mb-3 opacity-50" />
+                      {locale === 'fr' ? 'Aucune photo supplémentaire' : 'No additional photos'}
+                    </div>
+                  )}
+                </TabsContent>
+
+                {/* Videos Tab */}
+                <TabsContent value="videos">
+                  {videos.length > 0 ? (
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      {videos.map((video, index) => renderVideoThumbnail(video, index))}
+                    </div>
+                  ) : (
+                    <div className="text-center py-8 text-muted-foreground">
+                      <Video className="w-12 h-12 mx-auto mb-3 opacity-50" />
+                      {locale === 'fr' ? 'Aucune vidéo disponible' : 'No videos available'}
+                    </div>
+                  )}
+                </TabsContent>
+              </Tabs>
             </div>
           )}
 
@@ -271,8 +499,8 @@ export default function RealisationDetailPage() {
         </div>
       </div>
 
-      {/* Lightbox Dialog */}
-      <Dialog open={lightboxOpen} onOpenChange={setLightboxOpen}>
+      {/* Image Lightbox Dialog */}
+      <Dialog open={imageLightboxOpen} onOpenChange={setImageLightboxOpen}>
         <DialogContent className="max-w-6xl w-full h-[90vh] p-0 bg-black/95 border-none">
           <div className="relative w-full h-full flex items-center justify-center">
             {/* Close Button */}
@@ -280,19 +508,19 @@ export default function RealisationDetailPage() {
               variant="ghost"
               size="icon"
               className="absolute top-4 right-4 text-white hover:bg-white/10 z-10"
-              onClick={() => setLightboxOpen(false)}
+              onClick={() => setImageLightboxOpen(false)}
             >
               <X className="w-6 h-6" />
             </Button>
 
             {/* Navigation Buttons */}
-            {allImages.length > 1 && (
+            {photos.length > 1 && (
               <>
                 <Button
                   variant="ghost"
                   size="icon"
                   className="absolute left-4 text-white hover:bg-white/10 z-10"
-                  onClick={() => navigateLightbox('prev')}
+                  onClick={() => navigateImageLightbox('prev')}
                 >
                   <ChevronLeft className="w-8 h-8" />
                 </Button>
@@ -300,26 +528,80 @@ export default function RealisationDetailPage() {
                   variant="ghost"
                   size="icon"
                   className="absolute right-4 text-white hover:bg-white/10 z-10"
-                  onClick={() => navigateLightbox('next')}
+                  onClick={() => navigateImageLightbox('next')}
                 >
                   <ChevronRight className="w-8 h-8" />
                 </Button>
               </>
             )}
 
-            {/* Image */}
-            {allImages[lightboxIndex] && (
+            {/* Image Content */}
+            {photos[imageLightboxIndex] && (
               <img
-                src={allImages[lightboxIndex]}
+                src={photos[imageLightboxIndex]}
                 alt={getTitle()}
                 className="max-w-full max-h-full object-contain"
               />
             )}
 
             {/* Counter */}
-            {allImages.length > 1 && (
-              <div className="absolute bottom-4 left-1/2 -translate-x-1/2 text-white text-sm">
-                {lightboxIndex + 1} / {allImages.length}
+            {photos.length > 1 && (
+              <div className="absolute bottom-4 left-1/2 -translate-x-1/2 text-white text-sm bg-black/50 px-3 py-1 rounded-full">
+                {imageLightboxIndex + 1} / {photos.length}
+              </div>
+            )}
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Video Lightbox Dialog */}
+      <Dialog open={videoLightboxOpen} onOpenChange={setVideoLightboxOpen}>
+        <DialogContent className="max-w-5xl w-full h-[85vh] p-0 bg-black/95 border-none">
+          <div className="relative w-full h-full flex items-center justify-center">
+            {/* Close Button */}
+            <Button
+              variant="ghost"
+              size="icon"
+              className="absolute top-4 right-4 text-white hover:bg-white/10 z-10"
+              onClick={() => setVideoLightboxOpen(false)}
+            >
+              <X className="w-6 h-6" />
+            </Button>
+
+            {/* Navigation Buttons */}
+            {videos.length > 1 && (
+              <>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="absolute left-4 text-white hover:bg-white/10 z-10"
+                  onClick={() => navigateVideoLightbox('prev')}
+                >
+                  <ChevronLeft className="w-8 h-8" />
+                </Button>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="absolute right-4 text-white hover:bg-white/10 z-10"
+                  onClick={() => navigateVideoLightbox('next')}
+                >
+                  <ChevronRight className="w-8 h-8" />
+                </Button>
+              </>
+            )}
+
+            {/* Video Content */}
+            {videos[videoLightboxIndex] && (
+              <div className="w-full h-full flex items-center justify-center p-4">
+                {renderVideoEmbed(videos[videoLightboxIndex])}
+              </div>
+            )}
+
+            {/* Counter */}
+            {videos.length > 1 && (
+              <div className="absolute bottom-4 left-1/2 -translate-x-1/2 text-white text-sm bg-black/50 px-3 py-1 rounded-full flex items-center gap-2">
+                <Video className="w-4 h-4" />
+                {videoLightboxIndex + 1} / {videos.length}
               </div>
             )}
           </div>

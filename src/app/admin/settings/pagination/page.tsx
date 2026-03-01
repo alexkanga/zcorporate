@@ -1,6 +1,5 @@
 "use client";
 
-import { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -29,6 +28,13 @@ interface SiteSettings {
   realisationsPerPage: number;
   resourcesPerPage: number;
   eventsPerPage: number;
+  siteNameFr: string;
+  siteNameEn: string;
+  color1: string;
+  color2: string;
+  color3: string;
+  color4: string;
+  mapZoom: number;
 }
 
 const PAGINATION_LABELS = {
@@ -109,12 +115,23 @@ export default function PaginationSettingsPage() {
   });
 
   const onSubmit = (data: PaginationFormData) => {
+    if (!settings) return;
+    
+    // Send ALL required fields plus pagination updates
     updateMutation.mutate({
-      ...data,
-      // Preserve other required settings
-      siteNameFr: settings?.siteNameFr || "AAEA",
-      siteNameEn: settings?.siteNameEn || "AAEA",
-      mapZoom: settings?.mapZoom || 15,
+      // Pagination fields
+      articlesPerPage: data.articlesPerPage,
+      realisationsPerPage: data.realisationsPerPage,
+      resourcesPerPage: data.resourcesPerPage,
+      eventsPerPage: data.eventsPerPage,
+      // Required fields from existing settings
+      siteNameFr: settings.siteNameFr || "AAEA",
+      siteNameEn: settings.siteNameEn || "AAEA",
+      color1: settings.color1 || "#362981",
+      color2: settings.color2 || "#009446",
+      color3: settings.color3 || "#029CB1",
+      color4: settings.color4 || "#9AD2E2",
+      mapZoom: settings.mapZoom || 15,
     });
   };
 

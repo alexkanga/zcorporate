@@ -15,7 +15,7 @@ export async function GET(
         published: true,
       },
       include: {
-        category: {
+        RealisationCategory: {
           select: {
             id: true,
             nameFr: true,
@@ -43,10 +43,27 @@ export async function GET(
       }
     }
 
+    // Parse videos JSON if exists
+    let videos: string[] = [];
+    if (realisation.videos) {
+      try {
+        videos = JSON.parse(realisation.videos);
+      } catch {
+        videos = [];
+      }
+    }
+
     return NextResponse.json({
       data: {
         ...realisation,
         gallery,
+        videos,
+        category: realisation.RealisationCategory ? {
+          id: realisation.RealisationCategory.id,
+          nameFr: realisation.RealisationCategory.nameFr,
+          nameEn: realisation.RealisationCategory.nameEn,
+          slug: realisation.RealisationCategory.slug,
+        } : null,
       },
     });
   } catch (error) {

@@ -14,8 +14,9 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { Skeleton } from '@/components/ui/skeleton';
-import { Calendar, MapPin, ArrowRight, Folder, ChevronLeft, ChevronRight } from 'lucide-react';
+import { Calendar, MapPin, ArrowRight, Folder, ChevronLeft, ChevronRight, Image, Video } from 'lucide-react';
 import { Link } from '@/i18n/routing';
+import { ClientOnly } from '@/components/ClientOnly';
 
 interface Realisation {
   id: string;
@@ -28,6 +29,8 @@ interface Realisation {
   location: string | null;
   imageUrl: string | null;
   featured: boolean;
+  photoCount?: number;
+  videoCount?: number;
   category: {
     id: string;
     nameFr: string;
@@ -84,14 +87,12 @@ function Pagination({
         items.push(i);
       }
     } else {
-      // Always show first page
       items.push(1);
       
       if (currentPage > 3) {
         items.push('ellipsis');
       }
       
-      // Pages around current
       const start = Math.max(2, currentPage - 1);
       const end = Math.min(totalPages - 1, currentPage + 1);
       
@@ -103,7 +104,6 @@ function Pagination({
         items.push('ellipsis');
       }
       
-      // Always show last page
       items.push(totalPages);
     }
     
@@ -114,7 +114,6 @@ function Pagination({
 
   return (
     <div className="flex items-center justify-center gap-1.5 mt-8">
-      {/* Previous button */}
       <Button
         variant="outline"
         size="icon"
@@ -125,7 +124,6 @@ function Pagination({
         <ChevronLeft className="h-4 w-4" />
       </Button>
 
-      {/* Page numbers */}
       {pages.map((page, index) => {
         if (page === 'ellipsis') {
           return (
@@ -156,7 +154,6 @@ function Pagination({
         );
       })}
 
-      {/* Next button */}
       <Button
         variant="outline"
         size="icon"
@@ -167,6 +164,42 @@ function Pagination({
         <ChevronRight className="h-4 w-4" />
       </Button>
     </div>
+  );
+}
+
+// Category filter component wrapped in ClientOnly to avoid hydration issues
+function CategoryFilter({
+  categories,
+  selectedCategory,
+  onCategoryChange,
+  locale,
+}: {
+  categories: Category[];
+  selectedCategory: string;
+  onCategoryChange: (value: string) => void;
+  locale: 'fr' | 'en';
+}) {
+  const getCategoryName = (category: Category | null) =>
+    category ? (locale === 'fr' ? category.nameFr : category.nameEn) : null;
+
+  return (
+    <ClientOnly fallback={<Skeleton className="h-10 w-[200px]" />}>
+      <Select value={selectedCategory} onValueChange={onCategoryChange}>
+        <SelectTrigger className="w-[200px]">
+          <SelectValue placeholder={locale === 'fr' ? 'Catégorie' : 'Category'} />
+        </SelectTrigger>
+        <SelectContent>
+          <SelectItem value="all">
+            {locale === 'fr' ? 'Toutes les catégories' : 'All categories'}
+          </SelectItem>
+          {categories.map((category) => (
+            <SelectItem key={category.id} value={category.id}>
+              {getCategoryName(category)}
+            </SelectItem>
+          ))}
+        </SelectContent>
+      </Select>
+    </ClientOnly>
   );
 }
 
@@ -243,21 +276,12 @@ export default function RealisationsPage() {
               <span className="text-sm font-medium text-muted-foreground">
                 {locale === 'fr' ? 'Filtrer par :' : 'Filter by:'}
               </span>
-              <Select value={selectedCategory} onValueChange={handleCategoryChange}>
-                <SelectTrigger className="w-[200px]">
-                  <SelectValue placeholder={locale === 'fr' ? 'Catégorie' : 'Category'} />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">
-                    {locale === 'fr' ? 'Toutes les catégories' : 'All categories'}
-                  </SelectItem>
-                  {categories.map((category) => (
-                    <SelectItem key={category.id} value={category.id}>
-                      {getCategoryName(category)}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+              <CategoryFilter
+                categories={categories}
+                selectedCategory={selectedCategory}
+                onCategoryChange={handleCategoryChange}
+                locale={locale}
+              />
               {selectedCategory !== 'all' && (
                 <Button
                   variant="ghost"
@@ -314,34 +338,53 @@ export default function RealisationsPage() {
                       key={realisation.id}
                       href={`/realisations/${realisation.id}`}
                     >
-                      <Card className="overflow-hidden group hover:shadow-xl transition-all duration-300 hover:-translate-y-1 h-full">
+                      <Card className="overflow-hidden group hover:shadow-2xl transition-all duration-500 hover:-translate-y-2 h-full border border-transparent hover:border-[var(--color-primary)]/20">
                         <div className="aspect-video relative overflow-hidden bg-muted">
                           {realisation.imageUrl ? (
                             <img
                               src={realisation.imageUrl}
                               alt={getTitle(realisation)}
-                              className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                              className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
                             />
                           ) : (
                             <div className="w-full h-full flex items-center justify-center">
                               <Folder className="w-12 h-12 text-muted-foreground/30" />
                             </div>
                           )}
+                          {/* Gradient overlay on hover */}
+                          <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                          
                           {realisation.featured && (
-                            <Badge className="absolute top-2 right-2 bg-[var(--color-primary)] text-white">
+                            <Badge className="absolute top-2 right-2 bg-[var(--color-primary)] text-white shadow-lg">
                               {locale === 'fr' ? 'À la une' : 'Featured'}
                             </Badge>
                           )}
+                          {realisation.category && (
+                            <Badge className="absolute top-2 left-2 bg-[var(--color-secondary)] text-white shadow-lg">
+                              {getCategoryName(realisation.category)}
+                            </Badge>
+                          )}
+                          
+                          {/* Photo/Video count badges */}
+                          {((realisation.photoCount && realisation.photoCount > 0) || (realisation.videoCount && realisation.videoCount > 0)) && (
+                            <div className="absolute bottom-2 right-2 flex gap-1.5 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                              {realisation.photoCount && realisation.photoCount > 0 && (
+                                <Badge variant="secondary" className="bg-white/90 text-gray-800 shadow-md backdrop-blur-sm gap-1 px-2 py-1">
+                                  <Image className="h-3 w-3" />
+                                  <span className="text-xs font-medium">{realisation.photoCount}</span>
+                                </Badge>
+                              )}
+                              {realisation.videoCount && realisation.videoCount > 0 && (
+                                <Badge variant="secondary" className="bg-white/90 text-gray-800 shadow-md backdrop-blur-sm gap-1 px-2 py-1">
+                                  <Video className="h-3 w-3" />
+                                  <span className="text-xs font-medium">{realisation.videoCount}</span>
+                                </Badge>
+                              )}
+                            </div>
+                          )}
                         </div>
                         <CardContent className="p-4">
-                          <div className="flex items-center gap-2 mb-2">
-                            {realisation.category && (
-                              <Badge variant="outline" className="text-xs">
-                                {getCategoryName(realisation.category)}
-                              </Badge>
-                            )}
-                          </div>
-                          <h3 className="text-lg font-semibold mb-2 group-hover:text-[var(--color-primary)] transition-colors">
+                          <h3 className="text-lg font-semibold mb-2 group-hover:text-[var(--color-primary)] transition-colors line-clamp-2">
                             {getTitle(realisation)}
                           </h3>
                           {getDescription(realisation) && (

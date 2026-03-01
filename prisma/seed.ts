@@ -144,7 +144,14 @@ async function main() {
   for (const item of menuItems) {
     await prisma.menuItem.upsert({
       where: { id: item.id },
-      update: {},
+      update: {
+        labelFr: item.labelFr,
+        labelEn: item.labelEn,
+        slug: item.slug,
+        route: item.route,
+        location: item.location,
+        order: item.order,
+      },
       create: item,
     });
   }

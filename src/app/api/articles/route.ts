@@ -69,12 +69,16 @@ export async function GET(request: NextRequest) {
     // Transform articles to match expected format
     const transformedArticles = articles.map(article => {
       // Parse gallery and videos to get counts
+      // Note: gallery count should NOT include the main image
       let photoCount = 0;
       let videoCount = 0;
       
       try {
         const gallery = article.gallery ? JSON.parse(article.gallery) : [];
-        photoCount = Array.isArray(gallery) ? gallery.length : 0;
+        if (Array.isArray(gallery)) {
+          // Filter out the main image URL from gallery count if it exists
+          photoCount = gallery.filter((url: string) => url && url !== article.imageUrl).length;
+        }
       } catch {
         photoCount = 0;
       }

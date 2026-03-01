@@ -46,6 +46,7 @@ import {
   Sparkles,
   LogOut,
   Newspaper,
+  Rows3,
 } from "lucide-react";
 
 const navigation = [
@@ -66,6 +67,7 @@ const navigation = [
       { title: "Logo", href: "/admin/settings/logo", icon: Image, color: "text-violet-600" },
       { title: "Couleurs", href: "/admin/settings/colors", icon: Palette, color: "text-pink-600" },
       { title: "Menus", href: "/admin/settings/menus", icon: Menu, color: "text-indigo-600" },
+      { title: "Pagination", href: "/admin/settings/pagination", icon: Rows3, color: "text-emerald-600" },
       { title: "Cartes", href: "/admin/settings/maps", icon: Map, color: "text-teal-600" },
     ],
   },

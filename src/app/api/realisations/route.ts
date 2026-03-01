@@ -29,7 +29,7 @@ export async function GET(request: NextRequest) {
     const realisations = await db.realisation.findMany({
       where,
       include: {
-        category: {
+        RealisationCategory: {
           select: {
             id: true,
             nameFr: true,
@@ -60,8 +60,44 @@ export async function GET(request: NextRequest) {
       },
     });
 
+    // Transform realisations to include photo/video counts
+    const transformedRealisations = realisations.map(realisation => {
+      // Parse gallery and videos to get counts (excluding main image from gallery count)
+      let photoCount = 0;
+      let videoCount = 0;
+      
+      try {
+        const gallery = realisation.gallery ? JSON.parse(realisation.gallery) : [];
+        if (Array.isArray(gallery)) {
+          // Filter out the main image URL from gallery count
+          photoCount = gallery.filter((url: string) => url && url !== realisation.imageUrl).length;
+        }
+      } catch {
+        photoCount = 0;
+      }
+      
+      try {
+        const videos = realisation.videos ? JSON.parse(realisation.videos) : [];
+        videoCount = Array.isArray(videos) ? videos.length : 0;
+      } catch {
+        videoCount = 0;
+      }
+
+      return {
+        ...realisation,
+        category: realisation.RealisationCategory ? {
+          id: realisation.RealisationCategory.id,
+          nameFr: realisation.RealisationCategory.nameFr,
+          nameEn: realisation.RealisationCategory.nameEn,
+          slug: realisation.RealisationCategory.slug,
+        } : null,
+        photoCount,
+        videoCount,
+      };
+    });
+
     return NextResponse.json({
-      data: realisations,
+      data: transformedRealisations,
       categories,
       pagination: {
         page,
