@@ -5,52 +5,53 @@ import { db } from "@/lib/db";
 import { z } from "zod";
 import { revalidatePath } from "next/cache";
 
-// Validation schema for settings update
+// Validation schema for settings update - all fields optional for partial updates
 const settingsSchema = z.object({
   // Logo
-  logoUrl: z.string().nullable(),
-  logoAltFr: z.string().nullable(),
-  logoAltEn: z.string().nullable(),
+  logoUrl: z.string().nullable().optional(),
+  faviconUrl: z.string().nullable().optional(),
+  logoAltFr: z.string().nullable().optional(),
+  logoAltEn: z.string().nullable().optional(),
   
   // Colors
-  color1: z.string().regex(/^#[0-9A-Fa-f]{6}$/, "Invalid hex color"),
-  color2: z.string().regex(/^#[0-9A-Fa-f]{6}$/, "Invalid hex color"),
-  color3: z.string().regex(/^#[0-9A-Fa-f]{6}$/, "Invalid hex color"),
-  color4: z.string().regex(/^#[0-9A-Fa-f]{6}$/, "Invalid hex color"),
+  color1: z.string().regex(/^#[0-9A-Fa-f]{6}$/, "Invalid hex color").optional(),
+  color2: z.string().regex(/^#[0-9A-Fa-f]{6}$/, "Invalid hex color").optional(),
+  color3: z.string().regex(/^#[0-9A-Fa-f]{6}$/, "Invalid hex color").optional(),
+  color4: z.string().regex(/^#[0-9A-Fa-f]{6}$/, "Invalid hex color").optional(),
   
   // Site info
-  siteNameFr: z.string().min(1, "Site name (FR) is required"),
-  siteNameEn: z.string().min(1, "Site name (EN) is required"),
-  siteDescriptionFr: z.string().nullable(),
-  siteDescriptionEn: z.string().nullable(),
+  siteNameFr: z.string().min(1, "Site name (FR) is required").optional(),
+  siteNameEn: z.string().min(1, "Site name (EN) is required").optional(),
+  siteDescriptionFr: z.string().nullable().optional(),
+  siteDescriptionEn: z.string().nullable().optional(),
   
   // Contact info
-  address: z.string().nullable(),
-  email: z.string().email("Invalid email").nullable().or(z.literal("")),
-  phone: z.string().nullable(),
-  phone2: z.string().nullable(),
-  workingHoursFr: z.string().nullable(),
-  workingHoursEn: z.string().nullable(),
+  address: z.string().nullable().optional(),
+  email: z.string().email("Invalid email").nullable().or(z.literal("")).optional(),
+  phone: z.string().nullable().optional(),
+  phone2: z.string().nullable().optional(),
+  workingHoursFr: z.string().nullable().optional(),
+  workingHoursEn: z.string().nullable().optional(),
   
   // Social links
-  socialLinks: z.string().nullable(),
+  socialLinks: z.string().nullable().optional(),
   
   // Google Maps
-  mapLatitude: z.number().min(-90).max(90).nullable(),
-  mapLongitude: z.number().min(-180).max(180).nullable(),
-  mapZoom: z.number().min(1).max(20),
-  mapApiKey: z.string().nullable(),
+  mapLatitude: z.number().min(-90).max(90).nullable().optional(),
+  mapLongitude: z.number().min(-180).max(180).nullable().optional(),
+  mapZoom: z.number().min(1).max(20).optional(),
+  mapApiKey: z.string().nullable().optional(),
   
   // SEO
-  metaTitleFr: z.string().nullable(),
-  metaTitleEn: z.string().nullable(),
-  metaDescriptionFr: z.string().nullable(),
-  metaDescriptionEn: z.string().nullable(),
-  metaKeywords: z.string().nullable(),
+  metaTitleFr: z.string().nullable().optional(),
+  metaTitleEn: z.string().nullable().optional(),
+  metaDescriptionFr: z.string().nullable().optional(),
+  metaDescriptionEn: z.string().nullable().optional(),
+  metaKeywords: z.string().nullable().optional(),
   
   // Analytics
-  googleAnalyticsId: z.string().nullable(),
-  googleTagManagerId: z.string().nullable(),
+  googleAnalyticsId: z.string().nullable().optional(),
+  googleTagManagerId: z.string().nullable().optional(),
   
   // Pagination
   articlesPerPage: z.number().min(1).max(50).optional(),
@@ -120,101 +121,77 @@ export async function PUT(request: NextRequest) {
     // Validate input
     const validatedData = settingsSchema.parse(body);
     
+    // Get existing settings or create default
+    const existingSettings = await db.siteSettings.findUnique({
+      where: { id: "site-settings" },
+    });
+    
+    // Merge with existing settings for partial updates
+    const dataToUpdate = {
+      // Logo (use new value or keep existing)
+      logoUrl: validatedData.logoUrl ?? existingSettings?.logoUrl,
+      faviconUrl: validatedData.faviconUrl ?? existingSettings?.faviconUrl,
+      logoAltFr: validatedData.logoAltFr ?? existingSettings?.logoAltFr,
+      logoAltEn: validatedData.logoAltEn ?? existingSettings?.logoAltEn,
+      
+      // Colors
+      color1: validatedData.color1 ?? existingSettings?.color1 ?? "#362981",
+      color2: validatedData.color2 ?? existingSettings?.color2 ?? "#009446",
+      color3: validatedData.color3 ?? existingSettings?.color3 ?? "#029CB1",
+      color4: validatedData.color4 ?? existingSettings?.color4 ?? "#9AD2E2",
+      
+      // Site info
+      siteNameFr: validatedData.siteNameFr ?? existingSettings?.siteNameFr ?? "AAEA",
+      siteNameEn: validatedData.siteNameEn ?? existingSettings?.siteNameEn ?? "AAEA",
+      siteDescriptionFr: validatedData.siteDescriptionFr ?? existingSettings?.siteDescriptionFr,
+      siteDescriptionEn: validatedData.siteDescriptionEn ?? existingSettings?.siteDescriptionEn,
+      
+      // Contact info
+      address: validatedData.address ?? existingSettings?.address,
+      email: validatedData.email ?? existingSettings?.email,
+      phone: validatedData.phone ?? existingSettings?.phone,
+      phone2: validatedData.phone2 ?? existingSettings?.phone2,
+      workingHoursFr: validatedData.workingHoursFr ?? existingSettings?.workingHoursFr,
+      workingHoursEn: validatedData.workingHoursEn ?? existingSettings?.workingHoursEn,
+      
+      // Social links
+      socialLinks: validatedData.socialLinks ?? existingSettings?.socialLinks,
+      
+      // Google Maps
+      mapLatitude: validatedData.mapLatitude ?? existingSettings?.mapLatitude,
+      mapLongitude: validatedData.mapLongitude ?? existingSettings?.mapLongitude,
+      mapZoom: validatedData.mapZoom ?? existingSettings?.mapZoom ?? 15,
+      mapApiKey: validatedData.mapApiKey ?? existingSettings?.mapApiKey,
+      
+      // SEO
+      metaTitleFr: validatedData.metaTitleFr ?? existingSettings?.metaTitleFr,
+      metaTitleEn: validatedData.metaTitleEn ?? existingSettings?.metaTitleEn,
+      metaDescriptionFr: validatedData.metaDescriptionFr ?? existingSettings?.metaDescriptionFr,
+      metaDescriptionEn: validatedData.metaDescriptionEn ?? existingSettings?.metaDescriptionEn,
+      metaKeywords: validatedData.metaKeywords ?? existingSettings?.metaKeywords,
+      
+      // Analytics
+      googleAnalyticsId: validatedData.googleAnalyticsId ?? existingSettings?.googleAnalyticsId,
+      googleTagManagerId: validatedData.googleTagManagerId ?? existingSettings?.googleTagManagerId,
+      
+      // Pagination
+      articlesPerPage: validatedData.articlesPerPage ?? existingSettings?.articlesPerPage ?? 10,
+      realisationsPerPage: validatedData.realisationsPerPage ?? existingSettings?.realisationsPerPage ?? 9,
+      resourcesPerPage: validatedData.resourcesPerPage ?? existingSettings?.resourcesPerPage ?? 12,
+      eventsPerPage: validatedData.eventsPerPage ?? existingSettings?.eventsPerPage ?? 6,
+    };
+    
     // Update settings
     const settings = await db.siteSettings.upsert({
       where: { id: "site-settings" },
-      update: {
-        // Logo
-        logoUrl: validatedData.logoUrl,
-        logoAltFr: validatedData.logoAltFr,
-        logoAltEn: validatedData.logoAltEn,
-        
-        // Colors
-        color1: validatedData.color1,
-        color2: validatedData.color2,
-        color3: validatedData.color3,
-        color4: validatedData.color4,
-        
-        // Site info
-        siteNameFr: validatedData.siteNameFr,
-        siteNameEn: validatedData.siteNameEn,
-        siteDescriptionFr: validatedData.siteDescriptionFr,
-        siteDescriptionEn: validatedData.siteDescriptionEn,
-        
-        // Contact info
-        address: validatedData.address,
-        email: validatedData.email || null,
-        phone: validatedData.phone,
-        phone2: validatedData.phone2,
-        workingHoursFr: validatedData.workingHoursFr,
-        workingHoursEn: validatedData.workingHoursEn,
-        
-        // Social links
-        socialLinks: validatedData.socialLinks,
-        
-        // Google Maps
-        mapLatitude: validatedData.mapLatitude,
-        mapLongitude: validatedData.mapLongitude,
-        mapZoom: validatedData.mapZoom,
-        mapApiKey: validatedData.mapApiKey,
-        
-        // SEO
-        metaTitleFr: validatedData.metaTitleFr,
-        metaTitleEn: validatedData.metaTitleEn,
-        metaDescriptionFr: validatedData.metaDescriptionFr,
-        metaDescriptionEn: validatedData.metaDescriptionEn,
-        metaKeywords: validatedData.metaKeywords,
-        
-        // Analytics
-        googleAnalyticsId: validatedData.googleAnalyticsId,
-        googleTagManagerId: validatedData.googleTagManagerId,
-        
-        // Pagination
-        ...(validatedData.articlesPerPage && { articlesPerPage: validatedData.articlesPerPage }),
-        ...(validatedData.realisationsPerPage && { realisationsPerPage: validatedData.realisationsPerPage }),
-        ...(validatedData.resourcesPerPage && { resourcesPerPage: validatedData.resourcesPerPage }),
-        ...(validatedData.eventsPerPage && { eventsPerPage: validatedData.eventsPerPage }),
-      },
+      update: dataToUpdate,
       create: {
         id: "site-settings",
-        logoUrl: validatedData.logoUrl,
-        logoAltFr: validatedData.logoAltFr,
-        logoAltEn: validatedData.logoAltEn,
-        color1: validatedData.color1,
-        color2: validatedData.color2,
-        color3: validatedData.color3,
-        color4: validatedData.color4,
-        siteNameFr: validatedData.siteNameFr,
-        siteNameEn: validatedData.siteNameEn,
-        siteDescriptionFr: validatedData.siteDescriptionFr,
-        siteDescriptionEn: validatedData.siteDescriptionEn,
-        address: validatedData.address,
-        email: validatedData.email || null,
-        phone: validatedData.phone,
-        phone2: validatedData.phone2,
-        workingHoursFr: validatedData.workingHoursFr,
-        workingHoursEn: validatedData.workingHoursEn,
-        socialLinks: validatedData.socialLinks,
-        mapLatitude: validatedData.mapLatitude,
-        mapLongitude: validatedData.mapLongitude,
-        mapZoom: validatedData.mapZoom,
-        mapApiKey: validatedData.mapApiKey,
-        metaTitleFr: validatedData.metaTitleFr,
-        metaTitleEn: validatedData.metaTitleEn,
-        metaDescriptionFr: validatedData.metaDescriptionFr,
-        metaDescriptionEn: validatedData.metaDescriptionEn,
-        metaKeywords: validatedData.metaKeywords,
-        googleAnalyticsId: validatedData.googleAnalyticsId,
-        googleTagManagerId: validatedData.googleTagManagerId,
-        ...(validatedData.articlesPerPage && { articlesPerPage: validatedData.articlesPerPage }),
-        ...(validatedData.realisationsPerPage && { realisationsPerPage: validatedData.realisationsPerPage }),
-        ...(validatedData.resourcesPerPage && { resourcesPerPage: validatedData.resourcesPerPage }),
-        ...(validatedData.eventsPerPage && { eventsPerPage: validatedData.eventsPerPage }),
+        ...dataToUpdate,
       },
     });
     
     // Revalidate all pages that use site settings
-    // This ensures the colors are updated immediately
     revalidatePath("/", "layout");
     revalidatePath("/fr", "layout");
     revalidatePath("/en", "layout");

@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Calendar, ArrowRight, User, Clock } from "lucide-react";
 import type { Locale } from "@/i18n";
+import { useSyncExternalStore } from "react";
 
 interface Article {
   id: string;
@@ -54,17 +55,6 @@ function getLocalizedText(
   return fr;
 }
 
-// Format date in localized format
-function formatDate(date: Date | null, locale: Locale): string {
-  if (!date) return "";
-  const d = new Date(date);
-  return d.toLocaleDateString(locale === "en" ? "en-US" : "fr-FR", {
-    year: "numeric",
-    month: "long",
-    day: "numeric",
-  });
-}
-
 function ArticleCardSkeleton() {
   return (
     <Card className="h-full overflow-hidden">
@@ -103,6 +93,25 @@ function LatestArticlesSkeleton() {
 }
 
 export function LatestArticles({ articles, sectionData, locale }: LatestArticlesProps) {
+  // Use useSyncExternalStore to detect client-side mounting
+  const mounted = useSyncExternalStore(
+    () => () => {},
+    () => true,
+    () => false
+  );
+
+  // Format date in localized format - only on client to avoid hydration mismatch
+  const formatDate = (date: Date | null): string => {
+    if (!date) return "";
+    if (!mounted) return new Date(date).toISOString().split('T')[0]; // Return ISO date on server
+    const d = new Date(date);
+    return d.toLocaleDateString(locale === "en" ? "en-US" : "fr-FR", {
+      year: "numeric",
+      month: "long",
+      day: "numeric",
+    });
+  };
+
   if (!articles || articles.length === 0) {
     return <LatestArticlesSkeleton />;
   }
@@ -233,7 +242,7 @@ export function LatestArticles({ articles, sectionData, locale }: LatestArticles
                       <div className="flex items-center gap-1.5">
                         <Calendar className="h-4 w-4 text-[var(--color-accent)]" />
                         <time dateTime={new Date(article.publishedAt).toISOString()}>
-                          {formatDate(article.publishedAt, locale)}
+                          {formatDate(article.publishedAt)}
                         </time>
                       </div>
                     )}

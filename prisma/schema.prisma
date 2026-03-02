@@ -414,6 +414,7 @@ model Service {
 model SiteSettings {
   id                  String   @id @default("site-settings")
   logoUrl             String?
+  faviconUrl          String?
   logoAltFr           String?
   logoAltEn           String?
   color1              String   @default("#362981")

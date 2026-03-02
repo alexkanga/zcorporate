@@ -21,6 +21,10 @@ export const metadata: Metadata = {
   },
   description: "Votre partenaire technologique de confiance",
   authors: [{ name: "AAEA Team" }],
+  icons: {
+    icon: "/api/favicon",
+    apple: "/logo_aaea.jpg",
+  },
 };
 
 export default function RootLayout({

@@ -2,7 +2,7 @@
 
 import { useQuery } from '@tanstack/react-query';
 import { useLocale } from 'next-intl';
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useSyncExternalStore } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -155,6 +155,13 @@ export default function EventsPage() {
   const locale = useLocale() as 'fr' | 'en';
   const [activeTab, setActiveTab] = useState<string>('all');
   const [page, setPage] = useState(1);
+  
+  // Use useSyncExternalStore to detect client-side mounting
+  const mounted = useSyncExternalStore(
+    () => () => {},
+    () => true,
+    () => false
+  );
 
   const [lightboxOpen, setLightboxOpen] = useState(false);
   const [lightboxImages, setLightboxImages] = useState<string[]>([]);
@@ -181,6 +188,7 @@ export default function EventsPage() {
     locale === 'fr' ? item.descriptionFr : item.descriptionEn;
 
   const formatDate = (dateString: string) => {
+    if (!mounted) return dateString; // Return raw date string on server
     return new Date(dateString).toLocaleDateString(locale === 'fr' ? 'fr-FR' : 'en-US', {
       year: 'numeric',
       month: 'long',
@@ -189,6 +197,7 @@ export default function EventsPage() {
   };
 
   const isUpcoming = (dateString: string) => {
+    if (!mounted) return false; // Default to false on server to avoid hydration mismatch
     return new Date(dateString) >= new Date();
   };
 

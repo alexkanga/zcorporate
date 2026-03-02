@@ -21,7 +21,9 @@ import {
 } from "@/components/ui/navigation-menu";
 import { LanguageSwitcher } from "./LanguageSwitcher";
 import { ClientOnly } from "@/components/ClientOnly";
-import { Search, Menu, LogIn, LogOut, LayoutDashboard, ChevronRight } from "lucide-react";
+import { 
+  Search, Menu, LogIn, LogOut, LayoutDashboard, ChevronRight
+} from "lucide-react";
 import { cn } from "@/lib/utils";
 import type { MenuItem } from "@prisma/client";
 import { useSession, signOut } from "next-auth/react";
@@ -123,17 +125,21 @@ export function Header({ logoUrl, siteName, menuItems }: HeaderProps) {
                         </span>
                       </NavigationMenuTrigger>
                       <NavigationMenuContent>
-                        <ul className="grid w-[400px] gap-2 p-4 md:w-[500px] md:grid-cols-2 lg:w-[600px] bg-white rounded-xl shadow-2xl border border-[var(--color-primary)]/10 animate-in fade-in-0 zoom-in-95 duration-200">
-                          {item.children.map((child) => (
-                            <ListItem
-                              key={child.id}
-                              title={getLabel(child)}
-                              href={child.external ? child.route : `/${locale}${child.route}`}
-                              external={child.external}
-                            >
-                              {child.slug}
-                            </ListItem>
-                          ))}
+                        <ul className="w-[220px] p-2">
+                          {item.children.map((child) => {
+                            const childActive = isActive(child.route);
+                            
+                            return (
+                              <ListItem
+                                key={child.id}
+                                title={getLabel(child)}
+                                href={child.external ? child.route : child.route}
+                                external={child.external}
+                                isActive={childActive}
+                                locale={locale}
+                              />
+                            );
+                          })}
                         </ul>
                       </NavigationMenuContent>
                     </NavigationMenuItem>
@@ -399,43 +405,49 @@ export function Header({ logoUrl, siteName, menuItems }: HeaderProps) {
   );
 }
 
-// List item component for dropdown menus
+// List item component for dropdown menus - same height as main menu items
 const ListItem = ({
   className,
   title,
-  children,
   href,
   external,
-  ...props
+  isActive,
 }: {
   className?: string;
   title: string;
-  children: React.ReactNode;
+  description?: string;
   href: string;
   external?: boolean;
-} & React.AnchorHTMLAttributes<HTMLAnchorElement>) => {
+  icon?: React.ElementType;
+  isActive?: boolean;
+  locale: string;
+}) => {
   return (
     <li>
       <NavigationMenuLink asChild>
         <Link
           href={href}
           className={cn(
-            "block select-none space-y-1 rounded-lg p-3 leading-none no-underline outline-none transition-all duration-300",
+            "flex items-center justify-between px-4 py-2 text-sm font-medium rounded-lg no-underline outline-none transition-all duration-300",
             "hover:bg-[var(--color-primary)] hover:text-white",
-            "focus:bg-[var(--color-primary)] focus:text-white",
-            "hover:shadow-lg",
+            isActive 
+              ? "bg-[var(--color-primary)]/10 text-[var(--color-primary)] font-semibold" 
+              : "text-gray-700",
             className
           )}
           {...(external ? { target: "_blank", rel: "noopener noreferrer" } : {})}
-          {...props}
         >
-          <div className="text-sm font-semibold leading-none text-[var(--color-primary)] transition-colors duration-300">
+          <span className="relative">
             {title}
-          </div>
-          <p className="line-clamp-2 text-sm leading-snug text-muted-foreground transition-colors duration-300">
-            {children}
-          </p>
-          <ChevronRight className="h-3 w-3 text-[var(--color-accent)] mt-2" />
+            {isActive && (
+              <span className="absolute -bottom-0.5 left-0 right-0 h-0.5 bg-[var(--color-secondary)] rounded-full" />
+            )}
+          </span>
+          <ChevronRight className={cn(
+            "h-4 w-4 transition-all duration-300",
+            isActive ? "text-[var(--color-primary)]" : "text-gray-400",
+            "group-hover:translate-x-0.5"
+          )} />
         </Link>
       </NavigationMenuLink>
     </li>
