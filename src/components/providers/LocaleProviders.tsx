@@ -53,7 +53,7 @@ export function LocaleProviders({
         disableTransitionOnChange
       >
         <QueryProvider>
-          <NextIntlClientProvider messages={messages} locale={locale}>
+          <NextIntlClientProvider messages={messages} locale={locale} timeZone="Europe/Paris">
             <Header
               logoUrl={settings.logoUrl}
               siteName={siteName}
