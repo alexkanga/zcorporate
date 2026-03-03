@@ -72,3 +72,89 @@ Stage Summary:
 - Pagination link now visible in Settings menu
 - Users can easily access pagination settings from the sidebar
 - Settings menu now includes: Logo, Couleurs, Menus, Pagination, Cartes
+
+---
+Task ID: 4
+Agent: Main
+Task: Fix database configuration, NextAuth, and blank page issues
+
+Work Log:
+- Fixed `.env` file:
+  - Updated DATABASE_URL to use PostgreSQL Neon connection string
+  - Verified NEXTAUTH_SECRET is properly configured
+  - Set NEXTAUTH_DEBUG to false for production
+- Created API to serve static files from `/upload` folder:
+  - Added rewrite rule in `next.config.ts` to redirect `/upload/*` to `/api/serve-upload/*`
+  - Created `/api/serve-upload/[...path]/route.ts` to serve files from the upload directory
+  - This fixes the 404 errors for images stored in `/upload/about/about.jpg`
+- Verified NextAuth configuration:
+  - Auth options are properly configured in `/lib/auth.ts`
+  - Ghost admin account works for authentication
+  - Session management is working correctly
+- Verified PostgreSQL connection:
+  - Dev logs show successful Prisma queries to PostgreSQL
+  - Database tables are accessible and working
+
+Stage Summary:
+- Database configuration fixed: PostgreSQL Neon is properly configured
+- NextAuth secret and configuration verified and working
+- Upload file serving implemented via API route
+- All pages are rendering correctly (200 status codes in logs)
+- Application is functional and connected to PostgreSQL database
+
+---
+Task ID: 5
+Agent: Main
+Task: Fix second image (mainImageUrl) not updating in About page
+
+Work Log:
+- Identified the problem: 
+  - Page frontend had no cache configuration (could show stale data)
+  - State management in admin didn't sync properly after data refresh
+- Added `force-dynamic` to About page frontend:
+  - Added `export const dynamic = "force-dynamic"` and `export const revalidate = 0`
+  - This ensures the page always fetches fresh data from the database
+- Fixed state synchronization in admin panel:
+  - Added `hasLocalChanges` state to track user modifications
+  - Added `useEffect` to sync local state when server data changes
+  - Created wrapper functions `handleHeroImageChange` and `handleMainImageChange`
+  - Reset `hasLocalChanges` after successful save
+  - This prevents the state from being overwritten when data is refreshed
+
+Stage Summary:
+- Frontend About page now has cache disabled (always fresh data)
+- Admin panel properly tracks and preserves local changes
+- Second image (mainImageUrl) updates correctly after save
+- Both hero and main images can be updated independently
+
+---
+Task ID: 6
+Agent: Main
+Task: Fix images not showing and hydration error in Header
+
+Work Log:
+- Identified root cause of images not showing:
+  - Database showed both video URLs were set, so videos took priority over images
+  - The frontend code: `heroVideoEmbed ? video : heroImageUrl ? image : null`
+  - User had both videos defined, so images were never displayed
+- Fixed media type selection in admin:
+  - Added `heroMediaType` and `mainMediaType` state variables
+  - Created controlled Tabs for Image/Video selection
+  - Added handlers that clear opposite media type when switching:
+    - `handleHeroImageChange`: clears video when image is uploaded
+    - `handleHeroVideoChange`: clears image when video is set
+    - Same for main content media
+  - Now when user selects "Image" tab and uploads, the video URL is cleared
+- Fixed hydration error in Header:
+  - Wrapped `NavigationMenu` in `ClientOnly` component
+  - This prevents random ID mismatch between server and client
+- Verified Vercel Blob compatibility:
+  - Upload API already supports `BLOB_READ_WRITE_TOKEN`
+  - When set, uploads go to Vercel Blob storage
+  - Falls back to local filesystem when not configured
+
+Stage Summary:
+- Images now display correctly when selected in admin
+- Media type selection is explicit (Image/Video tabs are controlled)
+- Hydration error fixed by using ClientOnly for NavigationMenu
+- Vercel Blob upload is already supported and ready for production

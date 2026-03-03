@@ -7,6 +7,79 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+model AboutPage {
+  id                            String   @id @default("about-page")
+  // Hero Section
+  heroTitleFr                   String   @default("À Propos de Nous")
+  heroTitleEn                   String   @default("About Us")
+  heroSubtitleFr                String?
+  heroSubtitleEn                String?
+  heroBadgeFr                   String?  @default("Présentation")
+  heroBadgeEn                   String?  @default("Presentation")
+  heroImageUrl                  String?
+  heroImageAltFr                String?
+  heroImageAltEn                String?
+  // Hero Video (YouTube, Vimeo, Dailymotion)
+  heroVideoUrl                  String?
+  heroVideoType                 String?  // youtube, vimeo, dailymotion
+  // Main Content Section
+  mainTitleFr                   String?
+  mainTitleEn                   String?
+  mainContentFr                 String?
+  mainContentEn                 String?
+  mainImageUrl                  String?
+  mainImageAltFr                String?
+  mainImageAltEn                String?
+  // Main Video (alternative to image)
+  mainVideoUrl                  String?
+  mainVideoType                 String?
+  // Statistics Section
+  stat1Value                    String?  @default("10+")
+  stat1LabelFr                  String?  @default("Années d'Expérience")
+  stat1LabelEn                  String?  @default("Years of Experience")
+  stat2Value                    String?  @default("500+")
+  stat2LabelFr                  String?  @default("Projets Réalisés")
+  stat2LabelEn                  String?  @default("Projects Completed")
+  stat3Value                    String?  @default("100%")
+  stat3LabelFr                  String?  @default("Clients Satisfaits")
+  stat3LabelEn                  String?  @default("Satisfied Clients")
+  stat4Value                    String?
+  stat4LabelFr                  String?
+  stat4LabelEn                  String?
+  // Mission Section
+  missionTitleFr                String?  @default("Notre Mission")
+  missionTitleEn                String?  @default("Our Mission")
+  missionContentFr              String?
+  missionContentEn              String?
+  missionIcon                   String?  @default("target")
+  // Values Section
+  valuesTitleFr                 String?  @default("Nos Valeurs")
+  valuesTitleEn                 String?  @default("Our Values")
+  valuesContentFr               String?
+  valuesContentEn               String?
+  // CTA Section
+  ctaTitleFr                    String?
+  ctaTitleEn                    String?
+  ctaSubtitleFr                 String?
+  ctaSubtitleEn                 String?
+  ctaButtonTextFr               String?
+  ctaButtonTextEn               String?
+  ctaButtonUrl                  String?
+  // Floating Badge on Image
+  floatingBadgeTitleFr          String?  @default("Excellence Certifiée")
+  floatingBadgeTitleEn          String?  @default("Certified Excellence")
+  floatingBadgeTextFr           String?  @default("Qualité garantie")
+  floatingBadgeTextEn           String?  @default("Quality guaranteed")
+  // Menu settings
+  menuLabelFr                   String?  @default("À Propos")
+  menuLabelEn                   String?  @default("About Us")
+  menuOrder                     Int      @default(0)
+  showInMenu                    Boolean  @default(true)
+  // Publication
+  published                     Boolean  @default(true)
+  updatedAt                     DateTime @updatedAt
+}
+
 model Approval {
   id                                String         @id
   status                            ApprovalStatus @default(PENDING)

@@ -10,6 +10,15 @@ const nextConfig: NextConfig = {
     ignoreBuildErrors: true,
   },
   reactStrictMode: false,
+  // Serve static files from /upload folder
+  async rewrites() {
+    return [
+      {
+        source: '/upload/:path*',
+        destination: '/api/serve-upload/:path*',
+      },
+    ];
+  },
 };
 
 export default withNextIntl(nextConfig);

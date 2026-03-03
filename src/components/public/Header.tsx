@@ -100,85 +100,67 @@ export function Header({ logoUrl, siteName, menuItems }: HeaderProps) {
 
         {/* Desktop Navigation */}
         <nav className="hidden lg:flex items-center">
-          <NavigationMenu>
-            <NavigationMenuList className="gap-1">
-              {groupedItems.map((item) => {
-                if (item.children.length > 0) {
-                  return (
-                    <NavigationMenuItem key={item.id}>
-                      <NavigationMenuTrigger 
-                        className={cn(
-                          "px-4 py-2 text-sm font-medium bg-transparent rounded-lg transition-all duration-300 relative",
-                          "hover:bg-[var(--color-primary)] hover:text-white",
-                          "data-[state=open]:bg-[var(--color-primary)] data-[state=open]:text-white",
-                          isActive(item.route) 
-                            ? "text-[var(--color-primary)] font-semibold" 
-                            : "text-gray-700"
-                        )}
-                      >
-                        <span className="relative">
-                          {getLabel(item)}
-                          {/* Active underline indicator */}
-                          {isActive(item.route) && (
-                            <span className="absolute -bottom-1 left-0 right-0 h-0.5 bg-[var(--color-secondary)] rounded-full" />
-                          )}
-                        </span>
-                      </NavigationMenuTrigger>
-                      <NavigationMenuContent>
-                        <ul className="min-w-[220px] p-2 bg-white/95 backdrop-blur-sm rounded-xl shadow-xl shadow-black/5 border border-gray-200/50">
-                          {item.children.map((child) => {
-                            const childActive = isActive(child.route);
-                            
-                            return (
-                              <ListItem
-                                key={child.id}
-                                title={getLabel(child)}
-                                href={child.external ? child.route : child.route}
-                                external={child.external}
-                                isActive={childActive}
-                                locale={locale}
-                              />
-                            );
-                          })}
-                        </ul>
-                      </NavigationMenuContent>
-                    </NavigationMenuItem>
-                  );
-                }
-
-                const active = isActive(item.route);
-
-                return (
-                  <NavigationMenuItem key={item.id}>
-                    {item.external ? (
-                      <NavigationMenuLink
-                        className={cn(
-                          "px-4 py-2 text-sm font-medium bg-transparent rounded-lg transition-all duration-300 cursor-pointer relative",
-                          "hover:bg-[var(--color-primary)] hover:text-white",
-                          active 
-                            ? "text-[var(--color-primary)] font-semibold" 
-                            : "text-gray-700"
-                        )}
-                        onClick={() => window.open(item.route, "_blank")}
-                      >
-                        <span className="relative">
-                          {getLabel(item)}
-                          {active && (
-                            <span className="absolute -bottom-1 left-0 right-0 h-0.5 bg-[var(--color-secondary)] rounded-full" />
-                          )}
-                        </span>
-                      </NavigationMenuLink>
-                    ) : (
-                      <NavigationMenuLink asChild>
-                        <Link 
-                          href={item.route}
+          <ClientOnly>
+            <NavigationMenu>
+              <NavigationMenuList className="gap-1">
+                {groupedItems.map((item) => {
+                  if (item.children.length > 0) {
+                    return (
+                      <NavigationMenuItem key={item.id}>
+                        <NavigationMenuTrigger 
                           className={cn(
                             "px-4 py-2 text-sm font-medium bg-transparent rounded-lg transition-all duration-300 relative",
+                            "hover:bg-[var(--color-primary)] hover:text-white",
+                            "data-[state=open]:bg-[var(--color-primary)] data-[state=open]:text-white",
+                            isActive(item.route) 
+                              ? "text-[var(--color-primary)] font-semibold" 
+                              : "text-gray-700"
+                          )}
+                        >
+                          <span className="relative">
+                            {getLabel(item)}
+                            {/* Active underline indicator */}
+                            {isActive(item.route) && (
+                              <span className="absolute -bottom-1 left-0 right-0 h-0.5 bg-[var(--color-secondary)] rounded-full" />
+                            )}
+                          </span>
+                        </NavigationMenuTrigger>
+                        <NavigationMenuContent>
+                          <ul className="min-w-[220px] p-2 bg-white/95 backdrop-blur-sm rounded-xl shadow-xl shadow-black/5 border border-gray-200/50">
+                            {item.children.map((child) => {
+                              const childActive = isActive(child.route);
+                              
+                              return (
+                                <ListItem
+                                  key={child.id}
+                                  title={getLabel(child)}
+                                  href={child.external ? child.route : child.route}
+                                  external={child.external}
+                                  isActive={childActive}
+                                  locale={locale}
+                                />
+                              );
+                            })}
+                          </ul>
+                        </NavigationMenuContent>
+                      </NavigationMenuItem>
+                    );
+                  }
+
+                  const active = isActive(item.route);
+
+                  return (
+                    <NavigationMenuItem key={item.id}>
+                      {item.external ? (
+                        <NavigationMenuLink
+                          className={cn(
+                            "px-4 py-2 text-sm font-medium bg-transparent rounded-lg transition-all duration-300 cursor-pointer relative",
                             "hover:bg-[var(--color-primary)] hover:text-white",
                             active 
                               ? "text-[var(--color-primary)] font-semibold" 
                               : "text-gray-700"
                           )}
+                          onClick={() => window.open(item.route, "_blank")}
                         >
                           <span className="relative">
                             {getLabel(item)}
@@ -186,14 +168,34 @@ export function Header({ logoUrl, siteName, menuItems }: HeaderProps) {
                               <span className="absolute -bottom-1 left-0 right-0 h-0.5 bg-[var(--color-secondary)] rounded-full" />
                             )}
                           </span>
-                        </Link>
-                      </NavigationMenuLink>
-                    )}
-                  </NavigationMenuItem>
-                );
-              })}
-            </NavigationMenuList>
-          </NavigationMenu>
+                        </NavigationMenuLink>
+                      ) : (
+                        <NavigationMenuLink asChild>
+                          <Link 
+                            href={item.route}
+                            className={cn(
+                              "px-4 py-2 text-sm font-medium bg-transparent rounded-lg transition-all duration-300 relative",
+                              "hover:bg-[var(--color-primary)] hover:text-white",
+                              active 
+                                ? "text-[var(--color-primary)] font-semibold" 
+                                : "text-gray-700"
+                            )}
+                          >
+                            <span className="relative">
+                              {getLabel(item)}
+                              {active && (
+                                <span className="absolute -bottom-1 left-0 right-0 h-0.5 bg-[var(--color-secondary)] rounded-full" />
+                              )}
+                            </span>
+                          </Link>
+                        </NavigationMenuLink>
+                      )}
+                    </NavigationMenuItem>
+                  );
+                })}
+              </NavigationMenuList>
+            </NavigationMenu>
+          </ClientOnly>
         </nav>
 
         {/* Right side actions */}
