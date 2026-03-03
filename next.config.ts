@@ -10,6 +10,11 @@ const nextConfig: NextConfig = {
     ignoreBuildErrors: true,
   },
   reactStrictMode: false,
+  // Allow cross-origin requests from preview panel
+  allowedDevOrigins: [
+    '.space.z.ai',
+    'localhost',
+  ],
   // Serve static files from /upload folder
   async rewrites() {
     return [
