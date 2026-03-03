@@ -125,7 +125,7 @@ export function Header({ logoUrl, siteName, menuItems }: HeaderProps) {
                         </span>
                       </NavigationMenuTrigger>
                       <NavigationMenuContent>
-                        <ul className="min-w-[200px] py-2 bg-white rounded-lg shadow-lg border border-gray-100">
+                        <ul className="min-w-[220px] p-2 bg-white/95 backdrop-blur-sm rounded-xl shadow-xl shadow-black/5 border border-gray-200/50">
                           {item.children.map((child) => {
                             const childActive = isActive(child.route);
                             
@@ -405,7 +405,7 @@ export function Header({ logoUrl, siteName, menuItems }: HeaderProps) {
   );
 }
 
-// List item component for dropdown menus - minimalist clean design
+// List item component for dropdown menus - premium design
 const ListItem = ({
   className,
   title,
@@ -428,10 +428,10 @@ const ListItem = ({
         <Link
           href={href}
           className={cn(
-            "block w-full px-4 py-2.5 text-sm no-underline outline-none transition-all duration-200 rounded-md mx-1",
+            "block w-full px-4 py-3 text-sm no-underline outline-none transition-all duration-200 rounded-lg",
             isActive 
-              ? "text-[var(--color-primary)] font-semibold bg-[var(--color-primary)]/5" 
-              : "text-gray-700 hover:text-[var(--color-primary)] hover:bg-gray-50",
+              ? "text-[var(--color-primary)] font-semibold bg-[var(--color-primary)]/10" 
+              : "text-gray-800 hover:text-[var(--color-primary)] hover:bg-[var(--color-primary)]/5 hover:font-medium",
             className
           )}
           {...(external ? { target: "_blank", rel: "noopener noreferrer" } : {})}
