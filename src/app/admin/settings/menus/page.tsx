@@ -112,8 +112,13 @@ type MenuItemFormData = z.infer<typeof menuItemSchema>;
 
 // API functions
 async function fetchMenus(): Promise<MenuItem[]> {
-  const response = await fetch("/api/admin/menus");
-  if (!response.ok) throw new Error("Failed to fetch menus");
+  const response = await fetch("/api/admin/menus", {
+    credentials: "include",
+  });
+  if (!response.ok) {
+    const error = await response.json().catch(() => ({ error: "Failed to fetch menus" }));
+    throw new Error(error.error || "Failed to fetch menus");
+  }
   return response.json();
 }
 
@@ -121,6 +126,7 @@ async function createMenuItem(data: MenuItemFormData): Promise<MenuItem> {
   const response = await fetch("/api/admin/menus", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
+    credentials: "include",
     body: JSON.stringify({ ...data, order: 0 }),
   });
   if (!response.ok) {
@@ -134,6 +140,7 @@ async function updateMenuItem(id: string, data: Partial<MenuItemFormData>): Prom
   const response = await fetch(`/api/admin/menus/${id}`, {
     method: "PUT",
     headers: { "Content-Type": "application/json" },
+    credentials: "include",
     body: JSON.stringify({ ...data, order: 0 }),
   });
   if (!response.ok) {
@@ -146,6 +153,7 @@ async function updateMenuItem(id: string, data: Partial<MenuItemFormData>): Prom
 async function deleteMenuItem(id: string): Promise<void> {
   const response = await fetch(`/api/admin/menus/${id}`, {
     method: "DELETE",
+    credentials: "include",
   });
   if (!response.ok) {
     const error = await response.json();
@@ -157,6 +165,7 @@ async function reorderMenuItems(items: Array<{ id: string; order: number; parent
   const response = await fetch("/api/admin/menus", {
     method: "PUT",
     headers: { "Content-Type": "application/json" },
+    credentials: "include",
     body: JSON.stringify({ items }),
   });
   if (!response.ok) throw new Error("Failed to reorder menu items");
@@ -309,9 +318,10 @@ export default function MenusPage() {
   const [isDeleteOpen, setIsDeleteOpen] = useState(false);
   const [selectedItem, setSelectedItem] = useState<MenuItem | null>(null);
 
-  const { data: menuItems = [], isLoading } = useQuery<MenuItem[]>({
+  const { data: menuItems = [], isLoading, error, refetch } = useQuery<MenuItem[]>({
     queryKey: ["menus"],
     queryFn: fetchMenus,
+    retry: 1,
   });
 
   // Form setup
@@ -529,6 +539,13 @@ export default function MenusPage() {
               {[...Array(5)].map((_, i) => (
                 <Skeleton key={i} className="h-16 w-full" />
               ))}
+            </div>
+          ) : error ? (
+            <div className="text-center py-12">
+              <p className="text-destructive mb-4">Error loading menu items: {error.message}</p>
+              <Button variant="outline" onClick={() => refetch()}>
+                Retry
+              </Button>
             </div>
           ) : menuItems.length === 0 ? (
             <div className="text-center py-12 text-muted-foreground">

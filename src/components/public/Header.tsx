@@ -78,11 +78,11 @@ export function Header({ logoUrl, siteName, menuItems }: HeaderProps) {
 
   return (
     <header className="sticky top-0 z-50 w-full border-b-2 border-[var(--color-primary)]/20 bg-white shadow-sm transition-all duration-300">
-      <div className="container mx-auto flex h-16 items-center justify-between px-4">
+      <div className="container mx-auto flex h-20 items-center justify-between px-4">
         {/* Logo */}
         <Link href="/" className="flex items-center gap-2 group relative">
           {logoUrl ? (
-            <div className="relative overflow-visible">
+            <div className="relative overflow-visible m-0 p-0">
               <img
                 src={logoUrl}
                 alt={t("logoAlt")}

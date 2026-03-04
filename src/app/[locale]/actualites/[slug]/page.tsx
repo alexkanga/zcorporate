@@ -12,7 +12,9 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import {
   Dialog,
   DialogContent,
+  DialogTitle,
 } from '@/components/ui/dialog';
+import { VisuallyHidden } from '@/components/ui/visually-hidden';
 import {
   ArrowLeft,
   Calendar,
@@ -523,6 +525,9 @@ export default function ArticleDetailPage() {
       {/* Image Lightbox Dialog */}
       <Dialog open={imageLightboxOpen} onOpenChange={setImageLightboxOpen}>
         <DialogContent className="max-w-6xl w-full h-[90vh] p-0 bg-black/95 border-none">
+          <VisuallyHidden>
+            <DialogTitle>{locale === 'fr' ? 'Visionneuse d\'images' : 'Image viewer'}</DialogTitle>
+          </VisuallyHidden>
           <div className="relative w-full h-full flex items-center justify-center">
             {/* Close Button */}
             <Button
@@ -578,6 +583,9 @@ export default function ArticleDetailPage() {
       {/* Video Lightbox Dialog */}
       <Dialog open={videoLightboxOpen} onOpenChange={setVideoLightboxOpen}>
         <DialogContent className="max-w-5xl w-full h-[85vh] p-0 bg-black/95 border-none">
+          <VisuallyHidden>
+            <DialogTitle>{locale === 'fr' ? 'Lecteur vidéo' : 'Video player'}</DialogTitle>
+          </VisuallyHidden>
           <div className="relative w-full h-full flex items-center justify-center">
             {/* Close Button */}
             <Button
