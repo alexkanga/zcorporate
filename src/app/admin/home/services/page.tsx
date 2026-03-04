@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useMemo, useCallback } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { DndContext, closestCenter, KeyboardSensor, PointerSensor, useSensor, useSensors } from '@dnd-kit/core';
 import { arrayMove, SortableContext, sortableKeyboardCoordinates, verticalListSortingStrategy } from '@dnd-kit/sortable';
@@ -63,13 +63,15 @@ export default function ServicesAdminPage() {
   const [formData, setFormData] = useState<Partial<Service>>({
     titleFr: '', titleEn: '', descriptionFr: '', descriptionEn: '', icon: '', imageUrl: '', visible: true,
   });
+  // Track locally reordered items for immediate UI update
+  const [localOrder, setLocalOrder] = useState<string[] | null>(null);
 
   const { data: services = [], isLoading } = useQuery({
     queryKey: ['admin-services'],
     queryFn: async () => {
       const res = await fetch('/api/admin/services');
       if (!res.ok) throw new Error('Failed to fetch');
-      return res.json();
+      return res.json() as Promise<Service[]>;
     },
   });
 
@@ -115,21 +117,34 @@ export default function ServicesAdminPage() {
       if (!res.ok) throw new Error('Failed');
       return res.json();
     },
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['admin-services'] }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['admin-services'] });
+      setLocalOrder(null);
+    },
   });
 
   const sensors = useSensors(useSensor(PointerSensor), useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates }));
-  const [items, setItems] = useState<Service[]>([]);
-  useEffect(() => { setItems(services); }, [services]);
+  
+  // Compute items based on local order or server order
+  const items = useMemo(() => {
+    if (localOrder) {
+      // Create a map for quick lookup
+      const serviceMap = new Map(services.map(s => [s.id, s]));
+      // Return items in local order, filtering out any that don't exist
+      return localOrder.map(id => serviceMap.get(id)).filter((s): s is Service => s !== undefined);
+    }
+    return services;
+  }, [services, localOrder]);
 
-  const handleDragEnd = (event: { active: { id: string }; over: { id: string } | null }) => {
+  const handleDragEnd = useCallback((event: { active: { id: string }; over: { id: string } | null }) => {
     const { active, over } = event;
     if (over && active.id !== over.id) {
-      const newItems = arrayMove(items, items.findIndex((i) => i.id === active.id), items.findIndex((i) => i.id === over.id));
-      setItems(newItems);
-      reorderMutation.mutate(newItems.map((item, index) => ({ id: item.id, order: index })));
+      const currentIds = items.map(i => i.id);
+      const newIds = arrayMove(currentIds, currentIds.indexOf(String(active.id)), currentIds.indexOf(String(over.id)));
+      setLocalOrder(newIds);
+      reorderMutation.mutate(newIds.map((id, index) => ({ id, order: index })));
     }
-  };
+  }, [items, reorderMutation]);
 
   const resetForm = () => {
     setFormData({ titleFr: '', titleEn: '', descriptionFr: '', descriptionEn: '', icon: '', imageUrl: '', visible: true });

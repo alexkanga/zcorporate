@@ -484,6 +484,55 @@ model Service {
   @@index([visible])
 }
 
+model ServicesPage {
+  id                            String   @id @default("services-page")
+  // Hero Section
+  heroTitleFr                   String   @default("Nos Services")
+  heroTitleEn                   String   @default("Our Services")
+  heroSubtitleFr                String?
+  heroSubtitleEn                String?
+  heroBadgeFr                   String?  @default("Services")
+  heroBadgeEn                   String?  @default("Services")
+  heroImageUrl                  String?
+  heroImageAltFr                String?
+  heroImageAltEn                String?
+  // Hero Video (YouTube, Vimeo, Dailymotion)
+  heroVideoUrl                  String?
+  heroVideoType                 String?
+  // Main Content Section
+  mainTitleFr                   String?
+  mainTitleEn                   String?
+  mainContentFr                 String?
+  mainContentEn                 String?
+  mainImageUrl                  String?
+  mainImageAltFr                String?
+  mainImageAltEn                String?
+  // Main Video (alternative to image)
+  mainVideoUrl                  String?
+  mainVideoType                 String?
+  // CTA Section
+  ctaTitleFr                    String?
+  ctaTitleEn                    String?
+  ctaSubtitleFr                 String?
+  ctaSubtitleEn                 String?
+  ctaButtonTextFr               String?
+  ctaButtonTextEn               String?
+  ctaButtonUrl                  String?
+  // Floating Badge on Image
+  floatingBadgeTitleFr          String?
+  floatingBadgeTitleEn          String?
+  floatingBadgeTextFr           String?
+  floatingBadgeTextEn           String?
+  // Menu settings
+  menuLabelFr                   String?  @default("Services")
+  menuLabelEn                   String?  @default("Services")
+  menuOrder                     Int      @default(0)
+  showInMenu                    Boolean  @default(true)
+  // Publication
+  published                     Boolean  @default(true)
+  updatedAt                     DateTime @updatedAt
+}
+
 model SiteSettings {
   id                  String   @id @default("site-settings")
   logoUrl             String?
