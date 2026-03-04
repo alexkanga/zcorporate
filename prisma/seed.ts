@@ -136,7 +136,7 @@ async function main() {
   const menuItems = [
     { id: 'menu-accueil', slug: 'accueil', route: '/', labelFr: 'Accueil', labelEn: 'Home', location: MenuLocation.HEADER, order: 0 },
     { id: 'menu-a-propos', slug: 'a-propos', route: '#', labelFr: 'Présentation', labelEn: 'Presentation', location: MenuLocation.HEADER, order: 1 },
-    { id: 'menu-solutions', slug: 'solutions', route: '/solutions', labelFr: 'Solutions', labelEn: 'Solutions', location: MenuLocation.HEADER, order: 2 },
+    { id: 'menu-services', slug: 'services', route: '/services', labelFr: 'Services', labelEn: 'Services', location: MenuLocation.HEADER, order: 2 },
     { id: 'menu-realisations', slug: 'realisations', route: '/realisations', labelFr: 'Réalisations', labelEn: 'Projects', location: MenuLocation.HEADER, order: 3 },
     { id: 'menu-ressources', slug: 'ressources', route: '/ressources', labelFr: 'Ressources', labelEn: 'Resources', location: MenuLocation.HEADER, order: 4 },
     { id: 'menu-evenements', slug: 'evenements', route: '/evenements', labelFr: 'Événements', labelEn: 'Events', location: MenuLocation.HEADER, order: 5 },
@@ -168,8 +168,8 @@ async function main() {
 
   const sliders = [
     { id: 'slider-1', titleFr: "Bienvenue à l'AAEA", titleEn: 'Welcome to AAEA', subtitleFr: 'Ensemble pour un avenir durable et une agriculture responsable', subtitleEn: 'Together for a sustainable future and responsible agriculture', buttonTextFr: 'Découvrir', buttonTextEn: 'Discover', buttonUrl: '/a-propos', imageUrl: '/images/slider-1.jpg', imageAltFr: 'Paysage naturel', imageAltEn: 'Natural landscape', order: 0, visible: true },
-    { id: 'slider-2', titleFr: 'Nos Solutions Innovantes', titleEn: 'Our Innovative Solutions', subtitleFr: "Technologies durables pour l'agriculture de demain", subtitleEn: "Sustainable technologies for tomorrow's agriculture", buttonTextFr: 'En savoir plus', buttonTextEn: 'Learn more', buttonUrl: '/solutions', imageUrl: '/images/slider-2.jpg', imageAltFr: 'Agriculture moderne', imageAltEn: 'Modern agriculture', order: 1, visible: true },
-    { id: 'slider-3', titleFr: 'Formez-vous avec nous', titleEn: 'Train with us', subtitleFr: 'Programmes de formation pour les agriculteurs et les communautés rurales', subtitleEn: 'Training programs for farmers and rural communities', buttonTextFr: 'Nos formations', buttonTextEn: 'Our training', buttonUrl: '/solutions', imageUrl: '/images/slider-3.jpg', imageAltFr: 'Formation agricole', imageAltEn: 'Agricultural training', order: 2, visible: true },
+    { id: 'slider-2', titleFr: 'Nos Services Innovants', titleEn: 'Our Innovative Services', subtitleFr: "Technologies durables pour l'agriculture de demain", subtitleEn: "Sustainable technologies for tomorrow's agriculture", buttonTextFr: 'En savoir plus', buttonTextEn: 'Learn more', buttonUrl: '/services', imageUrl: '/images/slider-2.jpg', imageAltFr: 'Agriculture moderne', imageAltEn: 'Modern agriculture', order: 1, visible: true },
+    { id: 'slider-3', titleFr: 'Formez-vous avec nous', titleEn: 'Train with us', subtitleFr: 'Programmes de formation pour les agriculteurs et les communautés rurales', subtitleEn: 'Training programs for farmers and rural communities', buttonTextFr: 'Nos formations', buttonTextEn: 'Our training', buttonUrl: '/services', imageUrl: '/images/slider-3.jpg', imageAltFr: 'Formation agricole', imageAltEn: 'Agricultural training', order: 2, visible: true },
     { id: 'slider-4', titleFr: "Engagez-vous pour l'environnement", titleEn: 'Commit to the environment', subtitleFr: 'Rejoignez notre mission pour protéger la biodiversité et les ressources naturelles', subtitleEn: 'Join our mission to protect biodiversity and natural resources', buttonTextFr: 'Nous rejoindre', buttonTextEn: 'Join us', buttonUrl: '/contact', imageUrl: '/images/slider-4.jpg', imageAltFr: "Protection de l'environnement", imageAltEn: 'Environmental protection', order: 3, visible: true },
   ];
 

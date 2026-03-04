@@ -102,12 +102,12 @@ const navigation = [
     ],
   },
   {
-    title: "Solutions",
+    title: "Services",
     icon: Briefcase,
     color: "text-blue-600",
     bgColor: "bg-blue-100",
     children: [
-      { title: "Pages", href: "/admin/solutions/pages", icon: FileText, color: "text-blue-600" },
+      { title: "Pages", href: "/admin/services/pages", icon: FileText, color: "text-blue-600" },
     ],
   },
   {
