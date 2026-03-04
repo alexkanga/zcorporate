@@ -82,13 +82,12 @@ export function Header({ logoUrl, siteName, menuItems }: HeaderProps) {
         {/* Logo */}
         <Link href="/" className="flex items-center gap-2 group relative">
           {logoUrl ? (
-            <div className="relative overflow-hidden rounded-lg">
+            <div className="relative overflow-visible">
               <img
                 src={logoUrl}
                 alt={t("logoAlt")}
-                className="h-10 w-auto object-contain transition-all duration-500 group-hover:scale-110"
+                className="h-16 w-auto object-contain transition-all duration-500 group-hover:scale-105"
               />
-              <div className="absolute inset-0 bg-[var(--color-primary)]/0 group-hover:bg-[var(--color-primary)]/5 transition-colors duration-300 rounded-lg" />
             </div>
           ) : (
             <span className="text-xl font-bold text-[var(--color-primary)] transition-all duration-300 group-hover:text-[var(--color-secondary)] relative">
