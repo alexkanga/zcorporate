@@ -77,7 +77,7 @@ export function Header({ logoUrl, siteName, menuItems }: HeaderProps) {
   };
 
   return (
-    <header className="sticky top-0 z-50 w-full border-b-2 border-[var(--color-primary)]/20 bg-white/95 backdrop-blur-md shadow-sm transition-all duration-300">
+    <header className="sticky top-0 z-50 w-full border-b-2 border-[var(--color-primary)]/20 bg-white shadow-sm transition-all duration-300">
       <div className="container mx-auto flex h-16 items-center justify-between px-4">
         {/* Logo */}
         <Link href="/" className="flex items-center gap-2 group relative">
