@@ -125,7 +125,7 @@ export function Header({ logoUrl, siteName, menuItems }: HeaderProps) {
                           </span>
                         </NavigationMenuTrigger>
                         <NavigationMenuContent>
-                          <ul className="min-w-[220px] p-2 bg-white/95 backdrop-blur-sm rounded-xl shadow-xl shadow-black/5 border border-gray-200/50">
+                          <ul className="min-w-[200px] py-1.5 px-1 bg-white/98 backdrop-blur-md rounded-lg shadow-lg shadow-black/5 border border-gray-100/80">
                             {item.children.map((child) => {
                               const childActive = isActive(child.route);
                               
@@ -429,10 +429,10 @@ const ListItem = ({
         <Link
           href={href}
           className={cn(
-            "block w-full px-4 py-3 text-sm no-underline outline-none transition-all duration-200 rounded-lg",
+            "block w-full px-4 py-1 text-sm no-underline outline-none transition-all duration-150 rounded-md",
             isActive 
-              ? "text-[var(--color-primary)] font-semibold bg-[var(--color-primary)]/10" 
-              : "text-gray-800 hover:text-[var(--color-primary)] hover:bg-[var(--color-primary)]/5 hover:font-medium",
+              ? "text-[var(--color-primary)] font-medium bg-[var(--color-primary)]/8" 
+              : "text-gray-600 hover:text-[var(--color-primary)] hover:bg-gray-50",
             className
           )}
           {...(external ? { target: "_blank", rel: "noopener noreferrer" } : {})}
