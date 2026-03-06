@@ -698,15 +698,15 @@ export default function DirectorMessageAdmin() {
                       <CardContent className="space-y-3">
                         <div>
                           <Label htmlFor={`stat${num}Value`}>Valeur</Label>
-                          <Input id={`stat${num}Value`} name={`stat${num}Value`} defaultValue={message?.[`stat${num}Value` as keyof DirectorMessageData] || ''} placeholder={`${num}0+`} />
+                          <Input id={`stat${num}Value`} name={`stat${num}Value`} defaultValue={(message?.[`stat${num}Value` as keyof DirectorMessageData] as string) ?? ''} placeholder={`${num}0+`} />
                         </div>
                         <div>
                           <Label htmlFor={`stat${num}LabelFr`}>Label (FR)</Label>
-                          <Input id={`stat${num}LabelFr`} name={`stat${num}LabelFr`} defaultValue={message?.[`stat${num}LabelFr` as keyof DirectorMessageData] || ''} />
+                          <Input id={`stat${num}LabelFr`} name={`stat${num}LabelFr`} defaultValue={(message?.[`stat${num}LabelFr` as keyof DirectorMessageData] as string) ?? ''} />
                         </div>
                         <div>
                           <Label htmlFor={`stat${num}LabelEn`}>Label (EN)</Label>
-                          <Input id={`stat${num}LabelEn`} name={`stat${num}LabelEn`} defaultValue={message?.[`stat${num}LabelEn` as keyof DirectorMessageData] || ''} />
+                          <Input id={`stat${num}LabelEn`} name={`stat${num}LabelEn`} defaultValue={(message?.[`stat${num}LabelEn` as keyof DirectorMessageData] as string) ?? ''} />
                         </div>
                       </CardContent>
                     </Card>

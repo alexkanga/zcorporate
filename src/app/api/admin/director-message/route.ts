@@ -134,15 +134,23 @@ export async function PUT(request: NextRequest) {
     const rawData = await request.json();
     const data = cleanDirectorMessageData(rawData);
 
+    // Ensure required fields have proper values
+    const heroTitleFr = typeof data.heroTitleFr === 'string' ? data.heroTitleFr : 'Mot du Directeur Exécutif';
+    const heroTitleEn = typeof data.heroTitleEn === 'string' ? data.heroTitleEn : 'Message from the Executive Director';
+
     const directorMessage = await db.directorMessage.upsert({
       where: { id: 'director-message' },
       create: {
         id: 'director-message',
-        heroTitleFr: data.heroTitleFr || 'Mot du Directeur Exécutif',
-        heroTitleEn: data.heroTitleEn || 'Message from the Executive Director',
+        heroTitleFr,
+        heroTitleEn,
         ...data,
       },
-      update: data,
+      update: {
+        ...data,
+        heroTitleFr,
+        heroTitleEn,
+      },
     });
 
     return NextResponse.json(directorMessage);

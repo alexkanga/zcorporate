@@ -63,11 +63,12 @@ interface DirectorMessage {
   directorPhotoAltFr: string | null;
   directorPhotoAltEn: string | null;
   directorSignatureUrl: string | null;
-  // Content
+  // Summary
   introTextFr: string | null;
   introTextEn: string | null;
   quoteFr: string | null;
   quoteEn: string | null;
+  // Content
   contentFr: string | null;
   contentEn: string | null;
   // Biography
@@ -81,10 +82,7 @@ interface DirectorMessage {
   directorDistinctions: string | null;
   directorLinkedInUrl: string | null;
   directorTwitterUrl: string | null;
-  // Media
-  videoUrl: string | null;
-  videoType: string | null;
-  // Statistics
+  // Stats
   showStats: boolean;
   stat1Value: string | null;
   stat1LabelFr: string | null;
@@ -95,7 +93,7 @@ interface DirectorMessage {
   stat3Value: string | null;
   stat3LabelFr: string | null;
   stat3LabelEn: string | null;
-  // Key Messages
+  // Key Messages (JSON)
   keyMessagesFr: string | null;
   keyMessagesEn: string | null;
   prioritiesFr: string | null;
@@ -106,9 +104,11 @@ interface DirectorMessage {
   cta1TextFr: string | null;
   cta1TextEn: string | null;
   cta1Url: string | null;
+  cta1External: boolean;
   cta2TextFr: string | null;
   cta2TextEn: string | null;
   cta2Url: string | null;
+  cta2External: boolean;
   // Section Visibility
   showHero: boolean;
   showKeyMessages: boolean;
@@ -119,11 +119,12 @@ interface DirectorMessage {
   showNavigation: boolean;
   // Layout
   portraitPosition: string | null;
-  // Dates
+  // Publication
+  published: boolean;
   publishedAt: string | null;
   updatedAt: string;
-  // Priorities
-  priorities: DirectorPriority[];
+  // Priorities (relation)
+  priorities?: DirectorPriority[];
 }
 
 async function fetchDirectorMessage() {
@@ -177,7 +178,7 @@ export default function DirectorMessagePage() {
     );
   }
 
-  if (!directorMessage) {
+  if (!directorMessage || !directorMessage.published) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <Card className="max-w-md mx-auto">
@@ -191,7 +192,7 @@ export default function DirectorMessagePage() {
                 : 'The director\'s message is not yet available.'}
             </p>
             <Link href="/">
-              <Button>
+              <Button className="cursor-pointer">
                 {locale === 'fr' ? 'Retour à l\'accueil' : 'Back to home'}
               </Button>
             </Link>
@@ -213,7 +214,7 @@ export default function DirectorMessagePage() {
   const specialties = parseJsonArray(directorMessage.directorSpecialties);
   const distinctions = parseJsonArray(directorMessage.directorDistinctions);
 
-  const portraitOnRight = directorMessage.portraitPosition === 'right';
+  const portraitOnRight = directorMessage.portraitPosition !== 'left';
 
   return (
     <div className="min-h-screen">
@@ -221,7 +222,7 @@ export default function DirectorMessagePage() {
       {directorMessage.showHero && (
         <section className="relative bg-gradient-to-br from-[var(--color-primary)]/10 via-background to-[var(--color-secondary)]/10 py-16 md:py-24">
           <div className="container mx-auto px-4">
-            <div className={`max-w-6xl mx-auto grid lg:grid-cols-2 gap-12 items-center ${portraitOnRight ? 'lg:flex-row-reverse' : ''}`}>
+            <div className={`max-w-6xl mx-auto grid lg:grid-cols-2 gap-12 items-center`}>
               {/* Director Photo */}
               <div className={`${portraitOnRight ? 'lg:order-2' : ''}`}>
                 {directorMessage.directorPhotoUrl ? (
@@ -308,8 +309,8 @@ export default function DirectorMessagePage() {
                 {directorMessage.showCta && (
                   <div className="flex flex-wrap gap-4">
                     {directorMessage.cta1Url && (
-                      <Link href={directorMessage.cta1Url}>
-                        <Button className="bg-[var(--color-primary)] hover:bg-[var(--color-primary)]/90 text-white">
+                      <Link href={directorMessage.cta1Url} target={directorMessage.cta1External ? '_blank' : undefined}>
+                        <Button className="bg-[var(--color-primary)] hover:bg-[var(--color-primary)]/90 text-white cursor-pointer">
                           {getText(directorMessage.cta1TextFr, directorMessage.cta1TextEn)}
                           <ArrowRight className="ml-2 w-4 h-4" />
                         </Button>
@@ -318,7 +319,8 @@ export default function DirectorMessagePage() {
                     {directorMessage.cta2Url && (
                       <Link href={directorMessage.cta2Url} target={directorMessage.cta2External ? '_blank' : undefined}>
                         <Button variant="outline" className="cursor-pointer">
-                          <Download className="mr-2 w-4 h-4" />
+                          {directorMessage.cta2External && <ExternalLink className="mr-2 w-4 h-4" />}
+                          {!directorMessage.cta2External && <Download className="mr-2 w-4 h-4" />}
                           {getText(directorMessage.cta2TextFr, directorMessage.cta2TextEn)}
                         </Button>
                       </Link>
@@ -341,7 +343,6 @@ export default function DirectorMessagePage() {
               </h2>
 
               <div className="grid md:grid-cols-3 gap-8">
-                {/* Key Messages */}
                 {keyMessages.length > 0 && (
                   <Card>
                     <CardContent className="p-6">
@@ -361,7 +362,6 @@ export default function DirectorMessagePage() {
                   </Card>
                 )}
 
-                {/* Priorities */}
                 {priorities.length > 0 && (
                   <Card>
                     <CardContent className="p-6">
@@ -381,7 +381,6 @@ export default function DirectorMessagePage() {
                   </Card>
                 )}
 
-                {/* Commitments */}
                 {commitments.length > 0 && (
                   <Card>
                     <CardContent className="p-6">
@@ -487,7 +486,6 @@ export default function DirectorMessagePage() {
               </h2>
 
               <div className="grid lg:grid-cols-2 gap-12">
-                {/* Bio Content */}
                 <div>
                   <Card>
                     <CardContent className="p-8">
@@ -501,7 +499,6 @@ export default function DirectorMessagePage() {
                         }}
                       />
 
-                      {/* Social Links */}
                       <div className="flex gap-4 mt-6 pt-6 border-t">
                         {directorMessage.directorLinkedInUrl && (
                           <a 
@@ -528,28 +525,7 @@ export default function DirectorMessagePage() {
                   </Card>
                 </div>
 
-                {/* Info Cards */}
                 <div className="space-y-6">
-                  {/* Experience */}
-                  {directorMessage.directorExperienceYears && (
-                    <Card>
-                      <CardContent className="p-6 flex items-center gap-4">
-                        <div className="w-12 h-12 rounded-lg bg-[var(--color-primary)]/10 flex items-center justify-center">
-                          <Clock className="w-6 h-6 text-[var(--color-primary)]" />
-                        </div>
-                        <div>
-                          <div className="text-2xl font-bold text-[var(--color-primary)]">
-                            {directorMessage.directorExperienceYears}+
-                          </div>
-                          <div className="text-sm text-muted-foreground">
-                            {locale === 'fr' ? 'Années d\'expérience' : 'Years of experience'}
-                          </div>
-                        </div>
-                      </CardContent>
-                    </Card>
-                  )}
-
-                  {/* Start Date */}
                   {directorMessage.directorStartDate && (
                     <Card>
                       <CardContent className="p-6 flex items-center gap-4">
@@ -571,7 +547,6 @@ export default function DirectorMessagePage() {
                     </Card>
                   )}
 
-                  {/* Specialties */}
                   {specialties.length > 0 && (
                     <Card>
                       <CardContent className="p-6">
@@ -590,7 +565,6 @@ export default function DirectorMessagePage() {
                     </Card>
                   )}
 
-                  {/* Distinctions */}
                   {distinctions.length > 0 && (
                     <Card>
                       <CardContent className="p-6">
@@ -616,39 +590,6 @@ export default function DirectorMessagePage() {
         </section>
       )}
 
-      {/* Video Section */}
-      {directorMessage.showVideo && directorMessage.videoUrl && (
-        <section className="py-16 bg-muted/30">
-          <div className="container mx-auto px-4">
-            <div className="max-w-4xl mx-auto">
-              <h2 className="text-2xl md:text-3xl font-bold text-center mb-8">
-                {locale === 'fr' ? 'Prise de parole' : 'Address'}
-              </h2>
-              <Card className="overflow-hidden">
-                <div className="aspect-video">
-                  {directorMessage.videoType === 'youtube' && (
-                    <iframe
-                      src={directorMessage.videoUrl.replace('watch?v=', 'embed/')}
-                      className="w-full h-full"
-                      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                      allowFullScreen
-                    />
-                  )}
-                  {directorMessage.videoType === 'vimeo' && (
-                    <iframe
-                      src={directorMessage.videoUrl.replace('vimeo.com', 'player.vimeo.com/video')}
-                      className="w-full h-full"
-                      allow="autoplay; fullscreen; picture-in-picture"
-                      allowFullScreen
-                    />
-                  )}
-                </div>
-              </Card>
-            </div>
-          </div>
-        </section>
-      )}
-
       {/* Signature Section */}
       <section className="py-16">
         <div className="container mx-auto px-4">
@@ -662,7 +603,7 @@ export default function DirectorMessagePage() {
                 className="mx-auto mb-4"
               />
             ) : (
-              <div className="text-3xl font-script text-[var(--color-primary)] mb-4 italic">
+              <div className="text-3xl text-[var(--color-primary)] mb-4 italic">
                 {directorMessage.directorFirstName} {directorMessage.directorLastName}
               </div>
             )}
