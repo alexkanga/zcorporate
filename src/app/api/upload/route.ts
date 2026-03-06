@@ -4,11 +4,10 @@ import { writeFile, mkdir, unlink } from 'fs/promises';
 import { existsSync } from 'fs';
 import path from 'path';
 
-// Check if we're in production (Vercel) or development
-const isProduction = process.env.VERCEL === '1' || process.env.NODE_ENV === 'production';
-
 // Check if Vercel Blob is configured
 const isVercelBlobConfigured = !!process.env.BLOB_READ_WRITE_TOKEN;
+
+console.log('[Upload] Vercel Blob configured:', isVercelBlobConfigured);
 
 export async function POST(request: NextRequest) {
   try {
@@ -24,10 +23,14 @@ export async function POST(request: NextRequest) {
     }
 
     // Validate file type
-    const allowedTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp', 'image/svg+xml'];
-    if (!allowedTypes.includes(file.type)) {
+    const allowedTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp', 'image/svg+xml', 'image/x-icon', 'image/ico', 'image/vnd.microsoft.icon'];
+    // Also allow .ico files by extension
+    const fileExtension = file.name.split('.').pop()?.toLowerCase();
+    const allowedExtensions = ['ico'];
+    
+    if (!allowedTypes.includes(file.type) && !allowedExtensions.includes(fileExtension || '')) {
       return NextResponse.json(
-        { error: 'Type de fichier non autorisé. Formats acceptés: JPEG, PNG, GIF, WebP, SVG' },
+        { error: 'Type de fichier non autorisé. Formats acceptés: JPEG, PNG, GIF, WebP, SVG, ICO' },
         { status: 400 }
       );
     }
@@ -51,42 +54,34 @@ export async function POST(request: NextRequest) {
     let url: string;
     let storageType: 'vercel-blob' | 'local';
 
-    if (isProduction && isVercelBlobConfigured) {
-      // Use Vercel Blob in production with BLOB_READ_WRITE_TOKEN
+    if (isVercelBlobConfigured) {
+      // Use Vercel Blob when token is configured
       console.log('[Upload] Using Vercel Blob storage');
       
-      const blob = await put(`${folderPath}/${filename}`, file, {
-        access: 'public',
-        addRandomSuffix: false,
-        token: process.env.BLOB_READ_WRITE_TOKEN,
-      });
-      
-      url = blob.url;
-      storageType = 'vercel-blob';
-      
-      console.log(`[Upload] File uploaded to Vercel Blob: ${url}`);
-    } else {
-      // Use local filesystem in development
-      console.log('[Upload] Using local filesystem storage');
-      
-      const publicDir = path.join(process.cwd(), 'public', 'uploads', folderPath);
-
-      // Create directory if it doesn't exist
-      if (!existsSync(publicDir)) {
-        await mkdir(publicDir, { recursive: true });
+      try {
+        const blob = await put(`${folderPath}/${filename}`, file, {
+          access: 'public',
+          addRandomSuffix: false,
+          token: process.env.BLOB_READ_WRITE_TOKEN,
+        });
+        
+        url = blob.url;
+        storageType = 'vercel-blob';
+        
+        console.log(`[Upload] File uploaded to Vercel Blob: ${url}`);
+      } catch (blobError) {
+        console.error('[Upload] Vercel Blob error, falling back to local:', blobError);
+        // Fall back to local storage
+        const localResult = await saveLocally(file, folderPath, filename);
+        url = localResult.url;
+        storageType = 'local';
       }
-
-      const filePath = path.join(publicDir, filename);
-      const bytes = await file.arrayBuffer();
-      const buffer = Buffer.from(bytes);
-
-      await writeFile(filePath, buffer);
-
-      // Return the public URL
-      url = `/uploads/${folderPath}/${filename}`;
+    } else {
+      // Use local filesystem
+      console.log('[Upload] Using local filesystem storage');
+      const localResult = await saveLocally(file, folderPath, filename);
+      url = localResult.url;
       storageType = 'local';
-      
-      console.log(`[Upload] File saved locally: ${filePath}`);
     }
 
     return NextResponse.json({
@@ -112,6 +107,29 @@ export async function POST(request: NextRequest) {
       { status: 500 }
     );
   }
+}
+
+// Helper function to save file locally
+async function saveLocally(file: File, folderPath: string, filename: string): Promise<{ url: string }> {
+  const publicDir = path.join(process.cwd(), 'public', 'uploads', folderPath);
+
+  // Create directory if it doesn't exist
+  if (!existsSync(publicDir)) {
+    await mkdir(publicDir, { recursive: true });
+  }
+
+  const filePath = path.join(publicDir, filename);
+  const bytes = await file.arrayBuffer();
+  const buffer = Buffer.from(bytes);
+
+  await writeFile(filePath, buffer);
+
+  // Return the public URL
+  const url = `/uploads/${folderPath}/${filename}`;
+  
+  console.log(`[Upload] File saved locally: ${filePath}`);
+  
+  return { url };
 }
 
 // Handle DELETE for removing files

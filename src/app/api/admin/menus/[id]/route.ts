@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getServerSession } from "next-auth";
-import { authOptions } from "@/lib/auth";
+import { getToken } from "next-auth/jwt";
 import { db } from "@/lib/db";
 import { z } from "zod";
 
@@ -18,20 +17,34 @@ const menuItemUpdateSchema = z.object({
   external: z.boolean(),
 });
 
+// Helper function to check authentication
+async function checkAuth(request: NextRequest) {
+  const token = await getToken({ 
+    req: request, 
+    secret: process.env.NEXTAUTH_SECRET 
+  });
+  
+  if (!token) {
+    return { authorized: false, error: "Unauthorized" };
+  }
+  
+  const userRole = token.role as string;
+  if (userRole !== "ADMIN" && userRole !== "SUPER_ADMIN") {
+    return { authorized: false, error: "Forbidden" };
+  }
+  
+  return { authorized: true, token };
+}
+
 // GET /api/admin/menus/[id] - Get a single menu item
 export async function GET(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const session = await getServerSession(authOptions);
-    
-    if (!session?.user) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
-    
-    if (session.user.role !== "ADMIN" && session.user.role !== "SUPER_ADMIN") {
-      return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+    const auth = await checkAuth(request);
+    if (!auth.authorized) {
+      return NextResponse.json({ error: auth.error }, { status: auth.error === "Unauthorized" ? 401 : 403 });
     }
     
     const { id } = await params;
@@ -39,7 +52,7 @@ export async function GET(
     const menuItem = await db.menuItem.findUnique({
       where: { id, deletedAt: null },
       include: {
-        children: {
+        other_MenuItem: {
           where: { deletedAt: null },
           orderBy: { order: "asc" },
         },
@@ -53,7 +66,13 @@ export async function GET(
       );
     }
     
-    return NextResponse.json(menuItem);
+    // Transform to expected format
+    const result = {
+      ...menuItem,
+      children: menuItem.other_MenuItem || [],
+    };
+    
+    return NextResponse.json(result);
   } catch (error) {
     console.error("Error fetching menu item:", error);
     return NextResponse.json(
@@ -69,14 +88,9 @@ export async function PUT(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const session = await getServerSession(authOptions);
-    
-    if (!session?.user) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
-    
-    if (session.user.role !== "ADMIN" && session.user.role !== "SUPER_ADMIN") {
-      return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+    const auth = await checkAuth(request);
+    if (!auth.authorized) {
+      return NextResponse.json({ error: auth.error }, { status: auth.error === "Unauthorized" ? 401 : 403 });
     }
     
     const { id } = await params;
@@ -161,14 +175,9 @@ export async function DELETE(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const session = await getServerSession(authOptions);
-    
-    if (!session?.user) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
-    
-    if (session.user.role !== "ADMIN" && session.user.role !== "SUPER_ADMIN") {
-      return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+    const auth = await checkAuth(request);
+    if (!auth.authorized) {
+      return NextResponse.json({ error: auth.error }, { status: auth.error === "Unauthorized" ? 401 : 403 });
     }
     
     const { id } = await params;
@@ -177,7 +186,7 @@ export async function DELETE(
     const existingItem = await db.menuItem.findUnique({
       where: { id, deletedAt: null },
       include: {
-        children: {
+        other_MenuItem: {
           where: { deletedAt: null },
         },
       },
@@ -194,7 +203,7 @@ export async function DELETE(
     const now = new Date();
     
     // Delete children first
-    if (existingItem.children.length > 0) {
+    if (existingItem.other_MenuItem.length > 0) {
       await db.menuItem.updateMany({
         where: {
           parentId: id,

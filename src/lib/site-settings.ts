@@ -1,5 +1,5 @@
 import { db } from "@/lib/db";
-import type { SiteSettings, MenuItem, MenuLocation } from "@prisma/client";
+import type { SiteSettings, MenuItem, MenuLocation, Page } from "@prisma/client";
 import { unstable_noStore as noStore } from "next/cache";
 
 export interface SiteSettingsData extends SiteSettings {
@@ -13,6 +13,11 @@ export interface SocialLinks {
   instagram?: string;
   youtube?: string;
 }
+
+// Extended MenuItem type that can include pages
+export type MenuItemWithPages = MenuItem & {
+  isPage?: boolean;
+};
 
 /**
  * Get site settings from database
@@ -88,11 +93,13 @@ export async function getSiteSettingsOnly(): Promise<SiteSettings> {
 
 /**
  * Get menu items by location
+ * Also includes AboutPage if showInMenu=true as child of "Présentation" menu
  */
 export async function getMenuItems(location: MenuLocation): Promise<MenuItem[]> {
   // Prevent caching
   noStore();
   
+  // Get regular menu items
   const menuItems = await db.menuItem.findMany({
     where: {
       deletedAt: null,
@@ -101,6 +108,43 @@ export async function getMenuItems(location: MenuLocation): Promise<MenuItem[]> 
     },
     orderBy: { order: "asc" },
   });
+
+  // If location is HEADER or BOTH, also include AboutPage if showInMenu
+  if (location === "HEADER" || location === "BOTH") {
+    // Find the "Présentation" menu item to use as parent for AboutPage
+    const presentationMenu = menuItems.find(
+      (item) => item.slug === "presentation" || item.slug === "a-propos"
+    );
+    
+    // Get AboutPage if it should be shown in menu
+    const aboutPage = await db.aboutPage.findUnique({
+      where: { id: 'about-page' },
+    });
+
+    // Create menu item for AboutPage if it exists and showInMenu is true
+    if (aboutPage && aboutPage.showInMenu && aboutPage.published) {
+      const aboutMenuItem: MenuItem = {
+        id: 'about-page-menu',
+        // Set parentId to "Présentation" menu so it appears as dropdown child
+        parentId: presentationMenu?.id || null,
+        order: aboutPage.menuOrder,
+        slug: 'a-propos',
+        route: '/presentation/a-propos',
+        labelFr: aboutPage.menuLabelFr || aboutPage.heroTitleFr || 'À Propos',
+        labelEn: aboutPage.menuLabelEn || aboutPage.heroTitleEn || 'About Us',
+        visible: true,
+        location: "HEADER" as MenuLocation,
+        icon: null,
+        external: false,
+        createdAt: new Date(),
+        updatedAt: aboutPage.updatedAt,
+        deletedAt: null,
+      };
+      
+      // Add AboutPage to menu items
+      return [...menuItems, aboutMenuItem].sort((a, b) => a.order - b.order);
+    }
+  }
 
   return menuItems;
 }
@@ -170,4 +214,60 @@ export function getWorkingHours(
   locale: "fr" | "en"
 ): string | null {
   return locale === "fr" ? settings.workingHoursFr : settings.workingHoursEn;
+}
+
+/**
+ * Get a published page by slug
+ * Returns null if page doesn't exist or is not published
+ */
+export async function getPublishedPage(slug: string): Promise<Page | null> {
+  noStore();
+  
+  const page = await db.page.findFirst({
+    where: {
+      slug,
+      deletedAt: null,
+      published: true,
+    },
+  });
+
+  return page;
+}
+
+/**
+ * Get page title by locale
+ */
+export function getPageTitle(
+  page: Page,
+  locale: "fr" | "en"
+): string {
+  return locale === "fr" ? page.titleFr : page.titleEn;
+}
+
+/**
+ * Get page content by locale
+ */
+export function getPageContent(
+  page: Page,
+  locale: "fr" | "en"
+): string | null {
+  return locale === "fr" ? page.contentFr : page.contentEn;
+}
+
+/**
+ * Get all published pages that should be shown in menu
+ */
+export async function getPagesInMenu(): Promise<Page[]> {
+  noStore();
+  
+  const pages = await db.page.findMany({
+    where: {
+      deletedAt: null,
+      published: true,
+      showInMenu: true,
+    },
+    orderBy: { order: "asc" },
+  });
+
+  return pages;
 }

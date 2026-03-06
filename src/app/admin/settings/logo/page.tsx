@@ -23,6 +23,7 @@ import Link from "next/link";
 
 const logoSchema = z.object({
   logoUrl: z.string().nullable(),
+  faviconUrl: z.string().nullable(),
   logoAltFr: z.string().nullable(),
   logoAltEn: z.string().nullable(),
   siteNameFr: z.string().min(1, "Site name (FR) is required"),
@@ -36,6 +37,7 @@ type LogoFormData = z.infer<typeof logoSchema>;
 interface SiteSettings {
   id: string;
   logoUrl: string | null;
+  faviconUrl: string | null;
   logoAltFr: string | null;
   logoAltEn: string | null;
   siteNameFr: string;
@@ -88,8 +90,11 @@ async function updateSettings(data: Partial<SiteSettings>): Promise<SiteSettings
 export default function LogoSettingsPage() {
   const queryClient = useQueryClient();
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const faviconInputRef = useRef<HTMLInputElement>(null);
   const [isUploading, setIsUploading] = useState(false);
+  const [isUploadingFavicon, setIsUploadingFavicon] = useState(false);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+  const [faviconPreviewUrl, setFaviconPreviewUrl] = useState<string | null>(null);
 
   const { data: settings, isLoading } = useQuery<SiteSettings>({
     queryKey: ["settings"],
@@ -100,6 +105,7 @@ export default function LogoSettingsPage() {
     resolver: zodResolver(logoSchema),
     values: {
       logoUrl: settings?.logoUrl || null,
+      faviconUrl: settings?.faviconUrl || null,
       logoAltFr: settings?.logoAltFr || null,
       logoAltEn: settings?.logoAltEn || null,
       siteNameFr: settings?.siteNameFr || "",
@@ -113,7 +119,7 @@ export default function LogoSettingsPage() {
     mutationFn: updateSettings,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["settings"] });
-      toast.success("Logo settings saved successfully");
+      toast.success("Paramètres enregistrés avec succès");
     },
     onError: (error: Error) => {
       toast.error(error.message);
@@ -124,26 +130,22 @@ export default function LogoSettingsPage() {
     const file = event.target.files?.[0];
     if (!file) return;
 
-    // Validate file type
     if (!file.type.startsWith("image/")) {
-      toast.error("Please select an image file");
+      toast.error("Veuillez sélectionner un fichier image");
       return;
     }
 
-    // Validate file size (max 5MB)
     if (file.size > 5 * 1024 * 1024) {
-      toast.error("Image must be less than 5MB");
+      toast.error("L'image doit faire moins de 5MB");
       return;
     }
 
-    // Show preview
     const reader = new FileReader();
     reader.onload = (e) => {
       setPreviewUrl(e.target?.result as string);
     };
     reader.readAsDataURL(file);
 
-    // Upload file
     setIsUploading(true);
     try {
       const formData = new FormData();
@@ -159,16 +161,58 @@ export default function LogoSettingsPage() {
 
       const data = await response.json();
       form.setValue("logoUrl", data.url);
-      toast.success("Logo uploaded successfully");
+      toast.success("Logo uploadé avec succès");
     } catch (error) {
       console.error("Upload error:", error);
-      toast.error("Failed to upload logo. Using base64 preview instead.");
-      // Fallback: use base64 preview as the logo URL
-      if (previewUrl) {
-        form.setValue("logoUrl", previewUrl);
-      }
+      toast.error("Échec de l'upload du logo");
     } finally {
       setIsUploading(false);
+    }
+  };
+
+  const handleFaviconSelect = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    // Validate file type - accept ico, png, svg
+    const validTypes = ["image/x-icon", "image/png", "image/svg+xml", "image/ico"];
+    if (!validTypes.includes(file.type) && !file.name.endsWith('.ico')) {
+      toast.error("Veuillez sélectionner un fichier .ico, .png ou .svg");
+      return;
+    }
+
+    if (file.size > 2 * 1024 * 1024) {
+      toast.error("Le favicon doit faire moins de 2MB");
+      return;
+    }
+
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      setFaviconPreviewUrl(e.target?.result as string);
+    };
+    reader.readAsDataURL(file);
+
+    setIsUploadingFavicon(true);
+    try {
+      const formData = new FormData();
+      formData.append("file", file);
+      formData.append("folder", "favicons");
+
+      const response = await fetch("/api/upload", {
+        method: "POST",
+        body: formData,
+      });
+
+      if (!response.ok) throw new Error("Upload failed");
+
+      const data = await response.json();
+      form.setValue("faviconUrl", data.url);
+      toast.success("Favicon uploadé avec succès");
+    } catch (error) {
+      console.error("Upload error:", error);
+      toast.error("Échec de l'upload du favicon");
+    } finally {
+      setIsUploadingFavicon(false);
     }
   };
 
@@ -180,10 +224,17 @@ export default function LogoSettingsPage() {
     }
   };
 
+  const handleRemoveFavicon = () => {
+    form.setValue("faviconUrl", null);
+    setFaviconPreviewUrl(null);
+    if (faviconInputRef.current) {
+      faviconInputRef.current.value = "";
+    }
+  };
+
   const onSubmit = (data: LogoFormData) => {
     updateMutation.mutate({
       ...data,
-      // Preserve other settings
       color1: settings?.color1 || "#362981",
       color2: settings?.color2 || "#009446",
       color3: settings?.color3 || "#029CB1",
@@ -193,6 +244,7 @@ export default function LogoSettingsPage() {
   };
 
   const currentLogo = previewUrl || form.watch("logoUrl");
+  const currentFavicon = faviconPreviewUrl || form.watch("faviconUrl");
 
   return (
     <div className="space-y-6">
@@ -205,18 +257,18 @@ export default function LogoSettingsPage() {
         <div>
           <h1 className="text-2xl font-bold tracking-tight">Logo & Branding</h1>
           <p className="text-muted-foreground">
-            Upload your logo and configure site branding
+            Uploadez votre logo et favicon, et configurez les informations du site
           </p>
         </div>
       </div>
 
-      <div className="grid gap-6 lg:grid-cols-2">
+      <div className="grid gap-6 lg:grid-cols-3">
         {/* Logo Upload */}
         <Card>
           <CardHeader>
             <CardTitle>Logo</CardTitle>
             <CardDescription>
-              Upload your company logo. Recommended size: 200x60px, PNG or SVG format.
+              Uploadez votre logo. Taille recommandée: 200x60px, format PNG ou SVG.
             </CardDescription>
           </CardHeader>
           <CardContent>
@@ -224,14 +276,13 @@ export default function LogoSettingsPage() {
               <Skeleton className="h-48 w-full" />
             ) : (
               <div className="space-y-4">
-                {/* Logo Preview */}
-                <div className="border-2 border-dashed rounded-lg p-6 flex flex-col items-center justify-center min-h-[200px] bg-muted/30">
+                <div className="border-2 border-dashed rounded-lg p-6 flex flex-col items-center justify-center min-h-[160px] bg-muted/30">
                   {currentLogo ? (
                     <div className="relative">
                       <img
                         src={currentLogo}
                         alt="Logo preview"
-                        className="max-h-32 max-w-full object-contain"
+                        className="max-h-24 max-w-full object-contain"
                       />
                       <Button
                         type="button"
@@ -245,13 +296,12 @@ export default function LogoSettingsPage() {
                     </div>
                   ) : (
                     <div className="flex flex-col items-center text-muted-foreground">
-                      <ImageIcon className="h-12 w-12 mb-2" />
-                      <p className="text-sm">No logo uploaded</p>
+                      <ImageIcon className="h-10 w-10 mb-2" />
+                      <p className="text-sm">Aucun logo</p>
                     </div>
                   )}
                 </div>
 
-                {/* Upload Button */}
                 <input
                   ref={fileInputRef}
                   type="file"
@@ -271,7 +321,72 @@ export default function LogoSettingsPage() {
                   ) : (
                     <Upload className="mr-2 h-4 w-4" />
                   )}
-                  {isUploading ? "Uploading..." : "Upload Logo"}
+                  {isUploading ? "Upload..." : "Uploader Logo"}
+                </Button>
+              </div>
+            )}
+          </CardContent>
+        </Card>
+
+        {/* Favicon Upload */}
+        <Card>
+          <CardHeader>
+            <CardTitle>Favicon</CardTitle>
+            <CardDescription>
+              Uploadez votre favicon. Taille recommandée: 32x32px ou 16x16px, format ICO, PNG ou SVG.
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            {isLoading ? (
+              <Skeleton className="h-48 w-full" />
+            ) : (
+              <div className="space-y-4">
+                <div className="border-2 border-dashed rounded-lg p-6 flex flex-col items-center justify-center min-h-[160px] bg-muted/30">
+                  {currentFavicon ? (
+                    <div className="relative">
+                      <img
+                        src={currentFavicon}
+                        alt="Favicon preview"
+                        className="max-h-16 max-w-full object-contain"
+                      />
+                      <Button
+                        type="button"
+                        variant="destructive"
+                        size="icon"
+                        className="absolute -top-2 -right-2 h-6 w-6"
+                        onClick={handleRemoveFavicon}
+                      >
+                        <Trash2 className="h-3 w-3" />
+                      </Button>
+                    </div>
+                  ) : (
+                    <div className="flex flex-col items-center text-muted-foreground">
+                      <ImageIcon className="h-10 w-10 mb-2" />
+                      <p className="text-sm">Aucun favicon</p>
+                    </div>
+                  )}
+                </div>
+
+                <input
+                  ref={faviconInputRef}
+                  type="file"
+                  accept=".ico,.png,.svg,image/x-icon,image/png,image/svg+xml"
+                  className="hidden"
+                  onChange={handleFaviconSelect}
+                />
+                <Button
+                  type="button"
+                  variant="outline"
+                  className="w-full"
+                  onClick={() => faviconInputRef.current?.click()}
+                  disabled={isUploadingFavicon}
+                >
+                  {isUploadingFavicon ? (
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  ) : (
+                    <Upload className="mr-2 h-4 w-4" />
+                  )}
+                  {isUploadingFavicon ? "Upload..." : "Uploader Favicon"}
                 </Button>
               </div>
             )}
@@ -279,11 +394,11 @@ export default function LogoSettingsPage() {
         </Card>
 
         {/* Logo Alt Text & Site Name */}
-        <Card>
+        <Card className="lg:col-span-1">
           <CardHeader>
-            <CardTitle>Site Information</CardTitle>
+            <CardTitle>Informations du Site</CardTitle>
             <CardDescription>
-              Configure site name and logo alt text for accessibility
+              Configurez le nom du site et le texte alternatif du logo pour l&apos;accessibilité
             </CardDescription>
           </CardHeader>
           <CardContent>
@@ -301,7 +416,7 @@ export default function LogoSettingsPage() {
                     name="siteNameFr"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Site Name (French)</FormLabel>
+                        <FormLabel>Nom du Site (Français)</FormLabel>
                         <FormControl>
                           <Input placeholder="AAEA" {...field} />
                         </FormControl>
@@ -315,7 +430,7 @@ export default function LogoSettingsPage() {
                     name="siteNameEn"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Site Name (English)</FormLabel>
+                        <FormLabel>Nom du Site (Anglais)</FormLabel>
                         <FormControl>
                           <Input placeholder="AAEA" {...field} />
                         </FormControl>
@@ -329,7 +444,7 @@ export default function LogoSettingsPage() {
                     name="logoAltFr"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Logo Alt Text (French)</FormLabel>
+                        <FormLabel>Texte Alt Logo (Français)</FormLabel>
                         <FormControl>
                           <Input placeholder="Logo de l'entreprise" {...field} value={field.value || ""} onChange={field.onChange} />
                         </FormControl>
@@ -343,7 +458,7 @@ export default function LogoSettingsPage() {
                     name="logoAltEn"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Logo Alt Text (English)</FormLabel>
+                        <FormLabel>Texte Alt Logo (Anglais)</FormLabel>
                         <FormControl>
                           <Input placeholder="Company logo" {...field} value={field.value || ""} onChange={field.onChange} />
                         </FormControl>
@@ -357,7 +472,7 @@ export default function LogoSettingsPage() {
                     name="siteDescriptionFr"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Site Description (French)</FormLabel>
+                        <FormLabel>Description du Site (Français)</FormLabel>
                         <FormControl>
                           <Input placeholder="Votre partenaire technologique de confiance" {...field} value={field.value || ""} onChange={field.onChange} />
                         </FormControl>
@@ -371,7 +486,7 @@ export default function LogoSettingsPage() {
                     name="siteDescriptionEn"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Site Description (English)</FormLabel>
+                        <FormLabel>Description du Site (Anglais)</FormLabel>
                         <FormControl>
                           <Input placeholder="Your trusted technology partner" {...field} value={field.value || ""} onChange={field.onChange} />
                         </FormControl>
@@ -386,13 +501,13 @@ export default function LogoSettingsPage() {
                       variant="outline"
                       onClick={() => form.reset()}
                     >
-                      Reset
+                      Réinitialiser
                     </Button>
                     <Button type="submit" disabled={updateMutation.isPending}>
                       {updateMutation.isPending && (
                         <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                       )}
-                      Save Changes
+                      Enregistrer
                     </Button>
                   </div>
                 </form>

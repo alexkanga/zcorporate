@@ -20,7 +20,7 @@ import {
 } from "lucide-react";
 import type { MenuItem, SiteSettings } from "@prisma/client";
 import { parseSocialLinks } from "@/lib/site-settings";
-import { useState } from "react";
+import { useState, useSyncExternalStore } from "react";
 
 interface FooterProps {
   logoUrl?: string | null;
@@ -51,6 +51,15 @@ export function Footer({ logoUrl, siteName, settings, menuItems }: FooterProps) 
   const locale = useLocale() as "fr" | "en";
   const [email, setEmail] = useState("");
   const [subscribed, setSubscribed] = useState(false);
+  
+  // Use useSyncExternalStore to detect client-side mounting
+  const mounted = useSyncExternalStore(
+    () => () => {},
+    () => true,
+    () => false
+  );
+
+  const currentYear = mounted ? new Date().getFullYear() : 2024;
 
   const socialLinks = parseSocialLinks(settings.socialLinks);
   const workingHours =
@@ -71,8 +80,6 @@ export function Footer({ logoUrl, siteName, settings, menuItems }: FooterProps) 
       setEmail("");
     }
   };
-
-  const currentYear = new Date().getFullYear();
 
   return (
     <footer className="bg-gradient-to-br from-[var(--color-primary)] via-[var(--color-primary)]/95 to-[var(--color-primary)]/90 text-white">

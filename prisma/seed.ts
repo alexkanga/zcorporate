@@ -128,10 +128,15 @@ async function main() {
   // ==================== MENU ITEMS ====================
   console.log('Creating menu items...');
 
+  // Delete the duplicate menu item if it exists
+  await prisma.menuItem.deleteMany({
+    where: { id: 'menu-presentation' }
+  });
+
   const menuItems = [
     { id: 'menu-accueil', slug: 'accueil', route: '/', labelFr: 'Accueil', labelEn: 'Home', location: MenuLocation.HEADER, order: 0 },
-    { id: 'menu-a-propos', slug: 'a-propos', route: '/a-propos', labelFr: 'Présentation', labelEn: 'Presentation', location: MenuLocation.HEADER, order: 1 },
-    { id: 'menu-solutions', slug: 'solutions', route: '/solutions', labelFr: 'Solutions', labelEn: 'Solutions', location: MenuLocation.HEADER, order: 2 },
+    { id: 'menu-a-propos', slug: 'a-propos', route: '#', labelFr: 'Présentation', labelEn: 'Presentation', location: MenuLocation.HEADER, order: 1 },
+    { id: 'menu-services', slug: 'services', route: '/services', labelFr: 'Services', labelEn: 'Services', location: MenuLocation.HEADER, order: 2 },
     { id: 'menu-realisations', slug: 'realisations', route: '/realisations', labelFr: 'Réalisations', labelEn: 'Projects', location: MenuLocation.HEADER, order: 3 },
     { id: 'menu-ressources', slug: 'ressources', route: '/ressources', labelFr: 'Ressources', labelEn: 'Resources', location: MenuLocation.HEADER, order: 4 },
     { id: 'menu-evenements', slug: 'evenements', route: '/evenements', labelFr: 'Événements', labelEn: 'Events', location: MenuLocation.HEADER, order: 5 },
@@ -163,8 +168,8 @@ async function main() {
 
   const sliders = [
     { id: 'slider-1', titleFr: "Bienvenue à l'AAEA", titleEn: 'Welcome to AAEA', subtitleFr: 'Ensemble pour un avenir durable et une agriculture responsable', subtitleEn: 'Together for a sustainable future and responsible agriculture', buttonTextFr: 'Découvrir', buttonTextEn: 'Discover', buttonUrl: '/a-propos', imageUrl: '/images/slider-1.jpg', imageAltFr: 'Paysage naturel', imageAltEn: 'Natural landscape', order: 0, visible: true },
-    { id: 'slider-2', titleFr: 'Nos Solutions Innovantes', titleEn: 'Our Innovative Solutions', subtitleFr: "Technologies durables pour l'agriculture de demain", subtitleEn: "Sustainable technologies for tomorrow's agriculture", buttonTextFr: 'En savoir plus', buttonTextEn: 'Learn more', buttonUrl: '/solutions', imageUrl: '/images/slider-2.jpg', imageAltFr: 'Agriculture moderne', imageAltEn: 'Modern agriculture', order: 1, visible: true },
-    { id: 'slider-3', titleFr: 'Formez-vous avec nous', titleEn: 'Train with us', subtitleFr: 'Programmes de formation pour les agriculteurs et les communautés rurales', subtitleEn: 'Training programs for farmers and rural communities', buttonTextFr: 'Nos formations', buttonTextEn: 'Our training', buttonUrl: '/solutions', imageUrl: '/images/slider-3.jpg', imageAltFr: 'Formation agricole', imageAltEn: 'Agricultural training', order: 2, visible: true },
+    { id: 'slider-2', titleFr: 'Nos Services Innovants', titleEn: 'Our Innovative Services', subtitleFr: "Technologies durables pour l'agriculture de demain", subtitleEn: "Sustainable technologies for tomorrow's agriculture", buttonTextFr: 'En savoir plus', buttonTextEn: 'Learn more', buttonUrl: '/services', imageUrl: '/images/slider-2.jpg', imageAltFr: 'Agriculture moderne', imageAltEn: 'Modern agriculture', order: 1, visible: true },
+    { id: 'slider-3', titleFr: 'Formez-vous avec nous', titleEn: 'Train with us', subtitleFr: 'Programmes de formation pour les agriculteurs et les communautés rurales', subtitleEn: 'Training programs for farmers and rural communities', buttonTextFr: 'Nos formations', buttonTextEn: 'Our training', buttonUrl: '/services', imageUrl: '/images/slider-3.jpg', imageAltFr: 'Formation agricole', imageAltEn: 'Agricultural training', order: 2, visible: true },
     { id: 'slider-4', titleFr: "Engagez-vous pour l'environnement", titleEn: 'Commit to the environment', subtitleFr: 'Rejoignez notre mission pour protéger la biodiversité et les ressources naturelles', subtitleEn: 'Join our mission to protect biodiversity and natural resources', buttonTextFr: 'Nous rejoindre', buttonTextEn: 'Join us', buttonUrl: '/contact', imageUrl: '/images/slider-4.jpg', imageAltFr: "Protection de l'environnement", imageAltEn: 'Environmental protection', order: 3, visible: true },
   ];
 
@@ -593,6 +598,183 @@ async function main() {
   });
 
   console.log('✅ Contact info ready');
+
+  // ==================== ABOUT PAGE ====================
+  console.log('Creating About Page...');
+
+  await prisma.aboutPage.upsert({
+    where: { id: 'about-page' },
+    update: {
+      heroTitleFr: 'À Propos de l\'AAEA',
+      heroTitleEn: 'About AAEA',
+      heroSubtitleFr: 'Association Africaine de l\'Eau et de l\'Assainissement - Au service des communautés depuis plus de 15 ans',
+      heroSubtitleEn: 'African Water and Sanitation Association - Serving communities for over 15 years',
+      heroBadgeFr: 'Présentation',
+      heroBadgeEn: 'Presentation',
+      heroImageUrl: '/images/about.jpg',
+      heroImageAltFr: 'Équipe AAEA en action',
+      heroImageAltEn: 'AAEA team in action',
+      // Main Content
+      mainTitleFr: 'Notre Histoire',
+      mainTitleEn: 'Our Story',
+      mainContentFr: `<p>L'<strong>Association Africaine de l'Eau et de l'Assainissement (AAEA)</strong> est une organisation panafricaine créée avec la vision d'améliorer l'accès à l'eau potable et à l'assainissement pour tous les Africains.</p>
+<p>Fondée par des experts passionnés du secteur de l'eau, l'AAEA s'est donnée pour mission de promouvoir des solutions durables et innovantes pour la gestion des ressources en eau à travers le continent.</p>
+<p>Nous travaillons en étroite collaboration avec les gouvernements, les organisations internationales, les communautés locales et le secteur privé pour développer des programmes d'approvisionnement en eau potable, d'assainissement et d'hygiène adaptés aux réalités africaines.</p>`,
+      mainContentEn: `<p>The <strong>African Water and Sanitation Association (AAEA)</strong> is a pan-African organization created with the vision of improving access to safe water and sanitation for all Africans.</p>
+<p>Founded by passionate water sector experts, AAEA's mission is to promote sustainable and innovative solutions for water resource management across the continent.</p>
+<p>We work closely with governments, international organizations, local communities, and the private sector to develop water supply, sanitation, and hygiene programs adapted to African realities.</p>`,
+      mainImageUrl: '/images/about.jpg',
+      mainImageAltFr: 'Projets AAEA',
+      mainImageAltEn: 'AAEA Projects',
+      // Statistics
+      stat1Value: '15+',
+      stat1LabelFr: "Années d'Expérience",
+      stat1LabelEn: 'Years of Experience',
+      stat2Value: '50+',
+      stat2LabelFr: 'Pays Membres',
+      stat2LabelEn: 'Member Countries',
+      stat3Value: '5M+',
+      stat3LabelFr: 'Bénéficiaires',
+      stat3LabelEn: 'Beneficiaries',
+      stat4Value: '200+',
+      stat4LabelFr: 'Projets Réalisés',
+      stat4LabelEn: 'Projects Completed',
+      // Mission
+      missionTitleFr: 'Notre Mission',
+      missionTitleEn: 'Our Mission',
+      missionContentFr: `<p>Contribuer à l'amélioration durable des conditions de vie des populations africaines en promouvant l'accès équitable à l'eau potable, à l'assainissement et à l'hygiène.</p>
+<p>Nous nous engageons à:</p>
+<ul>
+<li>Renforcer les capacités des acteurs de l'eau et de l'assainissement</li>
+<li>Promouvoir la gouvernance participative des ressources en eau</li>
+<li>Développer des solutions technologiques appropriées et durables</li>
+<li>Favoriser les partenariats public-privé pour le développement du secteur</li>
+</ul>`,
+      missionContentEn: `<p>Contribute to the sustainable improvement of living conditions for African populations by promoting equitable access to safe water, sanitation, and hygiene.</p>
+<p>We are committed to:</p>
+<ul>
+<li>Strengthening the capacities of water and sanitation stakeholders</li>
+<li>Promoting participatory water resource governance</li>
+<li>Developing appropriate and sustainable technological solutions</li>
+<li>Encouraging public-private partnerships for sector development</li>
+</ul>`,
+      // Values
+      valuesTitleFr: 'Nos Valeurs',
+      valuesTitleEn: 'Our Values',
+      valuesContentFr: `<p><strong>Excellence:</strong> Nous visons l'excellence dans tous nos projets et programmes.</p>
+<p><strong>Intégrité:</strong> Nous agissons avec transparence et éthique dans toutes nos actions.</p>
+<p><strong>Innovation:</strong> Nous encourageons les solutions créatives et adaptées aux contextes locaux.</p>
+<p><strong>Collaboration:</strong> Nous croyons en la force du partenariat et de la coopération.</p>
+<p><strong>Durabilité:</strong> Nous privilégions les solutions à long terme respectueuses de l'environnement.</p>`,
+      valuesContentEn: `<p><strong>Excellence:</strong> We aim for excellence in all our projects and programs.</p>
+<p><strong>Integrity:</strong> We act with transparency and ethics in all our actions.</p>
+<p><strong>Innovation:</strong> We encourage creative solutions adapted to local contexts.</p>
+<p><strong>Collaboration:</strong> We believe in the power of partnership and cooperation.</p>
+<p><strong>Sustainability:</strong> We prioritize long-term, environmentally-friendly solutions.</p>`,
+      // CTA
+      ctaTitleFr: 'Rejoignez notre mission',
+      ctaTitleEn: 'Join our mission',
+      ctaSubtitleFr: 'Ensemble, construisons un avenir où chaque Africain a accès à l\'eau potable et à l\'assainissement',
+      ctaSubtitleEn: 'Together, let\'s build a future where every African has access to safe water and sanitation',
+      ctaButtonTextFr: 'Nous contacter',
+      ctaButtonTextEn: 'Contact us',
+      ctaButtonUrl: '/contact',
+      // Floating Badge
+      floatingBadgeTitleFr: 'Certifié ISO 9001',
+      floatingBadgeTitleEn: 'ISO 9001 Certified',
+      floatingBadgeTextFr: 'Qualité garantie',
+      floatingBadgeTextEn: 'Quality guaranteed',
+      // Menu settings
+      menuLabelFr: 'À Propos',
+      menuLabelEn: 'About Us',
+      menuOrder: 0,
+      showInMenu: true,
+      published: true,
+    },
+    create: {
+      id: 'about-page',
+      heroTitleFr: 'À Propos de l\'AAEA',
+      heroTitleEn: 'About AAEA',
+      heroSubtitleFr: 'Association Africaine de l\'Eau et de l\'Assainissement - Au service des communautés depuis plus de 15 ans',
+      heroSubtitleEn: 'African Water and Sanitation Association - Serving communities for over 15 years',
+      heroBadgeFr: 'Présentation',
+      heroBadgeEn: 'Presentation',
+      heroImageUrl: '/images/about.jpg',
+      heroImageAltFr: 'Équipe AAEA en action',
+      heroImageAltEn: 'AAEA team in action',
+      mainTitleFr: 'Notre Histoire',
+      mainTitleEn: 'Our Story',
+      mainContentFr: `<p>L'<strong>Association Africaine de l'Eau et de l'Assainissement (AAEA)</strong> est une organisation panafricaine créée avec la vision d'améliorer l'accès à l'eau potable et à l'assainissement pour tous les Africains.</p>
+<p>Fondée par des experts passionnés du secteur de l'eau, l'AAEA s'est donnée pour mission de promouvoir des solutions durables et innovantes pour la gestion des ressources en eau à travers le continent.</p>
+<p>Nous travaillons en étroite collaboration avec les gouvernements, les organisations internationales, les communautés locales et le secteur privé pour développer des programmes d'approvisionnement en eau potable, d'assainissement et d'hygiène adaptés aux réalités africaines.</p>`,
+      mainContentEn: `<p>The <strong>African Water and Sanitation Association (AAEA)</strong> is a pan-African organization created with the vision of improving access to safe water and sanitation for all Africans.</p>
+<p>Founded by passionate water sector experts, AAEA's mission is to promote sustainable and innovative solutions for water resource management across the continent.</p>
+<p>We work closely with governments, international organizations, local communities, and the private sector to develop water supply, sanitation, and hygiene programs adapted to African realities.</p>`,
+      mainImageUrl: '/images/about.jpg',
+      mainImageAltFr: 'Projets AAEA',
+      mainImageAltEn: 'AAEA Projects',
+      stat1Value: '15+',
+      stat1LabelFr: "Années d'Expérience",
+      stat1LabelEn: 'Years of Experience',
+      stat2Value: '50+',
+      stat2LabelFr: 'Pays Membres',
+      stat2LabelEn: 'Member Countries',
+      stat3Value: '5M+',
+      stat3LabelFr: 'Bénéficiaires',
+      stat3LabelEn: 'Beneficiaries',
+      stat4Value: '200+',
+      stat4LabelFr: 'Projets Réalisés',
+      stat4LabelEn: 'Projects Completed',
+      missionTitleFr: 'Notre Mission',
+      missionTitleEn: 'Our Mission',
+      missionContentFr: `<p>Contribuer à l'amélioration durable des conditions de vie des populations africaines en promouvant l'accès équitable à l'eau potable, à l'assainissement et à l'hygiène.</p>
+<p>Nous nous engageons à:</p>
+<ul>
+<li>Renforcer les capacités des acteurs de l'eau et de l'assainissement</li>
+<li>Promouvoir la gouvernance participative des ressources en eau</li>
+<li>Développer des solutions technologiques appropriées et durables</li>
+<li>Favoriser les partenariats public-privé pour le développement du secteur</li>
+</ul>`,
+      missionContentEn: `<p>Contribute to the sustainable improvement of living conditions for African populations by promoting equitable access to safe water, sanitation, and hygiene.</p>
+<p>We are committed to:</p>
+<ul>
+<li>Strengthening the capacities of water and sanitation stakeholders</li>
+<li>Promoting participatory water resource governance</li>
+<li>Developing appropriate and sustainable technological solutions</li>
+<li>Encouraging public-private partnerships for sector development</li>
+</ul>`,
+      valuesTitleFr: 'Nos Valeurs',
+      valuesTitleEn: 'Our Values',
+      valuesContentFr: `<p><strong>Excellence:</strong> Nous visons l'excellence dans tous nos projets et programmes.</p>
+<p><strong>Intégrité:</strong> Nous agissons avec transparence et éthique dans toutes nos actions.</p>
+<p><strong>Innovation:</strong> Nous encourageons les solutions créatives et adaptées aux contextes locaux.</p>
+<p><strong>Collaboration:</strong> Nous croyons en la force du partenariat et de la coopération.</p>
+<p><strong>Durabilité:</strong> Nous privilégions les solutions à long terme respectueuses de l'environnement.</p>`,
+      valuesContentEn: `<p><strong>Excellence:</strong> We aim for excellence in all our projects and programs.</p>
+<p><strong>Integrity:</strong> We act with transparency and ethics in all our actions.</p>
+<p><strong>Innovation:</strong> We encourage creative solutions adapted to local contexts.</p>
+<p><strong>Collaboration:</strong> We believe in the power of partnership and cooperation.</p>
+<p><strong>Sustainability:</strong> We prioritize long-term, environmentally-friendly solutions.</p>`,
+      ctaTitleFr: 'Rejoignez notre mission',
+      ctaTitleEn: 'Join our mission',
+      ctaSubtitleFr: 'Ensemble, construisons un avenir où chaque Africain a accès à l\'eau potable et à l\'assainissement',
+      ctaSubtitleEn: 'Together, let\'s build a future where every African has access to safe water and sanitation',
+      ctaButtonTextFr: 'Nous contacter',
+      ctaButtonTextEn: 'Contact us',
+      ctaButtonUrl: '/contact',
+      floatingBadgeTitleFr: 'Certifié ISO 9001',
+      floatingBadgeTitleEn: 'ISO 9001 Certified',
+      floatingBadgeTextFr: 'Qualité garantie',
+      floatingBadgeTextEn: 'Quality guaranteed',
+      menuLabelFr: 'À Propos',
+      menuLabelEn: 'About Us',
+      menuOrder: 0,
+      showInMenu: true,
+      published: true,
+    },
+  });
+
+  console.log('✅ About Page ready');
 
   console.log('🎉 Seed completed successfully!');
 }

@@ -12,7 +12,9 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import {
   Dialog,
   DialogContent,
+  DialogTitle,
 } from '@/components/ui/dialog';
+import { VisuallyHidden } from '@/components/ui/visually-hidden';
 import {
   ArrowLeft,
   Calendar,
@@ -353,26 +355,23 @@ export default function ArticleDetailPage() {
     <div className="min-h-screen py-8">
       <div className="container mx-auto px-4">
         <div className="max-w-4xl mx-auto">
-          {/* Back Link */}
+          {/* Back Link - Always clickable, no overlay */}
           <Link
             href="/actualites"
-            className="inline-flex items-center text-sm text-muted-foreground hover:text-foreground mb-8 transition-colors"
+            className="relative z-10 inline-flex items-center text-sm text-muted-foreground hover:text-foreground mb-8 transition-colors bg-background/80 backdrop-blur-sm px-3 py-2 rounded-lg"
           >
             <ArrowLeft className="mr-2 w-4 h-4" />
             {locale === 'fr' ? 'Retour aux actualités' : 'Back to news'}
           </Link>
 
-          {/* Main Image */}
-          <div className="mb-8">
+          {/* Main Image - Static display, no overlay, no click handler */}
+          <div className="mb-8 relative z-0">
             {article.imageUrl ? (
-              <div
-                className="aspect-video rounded-lg overflow-hidden bg-muted cursor-pointer group"
-                onClick={() => openImageLightbox(0)}
-              >
+              <div className="aspect-video rounded-lg overflow-hidden bg-muted">
                 <img
                   src={article.imageUrl}
                   alt={getTitle()}
-                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                  className="w-full h-full object-cover pointer-events-none"
                 />
               </div>
             ) : (
@@ -523,6 +522,9 @@ export default function ArticleDetailPage() {
       {/* Image Lightbox Dialog */}
       <Dialog open={imageLightboxOpen} onOpenChange={setImageLightboxOpen}>
         <DialogContent className="max-w-6xl w-full h-[90vh] p-0 bg-black/95 border-none">
+          <VisuallyHidden>
+            <DialogTitle>{locale === 'fr' ? 'Visionneuse d\'images' : 'Image viewer'}</DialogTitle>
+          </VisuallyHidden>
           <div className="relative w-full h-full flex items-center justify-center">
             {/* Close Button */}
             <Button
@@ -578,6 +580,9 @@ export default function ArticleDetailPage() {
       {/* Video Lightbox Dialog */}
       <Dialog open={videoLightboxOpen} onOpenChange={setVideoLightboxOpen}>
         <DialogContent className="max-w-5xl w-full h-[85vh] p-0 bg-black/95 border-none">
+          <VisuallyHidden>
+            <DialogTitle>{locale === 'fr' ? 'Lecteur vidéo' : 'Video player'}</DialogTitle>
+          </VisuallyHidden>
           <div className="relative w-full h-full flex items-center justify-center">
             {/* Close Button */}
             <Button

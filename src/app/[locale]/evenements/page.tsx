@@ -2,7 +2,7 @@
 
 import { useQuery } from '@tanstack/react-query';
 import { useLocale } from 'next-intl';
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useSyncExternalStore } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -11,7 +11,9 @@ import { Skeleton } from '@/components/ui/skeleton';
 import {
   Dialog,
   DialogContent,
+  DialogTitle,
 } from '@/components/ui/dialog';
+import { VisuallyHidden } from '@/components/ui/visually-hidden';
 import {
   Calendar,
   MapPin,
@@ -155,6 +157,13 @@ export default function EventsPage() {
   const locale = useLocale() as 'fr' | 'en';
   const [activeTab, setActiveTab] = useState<string>('all');
   const [page, setPage] = useState(1);
+  
+  // Use useSyncExternalStore to detect client-side mounting
+  const mounted = useSyncExternalStore(
+    () => () => {},
+    () => true,
+    () => false
+  );
 
   const [lightboxOpen, setLightboxOpen] = useState(false);
   const [lightboxImages, setLightboxImages] = useState<string[]>([]);
@@ -181,6 +190,7 @@ export default function EventsPage() {
     locale === 'fr' ? item.descriptionFr : item.descriptionEn;
 
   const formatDate = (dateString: string) => {
+    if (!mounted) return dateString; // Return raw date string on server
     return new Date(dateString).toLocaleDateString(locale === 'fr' ? 'fr-FR' : 'en-US', {
       year: 'numeric',
       month: 'long',
@@ -189,6 +199,7 @@ export default function EventsPage() {
   };
 
   const isUpcoming = (dateString: string) => {
+    if (!mounted) return false; // Default to false on server to avoid hydration mismatch
     return new Date(dateString) >= new Date();
   };
 
@@ -422,6 +433,9 @@ export default function EventsPage() {
       {/* Image Lightbox */}
       <Dialog open={lightboxOpen} onOpenChange={setLightboxOpen}>
         <DialogContent className="max-w-6xl w-full h-[90vh] p-0 bg-black/95 border-none">
+          <VisuallyHidden>
+            <DialogTitle>{locale === 'fr' ? 'Visionneuse d\'images' : 'Image viewer'}</DialogTitle>
+          </VisuallyHidden>
           <div className="relative w-full h-full flex items-center justify-center">
             <Button
               variant="ghost"
@@ -473,6 +487,9 @@ export default function EventsPage() {
       {/* Video Dialog */}
       <Dialog open={videoDialogOpen} onOpenChange={setVideoDialogOpen}>
         <DialogContent className="max-w-4xl w-full p-0 bg-black border-none">
+          <VisuallyHidden>
+            <DialogTitle>{locale === 'fr' ? 'Lecteur vidéo' : 'Video player'}</DialogTitle>
+          </VisuallyHidden>
           <div className="relative aspect-video">
             <Button
               variant="ghost"

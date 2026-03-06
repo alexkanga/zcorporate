@@ -21,7 +21,9 @@ import {
 } from "@/components/ui/navigation-menu";
 import { LanguageSwitcher } from "./LanguageSwitcher";
 import { ClientOnly } from "@/components/ClientOnly";
-import { Search, Menu, LogIn, LogOut, LayoutDashboard, ChevronRight } from "lucide-react";
+import { 
+  Search, Menu, LogIn, LogOut, LayoutDashboard, ChevronRight
+} from "lucide-react";
 import { cn } from "@/lib/utils";
 import type { MenuItem } from "@prisma/client";
 import { useSession, signOut } from "next-auth/react";
@@ -75,18 +77,17 @@ export function Header({ logoUrl, siteName, menuItems }: HeaderProps) {
   };
 
   return (
-    <header className="sticky top-0 z-50 w-full border-b-2 border-[var(--color-primary)]/20 bg-white/95 backdrop-blur-md shadow-sm transition-all duration-300">
-      <div className="container mx-auto flex h-16 items-center justify-between px-4">
+    <header className="sticky top-0 z-50 w-full border-b-2 border-[var(--color-primary)]/20 bg-white shadow-sm transition-all duration-300">
+      <div className="container mx-auto flex h-20 items-center justify-between px-4">
         {/* Logo */}
         <Link href="/" className="flex items-center gap-2 group relative">
           {logoUrl ? (
-            <div className="relative overflow-hidden rounded-lg">
+            <div className="relative overflow-visible m-0 p-0">
               <img
                 src={logoUrl}
                 alt={t("logoAlt")}
-                className="h-10 w-auto object-contain transition-all duration-500 group-hover:scale-110"
+                className="h-16 w-auto object-contain transition-all duration-500 group-hover:scale-105"
               />
-              <div className="absolute inset-0 bg-[var(--color-primary)]/0 group-hover:bg-[var(--color-primary)]/5 transition-colors duration-300 rounded-lg" />
             </div>
           ) : (
             <span className="text-xl font-bold text-[var(--color-primary)] transition-all duration-300 group-hover:text-[var(--color-secondary)] relative">
@@ -98,81 +99,67 @@ export function Header({ logoUrl, siteName, menuItems }: HeaderProps) {
 
         {/* Desktop Navigation */}
         <nav className="hidden lg:flex items-center">
-          <NavigationMenu>
-            <NavigationMenuList className="gap-1">
-              {groupedItems.map((item) => {
-                if (item.children.length > 0) {
-                  return (
-                    <NavigationMenuItem key={item.id}>
-                      <NavigationMenuTrigger 
-                        className={cn(
-                          "px-4 py-2 text-sm font-medium bg-transparent rounded-lg transition-all duration-300 relative",
-                          "hover:bg-[var(--color-primary)] hover:text-white",
-                          "data-[state=open]:bg-[var(--color-primary)] data-[state=open]:text-white",
-                          isActive(item.route) 
-                            ? "text-[var(--color-primary)] font-semibold" 
-                            : "text-gray-700"
-                        )}
-                      >
-                        <span className="relative">
-                          {getLabel(item)}
-                          {/* Active underline indicator */}
-                          {isActive(item.route) && (
-                            <span className="absolute -bottom-1 left-0 right-0 h-0.5 bg-[var(--color-secondary)] rounded-full" />
-                          )}
-                        </span>
-                      </NavigationMenuTrigger>
-                      <NavigationMenuContent>
-                        <ul className="grid w-[400px] gap-2 p-4 md:w-[500px] md:grid-cols-2 lg:w-[600px] bg-white rounded-xl shadow-2xl border border-[var(--color-primary)]/10 animate-in fade-in-0 zoom-in-95 duration-200">
-                          {item.children.map((child) => (
-                            <ListItem
-                              key={child.id}
-                              title={getLabel(child)}
-                              href={child.external ? child.route : `/${locale}${child.route}`}
-                              external={child.external}
-                            >
-                              {child.slug}
-                            </ListItem>
-                          ))}
-                        </ul>
-                      </NavigationMenuContent>
-                    </NavigationMenuItem>
-                  );
-                }
-
-                const active = isActive(item.route);
-
-                return (
-                  <NavigationMenuItem key={item.id}>
-                    {item.external ? (
-                      <NavigationMenuLink
-                        className={cn(
-                          "px-4 py-2 text-sm font-medium bg-transparent rounded-lg transition-all duration-300 cursor-pointer relative",
-                          "hover:bg-[var(--color-primary)] hover:text-white",
-                          active 
-                            ? "text-[var(--color-primary)] font-semibold" 
-                            : "text-gray-700"
-                        )}
-                        onClick={() => window.open(item.route, "_blank")}
-                      >
-                        <span className="relative">
-                          {getLabel(item)}
-                          {active && (
-                            <span className="absolute -bottom-1 left-0 right-0 h-0.5 bg-[var(--color-secondary)] rounded-full" />
-                          )}
-                        </span>
-                      </NavigationMenuLink>
-                    ) : (
-                      <NavigationMenuLink asChild>
-                        <Link 
-                          href={item.route}
+          <ClientOnly>
+            <NavigationMenu>
+              <NavigationMenuList className="gap-1">
+                {groupedItems.map((item) => {
+                  if (item.children.length > 0) {
+                    return (
+                      <NavigationMenuItem key={item.id}>
+                        <NavigationMenuTrigger 
                           className={cn(
                             "px-4 py-2 text-sm font-medium bg-transparent rounded-lg transition-all duration-300 relative",
+                            "hover:bg-[var(--color-primary)] hover:text-white",
+                            "data-[state=open]:bg-[var(--color-primary)] data-[state=open]:text-white",
+                            isActive(item.route) 
+                              ? "text-[var(--color-primary)] font-semibold" 
+                              : "text-gray-700"
+                          )}
+                        >
+                          <span className="relative">
+                            {getLabel(item)}
+                            {/* Active underline indicator */}
+                            {isActive(item.route) && (
+                              <span className="absolute -bottom-1 left-0 right-0 h-0.5 bg-[var(--color-secondary)] rounded-full" />
+                            )}
+                          </span>
+                        </NavigationMenuTrigger>
+                        <NavigationMenuContent>
+                          <ul className="min-w-[200px] py-1.5 px-1 bg-white/98 backdrop-blur-md rounded-lg shadow-lg shadow-black/5 border border-gray-100/80">
+                            {item.children.map((child) => {
+                              const childActive = isActive(child.route);
+                              
+                              return (
+                                <ListItem
+                                  key={child.id}
+                                  title={getLabel(child)}
+                                  href={child.external ? child.route : child.route}
+                                  external={child.external}
+                                  isActive={childActive}
+                                  locale={locale}
+                                />
+                              );
+                            })}
+                          </ul>
+                        </NavigationMenuContent>
+                      </NavigationMenuItem>
+                    );
+                  }
+
+                  const active = isActive(item.route);
+
+                  return (
+                    <NavigationMenuItem key={item.id}>
+                      {item.external ? (
+                        <NavigationMenuLink
+                          className={cn(
+                            "px-4 py-2 text-sm font-medium bg-transparent rounded-lg transition-all duration-300 cursor-pointer relative",
                             "hover:bg-[var(--color-primary)] hover:text-white",
                             active 
                               ? "text-[var(--color-primary)] font-semibold" 
                               : "text-gray-700"
                           )}
+                          onClick={() => window.open(item.route, "_blank")}
                         >
                           <span className="relative">
                             {getLabel(item)}
@@ -180,14 +167,34 @@ export function Header({ logoUrl, siteName, menuItems }: HeaderProps) {
                               <span className="absolute -bottom-1 left-0 right-0 h-0.5 bg-[var(--color-secondary)] rounded-full" />
                             )}
                           </span>
-                        </Link>
-                      </NavigationMenuLink>
-                    )}
-                  </NavigationMenuItem>
-                );
-              })}
-            </NavigationMenuList>
-          </NavigationMenu>
+                        </NavigationMenuLink>
+                      ) : (
+                        <NavigationMenuLink asChild>
+                          <Link 
+                            href={item.route}
+                            className={cn(
+                              "px-4 py-2 text-sm font-medium bg-transparent rounded-lg transition-all duration-300 relative",
+                              "hover:bg-[var(--color-primary)] hover:text-white",
+                              active 
+                                ? "text-[var(--color-primary)] font-semibold" 
+                                : "text-gray-700"
+                            )}
+                          >
+                            <span className="relative">
+                              {getLabel(item)}
+                              {active && (
+                                <span className="absolute -bottom-1 left-0 right-0 h-0.5 bg-[var(--color-secondary)] rounded-full" />
+                              )}
+                            </span>
+                          </Link>
+                        </NavigationMenuLink>
+                      )}
+                    </NavigationMenuItem>
+                  );
+                })}
+              </NavigationMenuList>
+            </NavigationMenu>
+          </ClientOnly>
         </nav>
 
         {/* Right side actions */}
@@ -399,43 +406,38 @@ export function Header({ logoUrl, siteName, menuItems }: HeaderProps) {
   );
 }
 
-// List item component for dropdown menus
+// List item component for dropdown menus - premium design
 const ListItem = ({
   className,
   title,
-  children,
   href,
   external,
-  ...props
+  isActive,
 }: {
   className?: string;
   title: string;
-  children: React.ReactNode;
+  description?: string;
   href: string;
   external?: boolean;
-} & React.AnchorHTMLAttributes<HTMLAnchorElement>) => {
+  icon?: React.ElementType;
+  isActive?: boolean;
+  locale: string;
+}) => {
   return (
     <li>
       <NavigationMenuLink asChild>
         <Link
           href={href}
           className={cn(
-            "block select-none space-y-1 rounded-lg p-3 leading-none no-underline outline-none transition-all duration-300",
-            "hover:bg-[var(--color-primary)] hover:text-white",
-            "focus:bg-[var(--color-primary)] focus:text-white",
-            "hover:shadow-lg",
+            "block w-full px-4 py-1.5 text-sm no-underline outline-none transition-all duration-200 rounded-md",
+            isActive 
+              ? "text-[var(--color-primary)] font-semibold bg-[var(--color-primary)]/12 border-l-2 border-[var(--color-primary)]" 
+              : "text-gray-700 hover:text-white hover:bg-[var(--color-primary)] hover:pl-5",
             className
           )}
           {...(external ? { target: "_blank", rel: "noopener noreferrer" } : {})}
-          {...props}
         >
-          <div className="text-sm font-semibold leading-none text-[var(--color-primary)] transition-colors duration-300">
-            {title}
-          </div>
-          <p className="line-clamp-2 text-sm leading-snug text-muted-foreground transition-colors duration-300">
-            {children}
-          </p>
-          <ChevronRight className="h-3 w-3 text-[var(--color-accent)] mt-2" />
+          <span className="whitespace-nowrap">{title}</span>
         </Link>
       </NavigationMenuLink>
     </li>
