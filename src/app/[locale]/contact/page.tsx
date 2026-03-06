@@ -473,8 +473,12 @@ export default function ContactPage() {
 
                             <Button
                               type="submit"
-                              className="w-full bg-[var(--color-primary)] hover:bg-[var(--color-primary)]/90 text-white"
-                              disabled={mutation.isPending}
+                              className={`w-full text-white cursor-pointer ${
+                                !form.formState.isValid || mutation.isPending
+                                  ? 'bg-gray-400 cursor-not-allowed'
+                                  : 'bg-[var(--color-primary)] hover:bg-[var(--color-primary)]/90'
+                              }`}
+                              disabled={!form.formState.isValid || mutation.isPending}
                             >
                               {mutation.isPending ? (
                                 <>

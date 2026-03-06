@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/lib/db';
 import { Resend } from 'resend';
 import nodemailer from 'nodemailer';
+import { randomUUID } from 'crypto';
 
 // Initialize Resend if API key is available
 const resend = process.env.RESEND_API_KEY ? new Resend(process.env.RESEND_API_KEY) : null;
@@ -55,6 +56,7 @@ export async function POST(request: NextRequest) {
     // Save to database
     const contactMessage = await db.contactMessage.create({
       data: {
+        id: randomUUID(),
         name,
         email,
         phone: phone || null,
