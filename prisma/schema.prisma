@@ -173,6 +173,190 @@ model ContactInfo {
   emailTo        String   @default("kalexane@gmail.com")
 }
 
+// Director's Message Page
+model DirectorMessage {
+  id                            String   @id @default("director-message")
+
+  // Hero Section
+  heroTitleFr                   String   @default("Mot du Directeur Exécutif")
+  heroTitleEn                   String   @default("Message from the Executive Director")
+  heroSubtitleFr                String?  @default("À propos")
+  heroSubtitleEn                String?  @default("About")
+  heroBadgeFr                   String?  @default("Leadership")
+  heroBadgeEn                   String?  @default("Leadership")
+
+  // Director Identity
+  directorFirstName             String?  @default("Jean")
+  directorLastName              String?  @default("Dupont")
+  directorCivility              String?  @default("M.")
+  directorPositionFr            String?  @default("Directeur Exécutif")
+  directorPositionEn            String?  @default("Executive Director")
+  directorPositionShortFr       String?  @default("Directeur")
+  directorPositionShortEn       String?  @default("Director")
+  directorPhotoUrl              String?
+  directorPhotoAltFr            String?
+  directorPhotoAltEn            String?
+  directorSignatureUrl          String?
+
+  // Summary/Intro
+  introTextFr                   String?
+  introTextEn                   String?
+  quoteFr                       String?
+  quoteEn                       String?
+
+  // Main Content (Rich Text)
+  contentFr                     String?
+  contentEn                     String?
+
+  // Biography
+  bioShortFr                    String?
+  bioShortEn                    String?
+  bioLongFr                     String?
+  bioLongEn                     String?
+  directorStartDate             DateTime?
+  directorExperienceYears       Int?
+  directorSpecialties           String?  // JSON array of specialties
+  directorDistinctions          String?  // JSON array of distinctions
+  directorLinkedInUrl           String?
+  directorTwitterUrl            String?
+
+  // Media
+  videoUrl                      String?
+  videoType                     String?  // youtube, vimeo, dailymotion
+  galleryImages                 String?  // JSON array of image URLs
+
+  // Statistics/Key Figures
+  showStats                     Boolean  @default(true)
+  stat1Value                    String?  @default("15+")
+  stat1LabelFr                  String?  @default("Années d'expérience")
+  stat1LabelEn                  String?  @default("Years of experience")
+  stat2Value                    String?  @default("50+")
+  stat2LabelFr                  String?  @default("Projets menés")
+  stat2LabelEn                  String?  @default("Projects led")
+  stat3Value                    String?  @default("20+")
+  stat3LabelFr                  String?  @default("Partenaires")
+  stat3LabelEn                  String?  @default("Partners")
+
+  // Key Messages (JSON arrays)
+  keyMessagesFr                 String?  // JSON array
+  keyMessagesEn                 String?  // JSON array
+  prioritiesFr                  String?  // JSON array
+  prioritiesEn                  String?  // JSON array
+  commitmentsFr                 String?  // JSON array
+  commitmentsEn                 String?  // JSON array
+
+  // CTA Buttons
+  cta1TextFr                    String?  @default("Voir notre équipe")
+  cta1TextEn                    String?  @default("View our team")
+  cta1Url                       String?  @default("/presentation/notre-equipe")
+  cta1External                  Boolean  @default(false)
+
+  cta2TextFr                    String?  @default("Télécharger le rapport annuel")
+  cta2TextEn                    String?  @default("Download annual report")
+  cta2Url                       String?
+  cta2External                  Boolean  @default(false)
+
+  cta3TextFr                    String?
+  cta3TextEn                    String?
+  cta3Url                       String?
+  cta3External                  Boolean  @default(false)
+
+  // Section Visibility
+  showHero                      Boolean  @default(true)
+  showKeyMessages               Boolean  @default(true)
+  showPriorities                Boolean  @default(true)
+  showBiography                 Boolean  @default(true)
+  showVideo                     Boolean  @default(false)
+  showGallery                   Boolean  @default(false)
+  showCta                       Boolean  @default(true)
+  showNavigation                Boolean  @default(true)
+
+  // SEO
+  metaTitleFr                   String?
+  metaTitleEn                   String?
+  metaDescriptionFr             String?
+  metaDescriptionEn             String?
+  ogImageUrl                    String?
+
+  // Publication
+  published                     Boolean  @default(false)
+  publishedAt                   DateTime?
+
+  // Layout Settings
+  portraitPosition              String?  @default("right")  // left, right
+  layoutStyle                   String?  @default("standard")  // standard, compact, wide
+
+  updatedAt                     DateTime @updatedAt
+}
+
+// Strategic Priorities Cards
+model DirectorPriority {
+  id              String   @id
+  directorMessageId String? @default("director-message")
+
+  titleFr         String
+  titleEn         String
+  descriptionFr   String?
+  descriptionEn   String?
+  icon            String?  @default("target")
+  imageUrl        String?
+  color           String?  @default("primary")
+  linkUrl         String?
+  linkExternal    Boolean  @default(false)
+  order           Int      @default(0)
+  visible         Boolean  @default(true)
+
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  @@index([order])
+  @@index([visible])
+}
+
+// Team Member for "Notre Équipe" page
+model TeamMember {
+  id              String   @id
+
+  firstName       String
+  lastName        String
+  civility        String?  @default("M.")
+
+  positionFr      String
+  positionEn      String
+  positionShortFr String?
+  positionShortEn String?
+
+  bioShortFr      String?
+  bioShortEn      String?
+  bioLongFr       String?
+  bioLongEn       String?
+
+  photoUrl        String?
+  photoAltFr      String?
+  photoAltEn      String?
+
+  email           String?
+  phone           String?
+  linkedInUrl     String?
+  twitterUrl      String?
+
+  department      String?
+  specialties     String?  // JSON array
+
+  order           Int      @default(0)
+  visible         Boolean  @default(true)
+  featured        Boolean  @default(false)
+
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  deletedAt       DateTime?
+
+  @@index([deletedAt])
+  @@index([order])
+  @@index([visible])
+  @@index([featured])
+}
+
 model ContactMessage {
   id           String    @id
   name         String
