@@ -429,10 +429,10 @@ const ListItem = ({
         <Link
           href={href}
           className={cn(
-            "block w-full px-4 py-1 text-sm no-underline outline-none transition-all duration-150 rounded-md",
+            "block w-full px-4 py-1.5 text-sm no-underline outline-none transition-all duration-200 rounded-md",
             isActive 
-              ? "text-[var(--color-primary)] font-medium bg-[var(--color-primary)]/8" 
-              : "text-gray-600 hover:text-[var(--color-primary)] hover:bg-gray-50",
+              ? "text-[var(--color-primary)] font-semibold bg-[var(--color-primary)]/12 border-l-2 border-[var(--color-primary)]" 
+              : "text-gray-700 hover:text-white hover:bg-[var(--color-primary)] hover:pl-5",
             className
           )}
           {...(external ? { target: "_blank", rel: "noopener noreferrer" } : {})}
